@@ -1,8 +1,8 @@
 const NotFound=()=>{
 
     return(
-        <div>
-            <h1>404 NotFound</h1>
+        <div className="flex justify-center items-center">
+            <h1 className="text-red-600 font-bold">404 NotFound</h1>
         </div>
     )
 }
