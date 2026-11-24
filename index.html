@@ -1,13 +1,58 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>brainxnext-learning-platform-frontend</title>
+    <meta
+      name="description"
+      content="BrainXNext is a structured learning platform for engineers, designers and analysts — free courses and notes in Bangla, with projects, mentor review and certificates on Pro."
+    />
+    <meta name="theme-color" content="#0A1B33" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BrainXNext" />
+    <meta property="og:title" content="BrainXNext — Learn · Build · Grow" />
+    <meta
+      property="og:description"
+      content="BrainXNext is a structured learning platform for engineers, designers and analysts — free courses and notes in Bangla, with projects, mentor review and certificates on Pro."
+    />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="BrainXNext — Learn · Build · Grow" />
+    <meta
+      name="twitter:description"
+      content="BrainXNext is a structured learning platform for engineers, designers and analysts — free courses and notes in Bangla, with projects, mentor review and certificates on Pro."
+    />
+    <meta name="twitter:image" content="/icon-512.png" />
+    <title>BrainXNext — Learn · Build · Grow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..600,0..1,0&display=block"
+    />
+
+    <!-- Apply the saved theme before first paint to avoid a light/dark flash -->
+    <script>
+      try {
+        // zustand persists { state: { theme } }; older builds stored the bare string
+        var raw = localStorage.getItem("bx-theme");
+        var t = raw && raw.charAt(0) === "{" ? (JSON.parse(raw).state || {}).theme : raw;
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
