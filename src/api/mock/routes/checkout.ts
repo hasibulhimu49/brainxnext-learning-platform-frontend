@@ -27,6 +27,7 @@ const DECLINED_ACCOUNT = "•••• 0000";
 /** A paid order grants what it sold and counts its promo code. */
 const fulfil = (order: OrderRecord) => {
   if (order.userEmail && order.kind === "course") enroll(order.userEmail, order.itemId, "purchase");
+  if (order.userEmail && order.kind === "cart") for (const item of order.items ?? []) enroll(order.userEmail, item.courseId, "purchase");
   if (order.userEmail && order.kind === "plan") startSubscription(order.userEmail, order.cycle ?? "monthly");
   if (order.promoCode) {
     promos.update(
@@ -103,6 +104,32 @@ const placeOrder = (req: MockRequest) => {
       itemTitle: cycle === "yearly" ? "Pro plan (yearly)" : "Pro plan (monthly)",
       cycle,
       ...priced(PRO_PRICE[cycle], code),
+    });
+  }
+
+  if (kind === "cart") {
+    const ids = Array.isArray(b.courseIds) ? [...new Set(b.courseIds.filter((x): x is string => typeof x === "string"))] : [];
+    if (ids.length === 0) return invalid([{ path: ["courseIds"], message: "Your cart is empty" }]);
+    if (isPro(user.email)) return fail(409, CODES.alreadySubscribed, "Every course is already included in your Pro plan.");
+    const items = [];
+    for (const id of ids) {
+      const c = findCourse(id);
+      if (!c) return fail(404, CODES.notFound, "One of the courses in your cart no longer exists.");
+      if (c.free) return fail(400, CODES.validation, `${c.title} is free — enrol from the course page.`);
+      if (findEnrollment(user.email, c.id)) return fail(409, CODES.alreadyEnrolled, `You already own ${c.title}.`);
+      items.push({ courseId: c.id, title: c.title, price: c.price });
+    }
+    return createPaidOrPending({
+      ...base,
+      ...who,
+      kind: "cart",
+      itemId: "cart",
+      itemTitle: items.length === 1 ? (items[0]?.title ?? "1 course") : `${items.length} courses`,
+      items,
+      ...priced(
+        items.reduce((sum, i) => sum + i.price, 0),
+        code
+      ),
     });
   }
 

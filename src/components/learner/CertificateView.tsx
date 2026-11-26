@@ -1,46 +1,108 @@
 import Icon from "@/components/common/Icon";
 import LogoMark from "@/components/common/LogoMark";
+import { CERTIFICATE_SIGNATORY } from "@/constants/certificate";
 import { formatDate } from "@/lib/dates";
 import type { CertificateRecord } from "@/types/account";
 
-/** The certificate itself (holder, course, issued, mentor, id). Used by /certificates/:id and /verify/:id. */
+/*
+ * Landscape A4 certificate (297 × 210). Sizes use container units (cqw), so it scales like a
+ * printed document at any width and prints as one page (see `.certificate` in index.css).
+ * Colours are fixed "paper" colours, not theme tokens: a certificate stays light in dark mode.
+ */
+
+const SERIF = { fontFamily: 'Georgia, "Times New Roman", serif' };
+
+const Signature = ({ name, title }: { name: string; title: string }) => (
+  <div className="flex w-[27cqw] flex-col items-center gap-[0.6cqw] text-center">
+    <span className="text-[2.4cqw] leading-none whitespace-nowrap text-[#0A1B33] italic" style={SERIF}>
+      {name}
+    </span>
+    <span className="h-px w-full bg-[#0A1B33]/35" />
+    <span className="text-[1.15cqw] font-bold tracking-[0.08em] text-[#5B6B80] uppercase">{title}</span>
+  </div>
+);
+
+/** Gold seal with the certificate badge. */
+const Seal = () => (
+  <div
+    className="relative flex aspect-square w-[12cqw] flex-none items-center justify-center rounded-full shadow-[0_0.6cqw_1.6cqw_rgba(184,134,43,.35)]"
+    style={{ background: "radial-gradient(circle at 35% 30%, #FBE7A1, #E9B949 45%, #B8862B 100%)" }}
+    aria-hidden="true"
+  >
+    <span className="absolute inset-[0.8cqw] rounded-full border-[0.2cqw] border-dashed border-white/70" />
+    <span className="flex flex-col items-center leading-none text-[#5C3D0A]">
+      <Icon name="workspace_premium" className="text-[4.6cqw]!" />
+      <span className="mt-[0.3cqw] text-[0.95cqw] font-extrabold tracking-[0.14em]">VERIFIED</span>
+    </span>
+  </div>
+);
+
+/** The certificate itself. Used by /certificates/:id (print / PDF) and the public /verify/:id page. */
 const CertificateView = ({ cert }: { cert: CertificateRecord }) => {
-  const meta = [
-    { label: "ISSUED", value: formatDate(cert.issuedAt) },
-    { label: "MENTOR", value: cert.mentor },
-    { label: "CERTIFICATE ID", value: cert.id, mono: true },
-  ];
+  const verifyUrl = `${typeof window === "undefined" ? "" : window.location.host}/verify/${cert.id}`;
   return (
-    <article className="overflow-hidden rounded-[26px] border border-line bg-surface shadow-pop">
-      <div className="h-2.5 bg-[linear-gradient(90deg,#1B6FD0,#0E97B0_55%,#F7C948)]" />
-      <div className="relative flex flex-col gap-6.5 px-5.5 py-8 sm:px-12 sm:py-11">
-        <Icon name="workspace_premium" size={170} className="pointer-events-none absolute top-9 right-11 text-ink opacity-[.07]" />
-        <div className="flex flex-wrap items-center justify-between gap-3.5">
-          <span className="flex items-center gap-2.5">
-            <LogoMark size={40} className="shadow-none!" />
-            <span className="font-display text-[17px] font-extrabold text-ink">BrainXNext</span>
+    <article
+      aria-label={`Certificate of completion for ${cert.holder}`}
+      className="certificate @container relative aspect-[297/210] w-full overflow-hidden rounded-[18px] bg-[#FFFDF7] text-[#0A1B33] shadow-pop print:rounded-none print:shadow-none"
+    >
+      {/* fine background pattern + soft brand glows */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[.5]"
+        style={{
+          background:
+            "radial-gradient(60% 50% at 0% 0%, rgba(27,111,208,.08), transparent 70%), radial-gradient(50% 45% at 100% 100%, rgba(233,162,27,.12), transparent 70%), repeating-linear-gradient(45deg, rgba(10,27,51,.025) 0 1px, transparent 1px 12px)",
+        }}
+      />
+      {/* double frame */}
+      <div className="pointer-events-none absolute inset-[1.6cqw] rounded-[1cqw] border-[0.35cqw] border-[#C9A24A]" />
+      <div className="pointer-events-none absolute inset-[2.5cqw] rounded-[0.6cqw] border-[0.12cqw] border-[#C9A24A]/60" />
+
+      <div className="relative flex h-full flex-col items-center justify-between px-[7cqw] pt-[5.2cqw] pb-[4.4cqw] text-center">
+        <div className="flex flex-col items-center gap-[1cqw]">
+          <span className="flex items-center gap-[1cqw]">
+            <span className="block w-[4.4cqw]">
+              <LogoMark size={44} className="h-auto! w-full! shadow-none!" />
+            </span>
+            <span className="font-display text-[2.3cqw] font-extrabold tracking-[-0.01em]">
+              BrainX<span className="text-[#1B6FD0]">Next</span>
+            </span>
           </span>
-          <span className="text-[11px] font-extrabold tracking-[0.14em] text-soft">CERTIFICATE OF COMPLETION</span>
+          <span className="mt-[0.8cqw] font-display text-[4.6cqw] leading-none font-extrabold tracking-[0.22em]">CERTIFICATE</span>
+          <span className="flex items-center gap-[1.2cqw] text-[1.35cqw] font-extrabold tracking-[0.32em] text-[#B8862B]">
+            <span className="h-px w-[5cqw] bg-[#C9A24A]" />
+            OF COMPLETION
+            <span className="h-px w-[5cqw] bg-[#C9A24A]" />
+          </span>
         </div>
-        <div className="flex flex-col gap-3.5">
-          <span className="text-[13.5px] font-semibold text-muted">This certifies that</span>
-          <span className="w-max max-w-full border-b-2 border-line pb-3.5 font-display text-[clamp(28px,4vw,40px)] font-extrabold tracking-[-0.02em] text-ink">
+
+        <div className="flex flex-col items-center gap-[1.1cqw]">
+          <span className="text-[1.5cqw] font-semibold text-[#5B6B80]">This is to certify that</span>
+          <span className="text-[5.4cqw] leading-[1.05] text-[#0A1B33] italic" style={SERIF}>
             {cert.holder}
           </span>
-          <span className="text-[13.5px] font-semibold text-muted">
-            has successfully completed all {cert.lessons} lessons and the final project of
+          <span className="h-[0.15cqw] w-[38cqw] bg-[linear-gradient(90deg,transparent,#C9A24A,transparent)]" />
+          <span className="max-w-[62cqw] text-[1.5cqw] leading-normal font-semibold text-[#5B6B80]">
+            has successfully completed all {cert.lessons} lessons and the mentor-reviewed final project of
           </span>
-          <span className="text-grad font-display text-[clamp(19px,2.6vw,25px)] font-extrabold tracking-[-0.01em]">{cert.course}</span>
+          <span className="font-display text-[2.9cqw] leading-tight font-extrabold tracking-[-0.01em] text-[#1B6FD0]">{cert.course}</span>
         </div>
-        <div className="grid grid-cols-2 gap-4 border-t border-line pt-5.5 sm:grid-cols-3">
-          {meta.map((m) => (
-            <span key={m.label} className="flex min-w-0 flex-col gap-1">
-              <span className="text-[10.5px] font-extrabold tracking-widest text-soft">{m.label}</span>
-              <span className={`text-[13.5px] font-extrabold wrap-break-word ${m.mono ? "font-mono text-brand" : "text-ink"}`}>
-                {m.value}
-              </span>
-            </span>
-          ))}
+
+        <div className="flex w-full items-end justify-between">
+          <Signature name={cert.mentor} title="Course mentor" />
+          <Seal />
+          <Signature name={CERTIFICATE_SIGNATORY.name} title={CERTIFICATE_SIGNATORY.title} />
+        </div>
+
+        <div className="flex w-full flex-wrap items-center justify-center gap-x-[2.4cqw] gap-y-[0.4cqw] text-[1.1cqw] font-bold text-[#5B6B80]">
+          <span>
+            Issued <span className="text-[#0A1B33]">{formatDate(cert.issuedAt)}</span>
+          </span>
+          <span>
+            ID <span className="font-mono text-[#0A1B33]">{cert.id}</span>
+          </span>
+          <span>
+            Verify at <span className="text-[#1B6FD0]">{verifyUrl}</span>
+          </span>
         </div>
       </div>
     </article>

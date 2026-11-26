@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
 import { BrowserRouter } from "react-router-dom";
+import AssistantWidget from "@/components/assistant/AssistantWidget";
 import AppErrorBoundary from "@/components/common/AppErrorBoundary";
 import LogoutListener from "@/components/common/LogoutListener";
 import ScrollToTop from "@/components/common/ScrollToTop";
@@ -20,6 +21,7 @@ const App = () => {
         <AppErrorBoundary>
           <AppRoutes />
         </AppErrorBoundary>
+        <AssistantWidget />
         <Toaster />
       </BrowserRouter>
       {import.meta.env.DEV && <ReactQueryDevtools buttonPosition="bottom-left" />}

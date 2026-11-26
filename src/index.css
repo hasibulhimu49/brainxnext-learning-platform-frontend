@@ -534,3 +534,26 @@
     translate: none !important;
   }
 }
+
+/* Certificate print / "Save as PDF": only the certificate, one landscape A4 page, true colours */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+  body:has(.certificate) * {
+    visibility: hidden;
+  }
+  body:has(.certificate) .certificate,
+  body:has(.certificate) .certificate * {
+    visibility: visible;
+  }
+  body:has(.certificate) .certificate {
+    position: fixed;
+    inset: 0;
+    width: 297mm;
+    height: 210mm;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

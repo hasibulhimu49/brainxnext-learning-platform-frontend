@@ -34,7 +34,7 @@ const Notes = () => {
         <div className="mx-auto max-w-310">
           <QueryStatus query={handbooks}>
             {(books) => (
-              <div className="grid grid-cols-1 gap-5 min-[1001px]:grid-cols-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-4">
                 {books.map((b) => (
                   <div key={b.name} className="card card-hover flex flex-col items-center gap-1.5 px-6 pt-8 pb-6 text-center">
                     <span

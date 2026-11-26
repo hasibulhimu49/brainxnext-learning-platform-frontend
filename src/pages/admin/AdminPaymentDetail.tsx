@@ -120,12 +120,21 @@ const PaymentView = ({ detail: { order, timeline } }: { detail: Detail }) => {
             <InfoList
               items={[
                 {
-                  label: order.kind === "course" ? "Course" : order.kind === "plan" ? "Plan" : "Donation",
+                  label:
+                    order.kind === "course" ? "Course" : order.kind === "cart" ? "Courses" : order.kind === "plan" ? "Plan" : "Donation",
                   value:
                     order.kind === "course" ? (
                       <Link to={`/admin/courses/${order.itemId}`} className="text-brand">
                         {order.itemTitle}
                       </Link>
+                    ) : order.kind === "cart" ? (
+                      <span className="flex flex-col gap-1">
+                        {(order.items ?? []).map((i) => (
+                          <Link key={i.courseId} to={`/admin/courses/${i.courseId}`} className="text-brand">
+                            {i.title}
+                          </Link>
+                        ))}
+                      </span>
                     ) : (
                       order.itemTitle
                     ),

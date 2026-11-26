@@ -164,7 +164,7 @@ const Home = () => {
             lead="No 40-hour video dumps. Every course is a fixed ladder of lessons ending in something you built."
             className="mb-11"
           />
-          <div className="grid grid-cols-1 gap-4.5 min-[1001px]:grid-cols-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4.5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-4">
             {FEATURES.map((f) => (
               <div key={f.title} className="card card-hover px-6 py-7">
                 <span
@@ -222,7 +222,7 @@ const Home = () => {
             <QueryStatus query={coursesQuery}>{() => null}</QueryStatus>
           ) : shown.length > 0 ? (
             // phones show the first four; the full list is one tap away in the catalog
-            <div className="grid grid-cols-1 gap-5 min-[1001px]:grid-cols-3 sm:grid-cols-2 max-sm:[&>*:nth-child(n+5)]:hidden">
+            <div className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3 min-[1240px]:grid-cols-4 max-sm:[&>*:nth-child(n+5)]:hidden">
               {shown.map((c) => (
                 <CourseCard key={c.id} course={c} variant="featured" />
               ))}
@@ -316,7 +316,7 @@ const Home = () => {
             lead="Cancel anytime — courses you bought stay yours forever."
             className="mb-11 max-w-160"
           />
-          <div className="grid grid-cols-1 items-stretch gap-5 min-[1001px]:grid-cols-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3">
             {PLANS.map((p) => (
               <PricingCard key={p.name} {...p} />
             ))}

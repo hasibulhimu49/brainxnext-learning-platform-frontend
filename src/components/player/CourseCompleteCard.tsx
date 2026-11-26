@@ -61,6 +61,14 @@ const CourseCompleteCard = ({ course, entitled, certificateId }: CourseCompleteC
             )}
           </>
         )}
+        {/* F-006: finishing is the best moment to ask for a review */}
+        <Link
+          to={`/courses/${course.id}#reviews`}
+          className="btn border border-white/25 bg-white/10 px-5.5 py-3 text-[14px] text-white hover:text-white"
+        >
+          <Icon name="star" size={18} />
+          Rate this course
+        </Link>
       </div>
     </div>
   </section>

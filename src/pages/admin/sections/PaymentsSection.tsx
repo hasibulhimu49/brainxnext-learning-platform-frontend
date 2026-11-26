@@ -31,7 +31,15 @@ const COLUMNS: Column<OrderRecord>[] = [
     render: (o) => (
       <Name
         title={o.itemTitle}
-        sub={o.kind === "plan" ? `Plan · ${o.cycle ?? "monthly"}` : o.kind === "donation" ? "Donation" : "Course"}
+        sub={
+          o.kind === "plan"
+            ? `Plan · ${o.cycle ?? "monthly"}`
+            : o.kind === "donation"
+              ? "Donation"
+              : o.kind === "cart"
+                ? `Cart · ${o.items?.length ?? 0} courses`
+                : "Course"
+        }
       />
     ),
   },

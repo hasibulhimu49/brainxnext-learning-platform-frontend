@@ -1,5 +1,6 @@
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import HandbookDownload from "@/components/checkout/HandbookDownload";
+import { YouTubeSubscribe } from "@/components/common/SocialIcons";
 import Icon from "@/components/common/Icon";
 import { parseSupportAmount } from "@/constants/support";
 import usePageTitle from "@/hooks/usePageTitle";
@@ -47,6 +48,10 @@ const ThankYou = () => {
             Back to handbooks
           </Link>
         )}
+        <div className="flex flex-col items-center gap-2 border-t border-line pt-4.5">
+          <span className="text-[13px] font-semibold text-muted">Get free lessons every week on YouTube</span>
+          <YouTubeSubscribe />
+        </div>
       </div>
     </AuthLayout>
   );

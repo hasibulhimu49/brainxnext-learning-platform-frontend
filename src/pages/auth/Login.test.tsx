@@ -31,7 +31,7 @@ describe("<Login />", () => {
 
   it("signs a student in and goes straight to the dashboard", async () => {
     renderWithProviders(<Login />, { route: "/login" });
-    await fill("hasibulx26@gmail.com", "password123");
+    await fill("hasibulx26@gmail.com", "12345678");
     expect(await screen.findByText("Dashboard page")).toBeInTheDocument();
     expect(useAuthStore.getState().user?.name).toBe("Mohammad Hasibul Hasan");
     expect(localStorage.getItem(AUTH_STORAGE_KEY)).toContain("mock.");
@@ -46,13 +46,13 @@ describe("<Login />", () => {
   it("honours an internal ?next= and explains why the user is here", async () => {
     renderWithProviders(<Login />, { route: "/login?next=%2Fcheckout%2Fapplied-ml", stubs: ["/checkout/:courseId"] });
     expect(screen.getByRole("status")).toHaveTextContent("Log in to finish your purchase");
-    await fill("hasibulx26@gmail.com", "password123");
+    await fill("hasibulx26@gmail.com", "12345678");
     expect(await screen.findByText("Stub: /checkout/:courseId /checkout/applied-ml")).toBeInTheDocument();
   });
 
   it("ignores an external ?next=", async () => {
     renderWithProviders(<Login />, { route: "/login?next=%2F%2Fevil.com" });
-    await fill("hasibulx26@gmail.com", "password123");
+    await fill("hasibulx26@gmail.com", "12345678");
     expect(await screen.findByText("Dashboard page")).toBeInTheDocument();
   });
 
@@ -63,7 +63,7 @@ describe("<Login />", () => {
 
   it("keeps the session for this tab only when Remember me is unticked", async () => {
     renderWithProviders(<Login />, { route: "/login" });
-    await fill("hasibulx26@gmail.com", "password123", { remember: false });
+    await fill("hasibulx26@gmail.com", "12345678", { remember: false });
     await screen.findByText("Dashboard page");
     expect(sessionStorage.getItem(AUTH_STORAGE_KEY)).toContain("mock.");
     expect(localStorage.getItem(AUTH_STORAGE_KEY)).toBeNull();

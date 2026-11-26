@@ -5,7 +5,15 @@ import type { PaymentMethod } from "./account";
  * Provisional shapes for the mock API — replace with the backend contract when it is documented.
  */
 
-export type OrderKind = "course" | "plan" | "donation";
+export type OrderKind = "course" | "plan" | "donation" | "cart";
+
+/** One course line of a cart order (F-004). */
+export interface OrderItem {
+  courseId: string;
+  title: string;
+  /** whole taka, before the order-level promo */
+  price: number;
+}
 export type OrderStatus = "paid" | "pending" | "failed" | "refund_requested" | "refunded";
 export type BillingCycle = "monthly" | "yearly";
 
@@ -15,7 +23,7 @@ export interface OrderRecord {
   userEmail: string | null;
   userName: string;
   kind: OrderKind;
-  /** course id, plan id ("pro" | "teams") or "donation" */
+  /** course id, plan id ("pro" | "teams"), "donation" or "cart" */
   itemId: string;
   itemTitle: string;
   cycle?: BillingCycle;
@@ -30,6 +38,8 @@ export interface OrderRecord {
   refundReason?: string;
   /** masked payer account, e.g. "•••• 4242" (card) or "•••• 5678" (wallet) — added by F-002 Phase 2 */
   account?: string;
+  /** cart orders only: every course bought (F-004) */
+  items?: OrderItem[];
 }
 
 export interface Promo {

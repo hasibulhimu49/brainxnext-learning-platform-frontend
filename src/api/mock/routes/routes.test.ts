@@ -15,7 +15,7 @@ const loginAs = async (email: string, password: string) => {
 
 describe("mock API — enrolment and progress", () => {
   beforeEach(async () => {
-    await loginAs("hasibulx26@gmail.com", "password123");
+    await loginAs("hasibulx26@gmail.com", "12345678");
   });
 
   it("seeds the demo student with the dashboard courses", async () => {
@@ -92,7 +92,7 @@ describe("mock API — access control", () => {
 
   it("keeps admin endpoints for admins (401 guest, 403 student)", async () => {
     await expect(adminService.overview()).rejects.toMatchObject({ status: 401 });
-    await loginAs("hasibulx26@gmail.com", "password123");
+    await loginAs("hasibulx26@gmail.com", "12345678");
     await expect(adminService.overview()).rejects.toMatchObject({ status: 403, code: API_ERROR_CODES.forbidden });
     await loginAs("admin@brainxnext.com", "admin12345");
     await expect(adminService.overview()).resolves.toHaveProperty("kpis");

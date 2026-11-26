@@ -62,6 +62,8 @@ export const API_ERROR_CODES = {
   alreadySubscribed: "ALREADY_SUBSCRIBED",
   upgradeRequired: "UPGRADE_REQUIRED",
   refundNotAllowed: "REFUND_NOT_ALLOWED",
+  // F-006 (provisional)
+  reviewTooEarly: "REVIEW_TOO_EARLY",
 } as const;
 
 export class ApiError extends Error {

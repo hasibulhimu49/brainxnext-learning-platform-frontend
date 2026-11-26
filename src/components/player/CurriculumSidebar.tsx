@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Icon from "@/components/common/Icon";
 import type { FlatLesson } from "@/lib/lessons";
 import type { CourseModule } from "@/types/course";
+import type { QuizScore } from "@/types/quiz";
 
 interface CurriculumSidebarProps {
   curriculum: CourseModule[];
@@ -12,10 +14,29 @@ interface CurriculumSidebarProps {
   onSelect: (id: string) => void;
   /** tag free preview lessons (when the course is not owned) */
   showPreview: boolean;
+  /** F-007: link each module's quiz (enrolled learners only) with the best score */
+  quizzes?: { courseId: string; scores: QuizScore[] };
 }
 
+/** The module quiz row at the end of a module (F-007). */
+const QuizLink = ({ courseId, module, score }: { courseId: string; module: number; score?: QuizScore }) => (
+  <Link
+    to={`/learn/${courseId}/quiz/${module + 1}`}
+    className="mx-2.5 flex items-center gap-2.75 rounded-xl px-3 py-2.5 text-ink transition-colors hover:bg-surface2 hover:text-ink"
+  >
+    <Icon name="quiz" size={18} className={score?.passed ? "text-success" : "text-brand"} />
+    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <span className="text-[12.5px] leading-[1.35] font-extrabold">Module quiz</span>
+      <span className="text-[11px] font-bold text-soft">
+        {score ? `Best ${score.best}/${score.total}${score.passed ? " · Passed" : ""}` : "Practice · 4 questions"}
+      </span>
+    </span>
+    {score?.passed && <Icon name="check_circle" size={17} className="text-success" />}
+  </Link>
+);
+
 /** "Course content" accordion: one module open at a time, lessons with done / current / locked state. */
-const CurriculumSidebar = ({ curriculum, lessons, currentId, done, isLocked, onSelect, showPreview }: CurriculumSidebarProps) => {
+const CurriculumSidebar = ({ curriculum, lessons, currentId, done, isLocked, onSelect, showPreview, quizzes }: CurriculumSidebarProps) => {
   const currentModule = lessons.find((l) => l.id === currentId)?.moduleIndex ?? 0;
   const [openModule, setOpenModule] = useState(currentModule);
 
@@ -80,6 +101,7 @@ const CurriculumSidebar = ({ curriculum, lessons, currentId, done, isLocked, onS
                     </button>
                   );
                 })}
+                {quizzes && <QuizLink courseId={quizzes.courseId} module={mi} score={quizzes.scores.find((s) => s.module === mi)} />}
               </div>
             )}
           </div>

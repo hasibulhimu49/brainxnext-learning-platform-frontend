@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Icon from "./Icon";
 import Logo from "./Logo";
+import CartButton from "./CartButton";
 import ThemeToggle from "./ThemeToggle";
 import useTheme from "@/hooks/useTheme";
 import NotificationsMenu from "@/components/learner/NotificationsMenu";
@@ -16,9 +17,10 @@ interface NavItem {
 }
 
 /*
- * One stable public set (F-002 E5): Home · Courses · Notes · Pricing · About · Help · Contact,
- * the same on every marketing page and in the mobile menu.
- * The signed-in set ends with Contact on the dashboard and Settings on the settings page.
+ * The navbar depends only on whether you're signed in — never on the page — so it looks the same everywhere:
+ * - signed out: Home · Courses · Notes · Pricing · About · Help · Contact, then Login / Sign up
+ * - signed in:  Dashboard (or Admin) · Courses · Notes · Pricing · Help · Contact, then notifications, avatar, log out
+ * The lesson player, checkout and auth screens use their own focused headers on purpose.
  */
 const PUBLIC_LINKS: NavItem[] = [
   { to: "/", label: "Home", end: true },
@@ -30,11 +32,13 @@ const PUBLIC_LINKS: NavItem[] = [
   { to: "/contact", label: "Contact" },
 ];
 
-const appLinks = (onSettings: boolean): NavItem[] => [
-  { to: "/dashboard", label: "Dashboard" },
+const signedInLinks = (home: string, homeLabel: string): NavItem[] => [
+  { to: home, label: homeLabel },
   { to: "/courses", label: "Courses" },
   { to: "/notes", label: "Notes" },
-  onSettings ? { to: "/settings", label: "Settings" } : { to: "/contact", label: "Contact" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/help", label: "Help" },
+  { to: "/contact", label: "Contact" },
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -42,18 +46,12 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-chip font-bold text-brand" : "font-semibold text-muted hover:bg-chip hover:text-brand"
   }`;
 
-/**
- * Sticky top navigation.
- * variant="public" — marketing pages (Login / Sign up when signed out; Dashboard/Admin + avatar when signed in)
- * variant="app"    — signed-in pages (notifications, avatar, logout)
- */
-const Navbar = ({ variant = "public" }: { variant?: "public" | "app" }) => {
+/** Sticky top navigation — one navbar for every page that has one. */
+const Navbar = () => {
   const { pathname } = useLocation();
   // the mobile menu remembers the path it was opened on, so it closes itself after navigating
   const [openOn, setOpenOn] = useState<string | null>(null);
   const open = openOn === pathname;
-  const onSettings = pathname.startsWith("/settings");
-  const links = variant === "app" ? appLinks(onSettings) : PUBLIC_LINKS;
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   // Escape closes the mobile menu and puts focus back on its toggle
@@ -73,13 +71,14 @@ const Navbar = ({ variant = "public" }: { variant?: "public" | "app" }) => {
   const initial = user?.name[0]?.toUpperCase() ?? "";
   const home = homeFor(user?.role);
   const homeLabel = user?.role === "admin" ? "Admin" : "Dashboard";
+  const links = user ? signedInLinks(home, homeLabel) : PUBLIC_LINKS;
 
   const avatar = (
     <Link
       to="/settings"
       title="Profile & settings"
       aria-label="Profile & settings"
-      className="bg-grad-amber flex h-10 w-10 flex-none items-center justify-center rounded-full font-display text-[15px] font-extrabold text-cocoa"
+      className="bg-grad-amber flex h-10 w-10 flex-none items-center justify-center rounded-full font-display text-[15px] font-extrabold text-cocoa max-[399px]:size-9"
     >
       {initial}
     </Link>
@@ -98,47 +97,45 @@ const Navbar = ({ variant = "public" }: { variant?: "public" | "app" }) => {
           ))}
         </div>
 
-        <div className="ml-auto flex min-w-0 items-center gap-1.5 min-[400px]:gap-2.25 min-[1001px]:ml-2">
-          {/* very narrow phones: the toggle moves into the menu so the bar fits */}
-          <ThemeToggle className="max-[380px]:hidden" />
+        {/* under 400px the round buttons shrink to 36px so logo + cart + menu fit on a 360px phone */}
+        <div className="ml-auto flex min-w-0 items-center gap-1.5 min-[400px]:gap-2.25 min-[1001px]:ml-2 min-[1001px]:max-[1099px]:gap-1.5! max-[399px]:[&_.icon-btn]:size-9">
+          {/* phones: the theme toggle and wishlist move into the menu so the cart fits */}
+          <ThemeToggle className="max-sm:hidden" />
+          <Link
+            to="/wishlist"
+            aria-label="Wishlist"
+            title="Wishlist"
+            className="icon-btn text-ink max-sm:hidden min-[1001px]:max-[1199px]:hidden"
+          >
+            <Icon name="favorite" size={20} />
+          </Link>
+          <CartButton />
 
-          {variant === "app" ? (
+          {user ? (
             <>
-              {!onSettings && <NotificationsMenu />}
+              <NotificationsMenu />
               {avatar}
-              {!onSettings && (
-                <button
-                  type="button"
-                  title="Log out"
-                  aria-label="Log out"
-                  onClick={handleLogout}
-                  className="icon-btn hidden text-muted hover:border-danger! hover:text-danger! sm:inline-flex"
-                >
-                  <Icon name="logout" size={19} />
-                </button>
-              )}
-            </>
-          ) : user ? (
-            <>
-              <Link
-                to={home}
-                className="btn btn-primary hidden px-5.5 py-2.75 shadow-[0_6px_18px_rgba(27,111,208,.35)]! hover:shadow-[0_12px_26px_rgba(27,111,208,.45)]! sm:inline-flex"
+              <button
+                type="button"
+                title="Log out"
+                aria-label="Log out"
+                onClick={handleLogout}
+                className="icon-btn hidden text-muted hover:border-danger! hover:text-danger! sm:inline-flex"
               >
-                {homeLabel}
-              </Link>
-              {avatar}
+                <Icon name="logout" size={19} />
+              </button>
             </>
           ) : (
             <>
               <Link
                 to="/login"
-                className="hidden rounded-full border-[1.5px] border-line px-4.5 py-2.5 text-sm font-bold whitespace-nowrap text-ink transition-all hover:border-brand hover:text-brand sm:inline-flex"
+                className="hidden rounded-full border-[1.5px] border-line px-4.5 py-2.5 text-sm font-bold whitespace-nowrap text-ink transition-all hover:border-brand hover:text-brand min-[1001px]:max-[1099px]:px-3.5 sm:inline-flex"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="btn btn-primary px-4 py-2.75 whitespace-nowrap shadow-[0_6px_18px_rgba(27,111,208,.35)]! hover:shadow-[0_12px_26px_rgba(27,111,208,.45)]! min-[400px]:px-5.5"
+                className="btn btn-primary px-4 py-2.75 whitespace-nowrap shadow-[0_6px_18px_rgba(27,111,208,.35)]! hover:shadow-[0_12px_26px_rgba(27,111,208,.45)]! min-[400px]:px-5.5 min-[1001px]:max-[1099px]:px-4!"
               >
                 Sign up
               </Link>
@@ -167,21 +164,20 @@ const Navbar = ({ variant = "public" }: { variant?: "public" | "app" }) => {
                 {l.label}
               </NavLink>
             ))}
+            <NavLink to="/wishlist" className={(a) => `${linkClass(a)} sm:hidden`}>
+              Wishlist
+            </NavLink>
             <button
               type="button"
               onClick={toggleTheme}
-              className="flex items-center gap-2 rounded-[10px] px-3.75 py-2.25 text-left text-sm font-semibold text-muted min-[381px]:hidden"
+              className="flex items-center gap-2 rounded-[10px] px-3.75 py-2.25 text-left text-sm font-semibold text-muted sm:hidden"
             >
               <Icon name={theme === "light" ? "dark_mode" : "light_mode"} size={18} />
               {theme === "light" ? "Dark mode" : "Light mode"}
             </button>
-            {variant === "public" && !user ? (
+            {!user ? (
               <NavLink to="/login" className={linkClass}>
                 Login
-              </NavLink>
-            ) : variant === "public" ? (
-              <NavLink to={home} className={linkClass}>
-                {homeLabel}
               </NavLink>
             ) : (
               <button

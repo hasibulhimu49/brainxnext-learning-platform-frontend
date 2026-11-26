@@ -11,6 +11,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // unit tests check the real admin lock; the open demo mode is covered by e2e
+    env: { VITE_OPEN_ADMIN: "false" },
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],

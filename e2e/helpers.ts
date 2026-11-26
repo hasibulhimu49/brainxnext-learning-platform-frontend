@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 
-export const STUDENT = { email: "hasibulx26@gmail.com", password: "password123" };
+export const STUDENT = { email: "hasibulx26@gmail.com", password: "12345678" };
 export const ADMIN = { email: "admin@brainxnext.com", password: "admin12345" };
 
 /** Fill and submit the login form on the current page (must already be /login). */

@@ -1,10 +1,14 @@
 import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo";
+import { SocialLinks } from "./SocialIcons";
+import { OPEN_ADMIN } from "@/api/config";
 
 const LEGAL_LINKS = [
   { to: "/privacy", label: "Privacy" },
   { to: "/terms", label: "Terms" },
   { to: "/refunds", label: "Refunds" },
+  // demo mode only: the admin panel is open to everyone until the backend exists
+  ...(OPEN_ADMIN ? [{ to: "/admin", label: "Admin panel" }] : []),
 ];
 
 const COLUMNS = [
@@ -12,9 +16,9 @@ const COLUMNS = [
     title: "LEARN",
     links: [
       { to: "/courses", label: "Courses" },
+      { to: "/paths", label: "Learning paths" },
       { to: "/notes", label: "Free notes" },
       { to: "/pricing", label: "Pricing" },
-      // no public /verify page yet — certificates are explained in the help centre
       { to: "/verify", label: "Verify a certificate" },
     ],
   },
@@ -52,12 +56,13 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
     return (
       <footer className="bg-navy-deep px-6 pt-14 pb-9 text-[#A9BFD8]">
         <div className="mx-auto max-w-310">
-          <div className="grid grid-cols-1 gap-8 border-b border-white/10 pb-9 min-[1001px]:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-8 border-b border-white/10 pb-9 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
             <div className="flex flex-col gap-3.5">
               <Logo size="footer" onDark />
               <p className="m-0 max-w-[34ch] text-[13.5px] leading-relaxed">
                 A structured learning platform for engineers, designers and analysts. Free where it counts, paid where it&apos;s worth it.
               </p>
+              <SocialLinks />
             </div>
             {COLUMNS.map((col) => (
               <nav key={col.title} aria-label={col.title.toLowerCase()} className="flex flex-col gap-2.5">
@@ -82,7 +87,10 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
   return (
     <footer className="bg-navy-deep px-6 pt-11 pb-8 text-[#A9BFD8]">
       <div className="mx-auto flex max-w-310 flex-wrap items-center justify-between gap-5 border-b border-white/10 pb-6">
-        <Logo size="sm" onDark />
+        <span className="flex items-center gap-5">
+          <Logo size="sm" onDark />
+          <SocialLinks />
+        </span>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2.5">
           {SIMPLE_LINKS.map((l) => (
             <NavLink key={l.label} to={l.to} className={footerLink}>

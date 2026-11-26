@@ -37,17 +37,22 @@ interface PaymentFormProps {
   onPay: (payment: PaymentValues, promoCode?: string) => void;
   /** small print under the pay button */
   note: ReactNode;
+  /** pre-fills the promo box (e.g. a code already applied in the cart) */
+  initialPromo?: string;
 }
 
 /** Payment method, card / wallet fields, promo code and the Pay button — shared by course and plan checkout. */
-const PaymentForm = ({ price, promo, pending, error, onPay, note }: PaymentFormProps) => {
+const PaymentForm = ({ price, promo, pending, error, onPay, note, initialPromo = "" }: PaymentFormProps) => {
   const {
     register,
     control,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<CheckoutFormValues>({ resolver: zodResolver(checkoutFormSchema), defaultValues: defaultCheckoutValues });
+  } = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: { ...defaultCheckoutValues, promo: initialPromo },
+  });
 
   const values = useWatch({ control });
 

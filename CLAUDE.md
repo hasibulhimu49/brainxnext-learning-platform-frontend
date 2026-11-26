@@ -56,7 +56,7 @@ Current owners:
 - `src/stores/authStore.ts` — session token, signed-in user summary, pending sign-up email. Written only by the auth mutations (`src/queries/auth.ts`), `useUpdateProfile` (name sync) and the 401 interceptor.
 - `src/stores/uiStore.ts` — theme (persisted as `bx-theme`; `index.html` applies it before first paint).
 - Page-local UI state (tabs, accordions, filters) stays in component state.
-- There is no cart: checkout is single-course. If one is added it gets its own store with a documented owner.
+- `src/stores/shopStore.ts` — wishlist and cart course ids (persisted as `bx-shop`, F-004). Client-only until the backend has a wishlist/cart API; course data and ownership still come from queries (`src/hooks/useCart.ts`).
 
 ## 5. Components
 
@@ -129,4 +129,4 @@ docs/features/  one folder per feature (F-XXX-name): feature, plan, testing, rev
 
 ## 10. Design Fidelity
 
-UI must match the Figma exports exactly (spacing, sizes, colours, breakpoints such as 1000/1080/960/640/560px). Images in `src/assets/images` are placeholders — replace files in place, keeping names. Demo logins for the mock API: `hasibulx26@gmail.com` / `password123` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` simulates a wrong code; promo `LEARN20` gives 20% off.
+UI must match the Figma exports exactly (spacing, sizes, colours, breakpoints such as 1000/1080/960/640/560px). Images in `src/assets/images` are placeholders — replace files in place, keeping names. Demo mode: while the mock API is on, `/admin` is open to everyone (`OPEN_ADMIN`, see `src/api/config.ts`). Demo logins for the mock API: `hasibulx26@gmail.com` / `12345678` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` simulates a wrong code; promo `LEARN20` gives 20% off.

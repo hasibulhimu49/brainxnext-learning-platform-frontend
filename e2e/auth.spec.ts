@@ -23,12 +23,15 @@ test.describe("authentication", () => {
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  test("a student opening /admin sees the 403 page", async ({ page }) => {
-    await login(page);
-    await page.goto("/admin");
-    await expect(page.getByRole("heading", { name: "This area is for admins" })).toBeVisible();
-    await page.getByRole("link", { name: "Back to dashboard" }).click();
-    await expect(page).toHaveURL(/\/dashboard$/);
+  // demo mode (VITE_OPEN_ADMIN, on while the mock API is): the admin panel is open to everyone;
+  // the real lock (403 for students) is covered by the unit tests, which run with it off
+  test("demo mode: anyone can open the admin panel, even signed out", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Admin panel" }).click();
+    await expect(page).toHaveURL(/\/admin$/);
+    await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+    await page.goto("/admin/payments");
+    await expect(page.getByRole("cell", { name: "ORD-JS-8412", exact: true })).toBeVisible();
   });
 
   test("an admin logs in to /admin and logs out", async ({ page }) => {
@@ -37,8 +40,9 @@ test.describe("authentication", () => {
     await page.getByRole("button", { name: "Log out" }).filter({ visible: true }).first().click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText("You've been logged out")).toBeVisible();
+    // demo mode keeps /admin open after logout (see the test above)
     await page.goto("/admin");
-    await expect(page).toHaveURL(/\/login\?next=%2Fadmin$/);
+    await expect(page.getByRole("heading", { name: "Overview" }).first()).toBeVisible();
   });
 
   test("a new learner signs up, verifies their email and sees an empty dashboard", async ({ page }) => {

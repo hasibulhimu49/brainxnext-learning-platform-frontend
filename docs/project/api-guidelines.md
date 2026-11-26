@@ -105,7 +105,7 @@ All `/me/*` endpoints need a user token (no session → `401`). Orders use the s
 | Endpoint | Request | Response / errors |
 | --- | --- | --- |
 | `POST /checkout/promo` | `{ code }` | `PromoResult`; validated with `findValidPromo` (active, not expired, under limit) else `400 INVALID_PROMO` |
-| `POST /checkout/orders` | `{ kind: "course", courseId, payment, promoCode? }` · `{ kind: "plan", plan: "pro", cycle, payment, promoCode? }` · `{ kind: "donation", amount, payment: { method } }` | `201 OrderRecord` written to `orders`. Card → `paid` (fulfilled: enrol / start Pro, promo `used + 1`); bKash/Nagad → `pending`. Donations need no session and are paid at once. Owned course → `409 ALREADY_ENROLLED`; already Pro → `409 ALREADY_SUBSCRIBED`; Teams / free course → `400` |
+| `POST /checkout/orders` | `{ kind: "course", courseId, payment, promoCode? }` · `{ kind: "plan", plan: "pro", cycle, payment, promoCode? }` · `{ kind: "donation", amount, payment: { method } }` · `{ kind: "cart", courseIds, payment, promoCode? }` (F-004: one order with `items[]`, promo on the subtotal, paying enrols every course; empty/free → `400`, any owned → `409 ALREADY_ENROLLED`, Pro → `409 ALREADY_SUBSCRIBED`) | `201 OrderRecord` written to `orders`. Card → `paid` (fulfilled: enrol / start Pro, promo `used + 1`); bKash/Nagad → `pending`. Donations need no session and are paid at once. Owned course → `409 ALREADY_ENROLLED`; already Pro → `409 ALREADY_SUBSCRIBED`; Teams / free course → `400` |
 | `POST /checkout/orders/:id/confirm` | `{ simulateFailure? }` (demo) | `paid` order (fulfilled); wallet ending `0000` or `simulateFailure` → status `failed` + `402 PAYMENT_DECLINED`; not pending → `409 ORDER_NOT_PENDING` |
 | `POST /checkout/orders/:id/cancel` | — | order with status `failed` |
 | `GET /me/orders` · `GET /me/orders/:id` | — | own orders, newest first · one order (others' → `404`) |
@@ -126,3 +126,25 @@ All `/me/*` endpoints need a user token (no session → `401`). Orders use the s
 | `PATCH /me/profile` | `{ name, bio, portfolio, goal }` | the email is no longer changed here; response is the full `Profile` (with `memberSince`) |
 
 New error codes in `API_ERROR_CODES`: `PAYMENT_DECLINED`, `ORDER_NOT_PENDING`, `ALREADY_SUBSCRIBED`, `UPGRADE_REQUIRED`, `REFUND_NOT_ALLOWED`. Mock data: `src/api/mock/db/billing.ts` (`bxn-mock-subscriptions`; the demo student's Pro lapsed on 1 Sep 2026, so they start Free), certificates in `db/learning.ts` (`bxn-mock-certificates`), entitlement rules in `db/entitlement.ts`, preferences / read notifications / pending email on the mock user (`db/users.ts`). Route modules: `routes/billing.ts`, `routes/achievements.ts`, `routes/account.ts`, spread into `learnerRoutes`.
+
+
+## Next AI (F-005, provisional)
+
+| Endpoint | Body | Returns |
+| --- | --- | --- |
+| `POST /assistant/chat` | `{ message, context: { path, courseId?, lessonId? } }` | `AssistantReply { text, links?, courses? }`; empty / >1000 chars → `400 VALIDATION_ERROR`. Mock answers from site content; the backend will call an AI model with the key kept server-side. |
+
+## Demo admin access
+
+While the mock API is on, `OPEN_ADMIN` (`src/api/config.ts`, env `VITE_OPEN_ADMIN`) opens `/admin` and the mock admin endpoints to everyone. It is off whenever `VITE_USE_MOCK_API=false`, so the real backend's admin lock applies.
+
+## Reviews, quizzes, paths (F-006 – F-008, provisional)
+
+| Endpoint | Notes |
+| --- | --- |
+| `GET /me/reviews/:courseId` | `MyReviewState { review, canReview, reason, progressPct, minPct }` |
+| `PUT /me/reviews/:courseId` | `{ stars 1–5, text 20–1000 }` → `MyReviewState`; not enrolled → `403 NOT_ENROLLED`, under 30% → `403 REVIEW_TOO_EARLY` |
+| `GET /courses/:id/quizzes/:module` | `Quiz` without answers (enrolled only) |
+| `POST /me/quizzes/:courseId/:module` | `{ answers: number[] }` → `QuizResult` with explanations; best score kept |
+| `GET /me/quizzes/:courseId` | `QuizScore[]` |
+| `GET /paths`, `GET /paths/:id` | `LearningPath` (public) |

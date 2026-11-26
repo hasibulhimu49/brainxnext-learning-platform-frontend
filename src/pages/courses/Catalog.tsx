@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import HeroBand from "@/components/common/HeroBand";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
@@ -71,6 +72,18 @@ const Catalog = () => {
 
       <section className="bg-page px-4.5 pt-9 pb-22 sm:px-6">
         <div className="mx-auto flex max-w-310 flex-col gap-5.5">
+          {/* F-008: point beginners at the guided paths */}
+          <Link
+            to="/paths"
+            className="flex flex-wrap items-center gap-3.5 rounded-[18px] border border-brand/25 bg-chip px-5 py-3.5 text-ink transition-colors hover:border-brand hover:text-ink"
+          >
+            <Icon name="route" size={22} className="text-brand" />
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="text-[14.5px] font-extrabold">Not sure where to start?</span>
+              <span className="text-[13px] font-semibold text-muted">Follow a learning path — the right courses in the right order.</span>
+            </span>
+            <span className="text-[13.5px] font-extrabold text-brand">Browse paths →</span>
+          </Link>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
               {CATEGORY_FILTERS.map((label) => (
@@ -118,7 +131,7 @@ const Catalog = () => {
           {coursesQuery.isPending || coursesQuery.isError ? (
             <QueryStatus query={coursesQuery}>{() => null}</QueryStatus>
           ) : shown.length > 0 ? (
-            <div className="grid grid-cols-1 gap-5 min-[1001px]:grid-cols-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3 min-[1240px]:grid-cols-4">
               {shown.map((c) => (
                 <CourseCard key={c.id} course={c} />
               ))}

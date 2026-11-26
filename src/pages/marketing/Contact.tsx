@@ -8,7 +8,7 @@ import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DISCORD_URL, SUPPORT_EMAIL, YOUTUBE_URL } from "@/constants/social";
+import { FACEBOOK_URL, SUPPORT_EMAIL, YOUTUBE_URL } from "@/constants/social";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useSendContactMessage } from "@/queries/account";
 import { CONTACT_TOPICS, contactSchema, type ContactValues } from "@/schemas/account";
@@ -47,11 +47,11 @@ const CHANNELS: Channel[] = [
   },
   {
     icon: "groups",
-    grad: "linear-gradient(135deg,#0E97B0,#2FB8CF)",
-    glow: "rgba(14,151,176,.3)",
-    title: "Community",
-    sub: "Join our Discord — 12k members",
-    href: DISCORD_URL,
+    grad: "linear-gradient(135deg,#1877F2,#4B95F5)",
+    glow: "rgba(24,119,242,.3)",
+    title: "Facebook",
+    sub: "@brainxnext — news and student community",
+    href: FACEBOOK_URL,
     external: true,
   },
   {
@@ -59,7 +59,7 @@ const CHANNELS: Channel[] = [
     grad: "linear-gradient(135deg,#D0491B,#E9744B)",
     glow: "rgba(208,73,27,.3)",
     title: "YouTube",
-    sub: "@BrainXNext — 31k subscribers",
+    sub: "@brainxnext — free lessons, 31k subscribers",
     href: YOUTUBE_URL,
     external: true,
   },

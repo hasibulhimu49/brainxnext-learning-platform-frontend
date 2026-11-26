@@ -5,9 +5,11 @@ import { API_ERROR_CODES, errorMessage, isApiError } from "@/api/envelope";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import BuyCard from "@/components/course/BuyCard";
+import CourseReviews from "@/components/course/CourseReviews";
+import { YouTubeSubscribe } from "@/components/common/SocialIcons";
 import usePageTitle from "@/hooks/usePageTitle";
 import { flattenLessons } from "@/lib/lessons";
-import { courseCover, formatTaka, stars } from "@/lib/utils";
+import { courseCover, formatTaka } from "@/lib/utils";
 import { useIsPro } from "@/queries/account";
 import { useCourse, useCourses } from "@/queries/courses";
 import { useEnroll, useIsEnrolled } from "@/queries/learning";
@@ -108,6 +110,8 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
                   <span className="text-sm font-extrabold">{course.mentor}</span>
                   <span className="text-xs font-semibold text-[#8AA0B8]">Course instructor · 31k subscribers</span>
                 </span>
+                {/* BrainXNext's own courses come from its YouTube channel */}
+                {course.mentor === "BrainXNext" && <YouTubeSubscribe className="ml-1" />}
               </div>
             </div>
 
@@ -204,20 +208,7 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
               </div>
             </div>
 
-            <div className="card p-7">
-              <h2 className="mt-0 mb-4.5 font-display text-[21px] font-extrabold tracking-[-0.01em] text-ink">Reviews</h2>
-              <div className="grid grid-cols-1 gap-3.5 min-[1001px]:grid-cols-2">
-                {course.reviews.map((r) => (
-                  <div key={r.name} className="flex flex-col gap-2.5 rounded-2xl border border-line bg-surface2 p-4.5">
-                    <span className="text-[15px] tracking-[2px] text-amber" aria-label={`${r.stars} out of 5 stars`}>
-                      {stars(r.stars)}
-                    </span>
-                    <span className="text-[13.5px] leading-[1.55] font-medium text-muted">{r.text}</span>
-                    <span className="text-[12.5px] font-extrabold text-ink">{r.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CourseReviews course={course} />
           </div>
 
           <div className="flex flex-col gap-5">

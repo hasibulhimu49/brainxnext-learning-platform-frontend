@@ -3,7 +3,23 @@ import { ADMIN, STUDENT, login } from "./helpers";
 
 /** Small phones (360px): no page may scroll sideways. Absolutely positioned text (e.g. `.sr-only`) counts too. */
 const PAGES: [account: typeof STUDENT | null, paths: string[]][] = [
-  [null, ["/", "/courses", "/courses/java-generics", "/notes", "/pricing", "/about", "/contact", "/help", "/login", "/register"]],
+  [
+    null,
+    [
+      "/",
+      "/courses",
+      "/courses/java-generics",
+      "/notes",
+      "/pricing",
+      "/about",
+      "/contact",
+      "/help",
+      "/login",
+      "/register",
+      "/wishlist",
+      "/cart",
+    ],
+  ],
   [STUDENT, ["/dashboard", "/learn/java-generics/1-1", "/settings/billing", "/checkout/applied-ml", "/certificates"]],
   [ADMIN, ["/admin", "/admin/payments", "/admin/submissions", "/admin/courses/new"]],
 ];

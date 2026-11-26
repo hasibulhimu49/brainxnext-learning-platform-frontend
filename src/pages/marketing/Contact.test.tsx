@@ -23,11 +23,13 @@ describe("<Contact /> topic preselect", () => {
     expect(checkedTopic()).toHaveAccessibleName("Course question");
   });
 
-  it("opens Discord and YouTube in a new tab", () => {
+  it("opens Facebook and YouTube in a new tab", () => {
     renderWithProviders(<Contact />, { route: "/contact" });
-    const discord = screen.getByRole("link", { name: /Community/ });
-    expect(discord).toHaveAttribute("href", "https://discord.gg/brainxnext");
-    expect(discord).toHaveAttribute("target", "_blank");
-    expect(screen.getByRole("link", { name: /YouTube/ })).toHaveAttribute("rel", "noreferrer");
+    const facebook = screen.getByRole("link", { name: /Facebook/ });
+    expect(facebook).toHaveAttribute("href", "https://www.facebook.com/brainxnext");
+    expect(facebook).toHaveAttribute("target", "_blank");
+    const youtube = screen.getByRole("link", { name: /YouTube/ });
+    expect(youtube).toHaveAttribute("href", "https://www.youtube.com/@brainxnext");
+    expect(youtube).toHaveAttribute("rel", "noreferrer");
   });
 });

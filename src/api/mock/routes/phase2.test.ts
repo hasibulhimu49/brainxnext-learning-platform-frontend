@@ -13,7 +13,7 @@ const CARD = { method: "Card", cardName: "Test", cardNumber: "4242 4242 4242 424
 const WALLET = { method: "bKash", walletNumber: "01712345678" } as const;
 
 const loginStudent = async () => {
-  useAuthStore.getState().setSession(await authService.login("hasibulx26@gmail.com", "password123"));
+  useAuthStore.getState().setSession(await authService.login("hasibulx26@gmail.com", "12345678"));
 };
 
 const completeCourse = async (courseId: string) => {
@@ -168,10 +168,10 @@ describe("mock API — account settings", () => {
     await expect(accountService.startEmailChange({ newEmail: "new@me.com", password: "wrong" })).rejects.toMatchObject({
       code: API_ERROR_CODES.wrongPassword,
     });
-    await expect(accountService.startEmailChange({ newEmail: "admin@brainxnext.com", password: "password123" })).rejects.toMatchObject({
+    await expect(accountService.startEmailChange({ newEmail: "admin@brainxnext.com", password: "12345678" })).rejects.toMatchObject({
       code: API_ERROR_CODES.emailTaken,
     });
-    await accountService.startEmailChange({ newEmail: "new@me.com", password: "password123" });
+    await accountService.startEmailChange({ newEmail: "new@me.com", password: "12345678" });
     await expect(accountService.confirmEmailChange("000000")).rejects.toMatchObject({ code: API_ERROR_CODES.invalidCode });
     const session = await accountService.confirmEmailChange("123456");
     expect(session.user.email).toBe("new@me.com");
@@ -184,6 +184,6 @@ describe("mock API — account settings", () => {
   it("deletes the account after typing DELETE", async () => {
     await expect(accountService.deleteAccount("delete")).rejects.toMatchObject({ code: API_ERROR_CODES.validation });
     await expect(accountService.deleteAccount("DELETE")).resolves.toEqual({ deleted: true });
-    await expect(authService.login("hasibulx26@gmail.com", "password123")).rejects.toMatchObject({ code: API_ERROR_CODES.userNotFound });
+    await expect(authService.login("hasibulx26@gmail.com", "12345678")).rejects.toMatchObject({ code: API_ERROR_CODES.userNotFound });
   });
 });

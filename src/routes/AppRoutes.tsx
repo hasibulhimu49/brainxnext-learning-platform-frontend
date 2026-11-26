@@ -27,6 +27,12 @@ const Checkout = lazy(() => import("@/pages/marketing/Checkout"));
 const Contact = lazy(() => import("@/pages/marketing/Contact"));
 const Notes = lazy(() => import("@/pages/marketing/Notes"));
 const PlanCheckout = lazy(() => import("@/pages/marketing/PlanCheckout"));
+const Wishlist = lazy(() => import("@/pages/marketing/Wishlist"));
+const Cart = lazy(() => import("@/pages/marketing/Cart"));
+const CartCheckout = lazy(() => import("@/pages/marketing/CartCheckout"));
+const ModuleQuiz = lazy(() => import("@/pages/courses/ModuleQuiz"));
+const Paths = lazy(() => import("@/pages/marketing/Paths"));
+const PathDetail = lazy(() => import("@/pages/marketing/PathDetail"));
 const Pricing = lazy(() => import("@/pages/marketing/Pricing"));
 const Support = lazy(() => import("@/pages/marketing/Support"));
 const ThankYou = lazy(() => import("@/pages/marketing/ThankYou"));
@@ -79,27 +85,34 @@ const AppRoutes = () => (
         <Route path="refunds" element={<Refunds />} />
         <Route path="verify" element={<VerifyCertificate />} />
         <Route path="verify/:certId" element={<VerifyCertificate />} />
+        <Route path="wishlist" element={<Wishlist />} />
+        <Route path="cart" element={<Cart />} />
+        <Route path="paths" element={<Paths />} />
+        <Route path="paths/:pathId" element={<PathDetail />} />
       </Route>
 
       {/* Signed-in area — guests are sent to /login?next=… */}
       <Route element={<RequireAuth />}>
-        <Route element={<PublicLayout nav="app" />}>
+        <Route element={<PublicLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="dashboard/courses" element={<MyCourses />} />
           <Route path="dashboard/reviews" element={<MyReviews />} />
           <Route path="certificates" element={<Certificates />} />
         </Route>
-        <Route element={<PublicLayout nav="app" footer={false} />}>
+        <Route element={<PublicLayout footer={false} />}>
           <Route path="settings" element={<Settings />} />
           <Route path="settings/:tab" element={<Settings />} />
         </Route>
         <Route path="learn" element={<LearnIndex />} />
         <Route path="learn/:courseId/project" element={<ProjectSubmission />} />
+        <Route path="learn/:courseId/quiz/:module" element={<ModuleQuiz />} />
         <Route path="learn/:courseId/:lessonId?" element={<Player />} />
         <Route path="certificates/:certId" element={<Certificate />} />
         <Route path="certificate" element={<Navigate to="/certificates" replace />} />
         <Route path="orders/:orderId" element={<OrderReceipt />} />
         <Route path="checkout/plan/:plan" element={<PlanCheckout />} />
+        {/* before checkout/:courseId, so "cart" isn't read as a course id */}
+        <Route path="checkout/cart" element={<CartCheckout />} />
         <Route path="checkout/:courseId" element={<Checkout />} />
       </Route>
       <Route path="checkout" element={<Navigate to="/pricing" replace />} />

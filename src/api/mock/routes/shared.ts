@@ -1,3 +1,4 @@
+import { OPEN_ADMIN } from "../../config";
 import { API_ERROR_CODES as CODES } from "../../envelope";
 import { userFromToken } from "../db/users";
 import { fail, type MockRequest, type MockResult } from "../http";
@@ -15,6 +16,7 @@ export const requireUser = (req: MockRequest) => userFromToken(req.token);
 
 /** null when the caller is a signed-in admin; otherwise the 401 / 403 response to return. */
 export const requireAdmin = (req: MockRequest): MockResult | null => {
+  if (OPEN_ADMIN) return null; // demo mode, see OPEN_ADMIN in src/api/config.ts
   const user = requireUser(req);
   if (!user) return unauthorized();
   return user.role === "admin" ? null : forbidden("This area is for admins.");

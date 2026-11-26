@@ -27,7 +27,7 @@ const SEED: MockUser[] = [
   {
     name: "Mohammad Hasibul Hasan",
     email: "hasibulx26@gmail.com",
-    password: "password123",
+    password: "12345678",
     role: "student",
     verified: true,
     bio: "",
@@ -55,6 +55,8 @@ const load = (): MockUser[] => {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed: unknown = raw ? JSON.parse(raw) : null;
     memory = Array.isArray(parsed) && parsed.length ? (parsed as MockUser[]) : [...SEED];
+    // the demo student's password changed from "password123" to "12345678": upgrade copies saved by older builds
+    memory = memory.map((u) => (u.email === "hasibulx26@gmail.com" && u.password === "password123" ? { ...u, password: "12345678" } : u));
   } catch {
     memory = [...SEED];
   }

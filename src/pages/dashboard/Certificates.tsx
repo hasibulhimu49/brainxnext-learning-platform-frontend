@@ -31,7 +31,7 @@ const CertificatesView = ({ certs, isPro }: { certs: CertificateRecord[]; isPro:
       {!isPro && " Certificates come with Pro, or with any course you buy."}
     </EmptyCard>
   ) : (
-    <div className="grid grid-cols-1 gap-5 min-[1001px]:grid-cols-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3">
       {certs.map((c) => (
         <CertificateCard key={c.id} cert={c} />
       ))}

@@ -169,7 +169,7 @@ const About = () => {
               What we believe
             </h2>
           </div>
-          <div className="grid grid-cols-1 gap-4.5 min-[1001px]:grid-cols-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4.5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3">
             {VALUES.map((v) => (
               <div key={v.title} className="card px-6 py-7">
                 <span
@@ -198,7 +198,7 @@ const About = () => {
               hour a week.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4.5 min-[1001px]:grid-cols-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4.5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3">
             {MENTORS.map((m) => (
               <div
                 key={m.name}

@@ -158,6 +158,8 @@ export interface AdminReview {
   text: string;
   reply: string | null;
   hidden: boolean;
+  /** the reviewer's account (F-006); seed reviews from before may not have one */
+  userEmail?: string;
 }
 
 export interface AdminReviewList extends AdminList<AdminReview> {

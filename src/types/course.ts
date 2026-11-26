@@ -47,6 +47,22 @@ export interface CourseReview {
   stars: number;
   name: string;
   text: string;
+  /** F-006: student reviews carry an id, a date and the team's reply */
+  id?: string;
+  at?: string;
+  reply?: string | null;
+}
+
+/** GET /me/reviews/:courseId (F-006, provisional) — can the learner review this course, and their review if any. */
+export interface MyReviewState {
+  review: CourseReview | null;
+  canReview: boolean;
+  /** why not, when `canReview` is false */
+  reason: "not_enrolled" | "too_early" | null;
+  /** 0–100 */
+  progressPct: number;
+  /** % of lessons needed before reviewing */
+  minPct: number;
 }
 
 export interface CourseDetail extends Course {

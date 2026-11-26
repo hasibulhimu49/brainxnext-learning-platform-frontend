@@ -9,6 +9,9 @@ export const checkoutService = {
   /** Card → `paid`; bKash / Nagad → `pending` until confirmed. */
   placeOrder: (courseId: string, payment: PaymentValues, promoCode?: string) =>
     api.post<OrderRecord>("/checkout/orders", { kind: "course", courseId, payment, promoCode }),
+  /** F-004: several paid courses in one order (provisional endpoint shape) */
+  placeCartOrder: (courseIds: string[], payment: PaymentValues, promoCode?: string) =>
+    api.post<OrderRecord>("/checkout/orders", { kind: "cart", courseIds, payment, promoCode }),
   placePlanOrder: (cycle: BillingCycle, payment: PaymentValues, promoCode?: string) =>
     api.post<OrderRecord>("/checkout/orders", { kind: "plan", plan: "pro", cycle, payment, promoCode }),
   donate: (amount: number, method: PaymentMethod) =>

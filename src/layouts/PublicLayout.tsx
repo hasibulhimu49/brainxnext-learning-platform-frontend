@@ -4,19 +4,18 @@ import Navbar from "@/components/common/Navbar";
 
 /**
  * Navbar + page + footer.
- * nav: "public" | "app"   footer: "full" | "simple" | false
+ * footer: "full" | "simple" | false (the navbar is the same everywhere; it follows the sign-in state)
  */
 interface PublicLayoutProps {
   footer?: "full" | "simple" | false;
-  nav?: "public" | "app";
 }
 
-const PublicLayout = ({ footer = "simple", nav = "public" }: PublicLayoutProps) => (
+const PublicLayout = ({ footer = "simple" }: PublicLayoutProps) => (
   <div className="flex min-h-screen flex-col bg-page text-ink">
     <a href="#main" className="skip-link">
       Skip to content
     </a>
-    <Navbar variant={nav} />
+    <Navbar />
     <main id="main" tabIndex={-1} className="flex-1 outline-none">
       <Outlet />
     </main>

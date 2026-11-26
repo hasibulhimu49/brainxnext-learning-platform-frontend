@@ -18,6 +18,6 @@ The token is attached as `Authorization: Bearer …` by the request interceptor.
 
 Session state lives only in `authStore` (key `bxn-auth`). Profile details are fetched with `useProfile()`, not kept in the store.
 
-Mock accounts: `hasibulx26@gmail.com` / `password123` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` is rejected; any other 6 digits verify.
+Mock accounts: `hasibulx26@gmail.com` / `12345678` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` is rejected; any other 6 digits verify.
 
 Route guards are described in `routing.md` and `authorization.md`.

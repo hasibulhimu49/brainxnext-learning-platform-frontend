@@ -23,7 +23,9 @@
 - Read through `useTheme()`.
 
 ### Cart
-There is no cart: checkout buys one course or one plan. Adding one means a new `cartStore` with a documented owner — the cart's contents are client state, prices/availability still come from queries.
+### `shopStore` (`bx-shop` in localStorage, F-004)
+
+Wishlist and cart **course ids only** (`wishlist`, `cart`, `toggleWishlist`, `addToCart`, `removeFromCart`, `removeManyFromCart`, `clearCart`). Guests can use both. Course data, prices and ownership are server state: `useCart()` (`src/hooks/useCart.ts`) joins the ids with the catalog and enrolment queries and reports items that can no longer be bought (owned, free, gone), which the cart page drops. Paying a cart order removes its courses from the cart. Replace with queries once the backend documents wishlist/cart endpoints.
 
 ### Enrolments and progress
 Server state (TanStack Query): `useEnrollments`, `useProgress(courseId)`, `useEnroll`, `useUpdateProgress` in `src/queries/learning.ts`, keys `["me", "enrollments"]` and `["me", "progress", courseId]`. Enrolling, buying or saving progress invalidates the enrolments, the dashboard and that course's progress. Logout clears the whole query cache.

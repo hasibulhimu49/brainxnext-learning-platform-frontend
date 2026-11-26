@@ -14,7 +14,7 @@ describe("API client (against the mock adapter)", () => {
   });
 
   it("logs in the demo user", async () => {
-    const session = await authService.login("hasibulx26@gmail.com", "password123");
+    const session = await authService.login("hasibulx26@gmail.com", "12345678");
     expect(session.user).toEqual({ name: "Mohammad Hasibul Hasan", email: "hasibulx26@gmail.com", role: "student" });
     expect(session.token).toMatch(/^mock\./);
   });
@@ -33,7 +33,7 @@ describe("API client (against the mock adapter)", () => {
   });
 
   it("sends the bearer token and clears the session on 401", async () => {
-    const session = await authService.login("hasibulx26@gmail.com", "password123");
+    const session = await authService.login("hasibulx26@gmail.com", "12345678");
     useAuthStore.getState().setSession(session);
     await expect(accountService.profile()).resolves.toMatchObject({ email: "hasibulx26@gmail.com" });
 

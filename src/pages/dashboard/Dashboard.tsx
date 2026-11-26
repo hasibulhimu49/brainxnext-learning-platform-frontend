@@ -177,6 +177,36 @@ const DashboardView = ({ data }: { data: DashboardData }) => {
               <Icon name="arrow_forward" size={19} className="text-soft" />
             </Link>
 
+            {/* Learning paths (F-008) */}
+            <Link
+              to="/paths"
+              className="card flex items-center gap-3.5 p-5 text-ink transition-all hover:-translate-y-0.5 hover:text-ink hover:shadow-card-lg"
+            >
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-chip text-brand">
+                <Icon name="route" size={22} />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="font-display text-[15px] font-extrabold">Learning paths</span>
+                <span className="text-[12.5px] font-semibold text-soft">Step-by-step routes to a career</span>
+              </span>
+              <Icon name="arrow_forward" size={19} className="text-soft" />
+            </Link>
+
+            {/* Wishlist (F-004) */}
+            <Link
+              to="/wishlist"
+              className="card flex items-center gap-3.5 p-5 text-ink transition-all hover:-translate-y-0.5 hover:text-ink hover:shadow-card-lg"
+            >
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-chip text-danger">
+                <Icon name="favorite" size={22} />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="font-display text-[15px] font-extrabold">My wishlist</span>
+                <span className="text-[12.5px] font-semibold text-soft">Courses you saved for later</span>
+              </span>
+              <Icon name="arrow_forward" size={19} className="text-soft" />
+            </Link>
+
             {/* Recommended */}
             <div className="card p-6">
               <h3 className="mt-0 mb-3.5 font-display text-base font-extrabold text-ink">Recommended for you</h3>

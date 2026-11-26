@@ -15,6 +15,7 @@ import { useCertificates, useCourseExtras, useIsPro } from "@/queries/account";
 import { useLogout } from "@/queries/auth";
 import { useCourse } from "@/queries/courses";
 import { useEnroll, useProgress, useUpdateProgress } from "@/queries/learning";
+import { useQuizScores } from "@/queries/quizzes";
 import { useSessionUser } from "@/stores/authStore";
 import type { CourseDetail } from "@/types/course";
 import type { CourseProgress } from "@/types/learning";
@@ -29,6 +30,7 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
   const isPro = useIsPro() ?? false;
   const extras = useCourseExtras(course.id) ?? false;
   const certificates = useCertificates();
+  const quizScores = useQuizScores(course.id);
   usePageTitle(course.title);
 
   const lessons = flattenLessons(course.curriculum);
@@ -133,6 +135,7 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
           isLocked={isLocked}
           onSelect={goTo}
           showPreview={!owned && !canEnroll}
+          quizzes={owned ? { courseId: course.id, scores: quizScores.data ?? [] } : undefined}
         />
       </div>
     </div>

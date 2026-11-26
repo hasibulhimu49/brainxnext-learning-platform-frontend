@@ -1,8 +1,9 @@
 import type { CourseDetail } from "@/types/course";
 import { API_ERROR_CODES as CODES } from "../../envelope";
-import { COURSES, COURSE_OUTCOMES, COURSE_REVIEWS, CURRICULUM, JAVA_GENERICS_DESCRIPTION } from "../db/courses";
+import { COURSES, COURSE_OUTCOMES, CURRICULUM, JAVA_GENERICS_DESCRIPTION } from "../db/courses";
 import { TOTAL_LESSONS } from "../db/learning";
 import { fail, ok, type MockRoute } from "../http";
+import { publicReviews } from "./reviews";
 
 export const findCourse = (id: string | undefined) => COURSES.find((c) => c.id === id);
 
@@ -20,7 +21,7 @@ export const catalogRoutes: MockRoute[] = [
         outcomes: COURSE_OUTCOMES,
         curriculum: CURRICULUM,
         totalLessons: TOTAL_LESSONS,
-        reviews: COURSE_REVIEWS,
+        reviews: publicReviews(course.id),
       };
       return ok(detail);
     },

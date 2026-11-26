@@ -13,6 +13,7 @@ export const invalidateAfterOrder = (qc: QueryClient, order: OrderRecord) => {
     qc.invalidateQueries({ queryKey: queryKeys.me.orders, exact: true }),
     qc.invalidateQueries({ queryKey: queryKeys.me.notifications }),
     order.kind === "course" ? invalidateLearning(qc, order.itemId) : null,
+    ...(order.kind === "cart" ? (order.items ?? []).map((i) => invalidateLearning(qc, i.courseId)) : []),
     order.kind === "plan" ? qc.invalidateQueries({ queryKey: queryKeys.me.subscription }) : null,
   ]);
 };
@@ -29,6 +30,20 @@ export const usePlaceOrder = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ courseId, payment, promoCode }: CourseOrderVariables) => checkoutService.placeOrder(courseId, payment, promoCode),
+    onSuccess: (order) => invalidateAfterOrder(qc, order),
+  });
+};
+
+interface CartOrderVariables {
+  courseIds: string[];
+  payment: PaymentValues;
+  promoCode?: string;
+}
+
+export const usePlaceCartOrder = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseIds, payment, promoCode }: CartOrderVariables) => checkoutService.placeCartOrder(courseIds, payment, promoCode),
     onSuccess: (order) => invalidateAfterOrder(qc, order),
   });
 };

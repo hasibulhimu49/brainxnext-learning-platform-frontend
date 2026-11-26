@@ -8,7 +8,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const loginAs = async (email: string, password: string) => useAuthStore.getState().setSession(await authService.login(email, password));
 const asAdmin = () => loginAs("admin@brainxnext.com", "admin12345");
-const asStudent = () => loginAs("hasibulx26@gmail.com", "password123");
+const asStudent = () => loginAs("hasibulx26@gmail.com", "12345678");
 
 beforeEach(() => resetMockAdmin());
 

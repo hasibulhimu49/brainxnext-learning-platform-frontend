@@ -24,8 +24,18 @@ export const queryKeys = {
     submissions: ["me", "submissions"] as const,
     notifications: ["me", "notifications"] as const,
     preferences: ["me", "preferences"] as const,
+    // F-006 / F-007
+    review: (courseId: string) => ["me", "reviews", courseId] as const,
+    quizzes: (courseId: string) => ["me", "quizzes", courseId] as const,
   },
   certificate: (id: string) => ["certificates", id] as const,
+  /** F-007: questions for one module quiz (no answers) */
+  quiz: (courseId: string, module: number) => ["quiz", courseId, module] as const,
+  /** F-008 */
+  paths: {
+    all: ["paths"] as const,
+    detail: (id: string) => ["paths", id] as const,
+  },
   admin: {
     all: ["admin"] as const,
     overview: ["admin", "overview"] as const,

@@ -374,14 +374,17 @@ const review = (
 });
 
 const seedReviews = (): AdminReview[] => [
-  review(
-    1,
-    "Mohammad Hasibul Hasan",
-    "java-generics",
-    "2026-11-25T07:00:00.000Z",
-    5,
-    "Excellent course. The explanations are clear and practical examples helped me understand Java much faster."
-  ),
+  {
+    ...review(
+      1,
+      "Mohammad Hasibul Hasan",
+      "java-generics",
+      "2026-11-25T07:00:00.000Z",
+      5,
+      "Excellent course. The explanations are clear and practical examples helped me understand Java much faster."
+    ),
+    userEmail: "hasibulx26@gmail.com",
+  },
   review(
     2,
     "Nusrat Jahan",

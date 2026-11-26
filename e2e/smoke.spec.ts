@@ -21,6 +21,10 @@ const ROUTES: [path: string, heading: RegExp, account: Account][] = [
   ["/refunds", /Refund/, null],
   ["/help", /How can we/, null],
   ["/verify", /Verify a/, null],
+  ["/wishlist", /My wishlist/, null],
+  ["/cart", /My cart/, null],
+  ["/paths", /Learning/, null],
+  ["/paths/backend-developer", /Backend Developer/, null],
   ["/verify/BXN-2026-SQ-08412", /Verify a/, null],
   // no valid amount → back to /support
   ["/thank-you", /Support Our Platform/, null],
@@ -53,10 +57,15 @@ const ROUTES: [path: string, heading: RegExp, account: Account][] = [
   ["/orders/ORD-PRO-0801", /Order|Payment/, STUDENT],
   ["/orders/ORD-JS-8412", /Order not found/, STUDENT],
   ["/learn/java-generics/project", /Mentor review is part of Pro/, STUDENT],
+  ["/learn/java-generics/quiz/1", /Module 1 quiz/, STUDENT],
   ["/checkout/applied-ml", /Payment/, STUDENT],
   ["/checkout/plan/pro?cycle=yearly", /^Payment$/, STUDENT],
   ["/checkout/plan/teams", /Teams is set up with us/, STUDENT],
-  ["/admin", /This area is for admins/, STUDENT],
+  // empty cart → back to the cart page
+  ["/checkout/cart", /My cart/, STUDENT],
+  // demo mode: the admin panel is open to everyone until the backend exists
+  ["/admin", /Overview/, STUDENT],
+  ["/admin", /Overview/, null],
 
   ["/admin", /Overview/, ADMIN],
   ["/admin/courses", /Courses/, ADMIN],

@@ -1,5 +1,6 @@
 import { lazy, useState, type ReactNode } from "react";
 import { Navigate, Outlet, useLocation, useSearchParams } from "react-router-dom";
+import { OPEN_ADMIN } from "@/api/config";
 import { useAuthStore } from "@/stores/authStore";
 import type { UserRole } from "@/types/auth";
 import { homeFor, loginPath, safeNext } from "./redirects";
@@ -23,6 +24,8 @@ export const RequireAuth = ({ children }: { children?: ReactNode }) => {
 /** Guests go to login; signed-in users without the role see the 403 page. */
 export const RequireRole = ({ role, children }: { role: UserRole; children?: ReactNode }) => {
   const userRole = useAuthStore((s) => s.user?.role);
+  // demo mode: the admin panel is open to everyone while the mock API stands in for the backend
+  if (OPEN_ADMIN && role === "admin") return <>{children ?? <Outlet />}</>;
   return <RequireAuth>{userRole === role ? (children ?? <Outlet />) : <Forbidden />}</RequireAuth>;
 };
 

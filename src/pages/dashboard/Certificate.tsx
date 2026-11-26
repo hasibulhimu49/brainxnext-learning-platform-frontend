@@ -68,9 +68,14 @@ const CertificateDetail = ({ cert }: { cert: CertificateRecord }) => {
     return () => clearTimeout(t);
   }, [print]);
   return (
-    <div className="grid w-full max-w-260 grid-cols-1 items-start gap-6 min-[901px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-      <CertificateView cert={cert} />
-      <div className="flex flex-col gap-4.5">
+    // certificate and Share & download side by side on laptops, so both are visible without scrolling;
+    // on smaller screens the cards follow the certificate
+    <div className="grid w-full max-w-310 grid-cols-1 items-start gap-5 min-[1001px]:grid-cols-[minmax(0,1fr)_300px]">
+      {/* laptops: never taller than the screen (297:210 ≈ 1.4143), so the whole certificate shows without scrolling */}
+      <div className="w-full justify-self-center min-[1001px]:max-w-[calc((100dvh-130px)*1.4143)]">
+        <CertificateView cert={cert} />
+      </div>
+      <div className="grid grid-cols-1 items-start gap-4 min-[640px]:max-[1000px]:grid-cols-2">
         <ShareCard cert={cert} />
         <div className="card flex flex-col gap-2.5 rounded-3xl! p-6.5 print:hidden">
           <h2 className="m-0 font-display text-base font-extrabold text-ink">Verify a certificate</h2>

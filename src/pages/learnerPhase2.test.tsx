@@ -16,7 +16,7 @@ import type { OrderRecord } from "@/types/commerce";
 const CARD = { method: "Card", cardName: "Test", cardNumber: "4242 4242 4242 4242", expiry: "12 / 30", cvc: "123" } as const;
 
 beforeEach(async () => {
-  useAuthStore.getState().setSession(await authService.login("hasibulx26@gmail.com", "password123"));
+  useAuthStore.getState().setSession(await authService.login("hasibulx26@gmail.com", "12345678"));
 });
 
 describe("<OrderReceipt />", () => {

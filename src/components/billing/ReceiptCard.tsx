@@ -4,7 +4,12 @@ import { formatTaka } from "@/lib/utils";
 import type { OrderRecord } from "@/types/commerce";
 import OrderStatusPill from "./OrderStatusPill";
 
-const KIND_LABEL: Record<OrderRecord["kind"], string> = { course: "Course", plan: "Subscription", donation: "Contribution" };
+const KIND_LABEL: Record<OrderRecord["kind"], string> = {
+  course: "Course",
+  plan: "Subscription",
+  donation: "Contribution",
+  cart: "Courses",
+};
 
 /** The printable receipt: who, what, how it was paid, and the totals (whole taka, VAT included). */
 const ReceiptCard = ({ order }: { order: OrderRecord }) => {
@@ -43,6 +48,16 @@ const ReceiptCard = ({ order }: { order: OrderRecord }) => {
             </span>
             <span className="font-extrabold text-ink">{formatTaka(order.subtotal)}</span>
           </span>
+          {order.items && order.items.length > 1 && (
+            <ul className="m-0 flex list-none flex-col gap-1.5 rounded-[13px] border border-line bg-surface2 px-4 py-3 text-[12.5px]">
+              {order.items.map((i) => (
+                <li key={i.courseId} className="flex justify-between gap-3">
+                  <span className="min-w-0">{i.title}</span>
+                  <span className="font-bold text-ink">{formatTaka(i.price)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           {order.discount > 0 && (
             <span className="flex justify-between gap-3 text-success">
               <span className="font-bold">Promo {order.promoCode}</span>

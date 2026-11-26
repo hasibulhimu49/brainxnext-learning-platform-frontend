@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { Alert } from "@/components/auth/AuthCard";
 import Icon from "@/components/common/Icon";
 import { courseCover, formatTaka } from "@/lib/utils";
+import { useInCart, useShopStore } from "@/stores/shopStore";
 import type { CourseDetail } from "@/types/course";
+import WishlistButton from "./WishlistButton";
 
 const INCLUDES: { icon: string; color: string; text?: string }[] = [
   { icon: "smart_display", color: "#1B6FD0" },
@@ -27,6 +30,11 @@ interface BuyCardProps {
 /** Course detail sticky card: cover with preview button, price, enrol / buy / go-to-course action. */
 const BuyCard = ({ course, enrolled, includedInPro = false, pending, error, onPrimary, onPreview }: BuyCardProps) => {
   const label = enrolled ? "Go to course" : course.free ? "Enroll for free" : includedInPro ? "Enroll with Pro" : "Buy this course";
+  // cart (F-004): only paid courses the learner doesn't already have access to
+  const canCart = !course.free && !enrolled && !includedInPro;
+  const inCart = useInCart(course.id);
+  const addToCart = useShopStore((s) => s.addToCart);
+
   // phones/tablets: once the main button scrolls out of view, a slim bar keeps price + action on screen
   const primaryRef = useRef<HTMLButtonElement>(null);
   const [primaryHidden, setPrimaryHidden] = useState(false);
@@ -43,8 +51,11 @@ const BuyCard = ({ course, enrolled, includedInPro = false, pending, error, onPr
   useEffect(() => {
     if (!primaryHidden || window.matchMedia("(min-width: 1001px)").matches) return;
     document.body.style.paddingBottom = "76px";
+    // lifts the Next AI circle above the bar
+    document.body.style.setProperty("--bx-bottom-bar", "76px");
     return () => {
       document.body.style.paddingBottom = "";
+      document.body.style.removeProperty("--bx-bottom-bar");
     };
   }, [primaryHidden]);
 
@@ -90,6 +101,30 @@ const BuyCard = ({ course, enrolled, includedInPro = false, pending, error, onPr
             {label}
           </button>
           {error && <Alert>{error}</Alert>}
+          {!enrolled && (
+            <div className="flex flex-wrap gap-2.5">
+              {canCart &&
+                (inCart ? (
+                  <Link to="/cart" className="btn btn-outline min-w-0 flex-1 rounded-[13px] bg-transparent! px-4.5 py-3">
+                    <Icon name="shopping_cart_checkout" size={17} />
+                    In cart — view cart
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addToCart(course.id);
+                      toast("Added to your cart", { description: course.title });
+                    }}
+                    className="btn btn-outline min-w-0 flex-1 rounded-[13px] bg-transparent! px-4.5 py-3"
+                  >
+                    <Icon name="add_shopping_cart" size={17} />
+                    Add to cart
+                  </button>
+                ))}
+              <WishlistButton courseId={course.id} title={course.title} variant="full" className="min-w-0 flex-1" />
+            </div>
+          )}
           <Link to="/notes" className="btn btn-outline rounded-[13px] bg-transparent! px-4.5 py-3.25">
             <Icon name="download" size={17} />
             Download the handbook

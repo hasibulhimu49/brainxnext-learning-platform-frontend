@@ -105,7 +105,7 @@ VITE_USE_MOCK_API=true
 
 With `VITE_USE_MOCK_API=true` (the default) the app runs against a built-in mock API that speaks the same response envelope as the backend. Set it to `false` to call `VITE_API_BASE_URL`.
 
-Demo login for the mock API: `hasibulx26@gmail.com` / `password123`.
+Demo login for the mock API: `hasibulx26@gmail.com` / `12345678`.
 
 ## 📦 Available Scripts
 

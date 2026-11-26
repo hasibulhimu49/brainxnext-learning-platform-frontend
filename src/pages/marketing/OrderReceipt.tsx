@@ -21,6 +21,8 @@ const HEADLINE: Record<OrderRecord["status"], { icon: string; title: string; ton
 const subline = (o: OrderRecord) => {
   if (o.status !== "paid") return "Your receipt is below.";
   if (o.kind === "course") return `You're enrolled in ${o.itemTitle}. Start whenever you're ready.`;
+  if (o.kind === "cart")
+    return `You're enrolled in ${o.items?.length === 1 ? (o.items[0]?.title ?? "your course") : `${o.items?.length ?? 0} new courses`}. Find them in My courses.`;
   if (o.kind === "plan") return "Pro is active — every course, mentor review and certificates are unlocked.";
   return "Thank you for keeping free education free.";
 };
@@ -30,9 +32,11 @@ const ReceiptView = ({ order }: { order: OrderRecord }) => {
   const primary =
     order.kind === "course"
       ? { to: `/learn/${order.itemId}`, icon: "play_arrow", label: "Start learning now" }
-      : order.kind === "plan"
-        ? { to: "/courses", icon: "search", label: "Explore all courses" }
-        : { to: "/notes", icon: "menu_book", label: "Back to handbooks" };
+      : order.kind === "cart"
+        ? { to: "/dashboard/courses", icon: "school", label: "Go to my courses" }
+        : order.kind === "plan"
+          ? { to: "/courses", icon: "search", label: "Explore all courses" }
+          : { to: "/notes", icon: "menu_book", label: "Back to handbooks" };
 
   return (
     <div className="flex w-full max-w-140 flex-col gap-5.5">
