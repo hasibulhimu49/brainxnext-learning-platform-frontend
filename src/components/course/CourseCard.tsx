@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import WishlistButton from "./WishlistButton";
+import WishlistButton from "@/components/shop/WishlistButton";
 import { courseCover, formatTaka } from "@/lib/utils";
 import type { Course } from "@/types/course";
 import Icon from "../common/Icon";

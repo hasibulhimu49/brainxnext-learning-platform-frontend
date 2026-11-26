@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import { GitHubIcon } from "@/components/auth/AuthInputs";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";

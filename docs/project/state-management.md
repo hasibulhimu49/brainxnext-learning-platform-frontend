@@ -36,4 +36,4 @@ All server state under `["me", …]` in `src/queries/keys.ts`: `subscription`, `
 - Saving progress also invalidates certificates and notifications (finishing a course can issue a certificate).
 - `useIsPro()` and `useCourseExtras(courseId)` (Pro, or bought that course) are derived from the subscription and enrolment queries — nothing is copied into a store.
 - The email change swaps in the new session through `authStore.setSession` and invalidates `["me"]`.
-- Page-local state only: the wallet-checkout phase (`useWalletCheckout`), dialog open/close, the My courses tab, and questions posted in the player's Discussion tab (no discussion endpoint yet, so they vanish on reload).
+- Page-local state only: the wallet-checkout phase (`src/hooks/useWalletCheckout.ts`), dialog open/close, the My courses tab, and questions posted in the player's Discussion tab (no discussion endpoint yet, so they vanish on reload).

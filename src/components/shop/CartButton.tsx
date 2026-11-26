@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Icon from "./Icon";
+import Icon from "@/components/common/Icon";
 import { useCartCount } from "@/stores/shopStore";
 
 /** Navbar cart icon with the item count (F-004). */

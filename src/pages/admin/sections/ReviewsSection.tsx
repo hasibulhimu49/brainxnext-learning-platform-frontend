@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import ReviewReplyDialog from "@/components/admin/dialogs/ReviewReplyDialog";
 import EmptyState, { NoMatches } from "@/components/admin/EmptyState";
 import { FilterMenu, SelectFilter } from "@/components/admin/Filters";
-import { matches, timeAgo } from "@/components/admin/format";
+import { matches } from "@/lib/admin";
+import { timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import Pagination from "@/components/admin/Pagination";
@@ -102,7 +103,7 @@ const ReviewsSection = () => {
                       <div>
                         <b className="text-[13px] font-bold text-ink">{r.who}</b>
                         <div className="mt-0.75 text-[10px] font-semibold text-soft">
-                          {r.course} • {timeAgo(r.at)}
+                          {r.course} • {timeAgoGB(r.at)}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1.5">

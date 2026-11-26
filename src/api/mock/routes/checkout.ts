@@ -10,7 +10,7 @@ import { findValidPromo, orders, promos } from "../db/commerce";
 import { enroll, findEnrollment } from "../db/learning";
 import { newId } from "../db/store";
 import { bodyOf, fail, ok, str, type MockRequest, type MockRoute } from "../http";
-import { findCourse } from "./catalog";
+import { findCourse } from "../db/courses";
 import { invalid, requireUser, unauthorized } from "./shared";
 
 /*

@@ -4,7 +4,7 @@ import { CURRICULUM } from "../db/courses";
 import { findEnrollment } from "../db/learning";
 import { QUIZ_BANK, QUIZ_PASS_PCT, quizScores } from "../db/quizzes";
 import { bodyOf, fail, ok, type MockRequest, type MockRoute } from "../http";
-import { findCourse } from "./catalog";
+import { findCourse } from "../db/courses";
 import { invalid, requireUser, unauthorized } from "./shared";
 
 /*

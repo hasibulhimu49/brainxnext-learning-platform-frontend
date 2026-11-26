@@ -3,10 +3,10 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import { errorMessage } from "@/api/envelope";
 import { Field } from "@/components/admin/dialogs/FormDialog";
-import { formatDateTime } from "@/components/admin/format";
+import { formatDateTimeGB } from "@/lib/dates";
 import AdminPage from "@/components/admin/PageHeader";
 import { AdminCard, InfoList } from "@/components/admin/Panel";
 import Pill from "@/components/admin/Pill";
@@ -96,7 +96,7 @@ const SubmissionView = ({ submission: s }: { submission: Submission }) => {
         <span className="inline-flex flex-wrap items-center gap-2">
           <Pill status={s.status} />
           <SlaPill submission={s} />
-          Submitted {formatDateTime(s.submittedAt)}
+          Submitted {formatDateTimeGB(s.submittedAt)}
         </span>
       }
     >
@@ -119,7 +119,7 @@ const SubmissionView = ({ submission: s }: { submission: Submission }) => {
             {reviewed && (
               <div className="mb-4 rounded-[13px] bg-surface2 px-4 py-3 text-xs leading-relaxed font-semibold text-muted">
                 <b className="mb-1 block text-ink">
-                  {s.status === "approved" ? "Approved" : "Changes requested"} by {s.reviewer ?? "—"} · {formatDateTime(s.reviewedAt)}
+                  {s.status === "approved" ? "Approved" : "Changes requested"} by {s.reviewer ?? "—"} · {formatDateTimeGB(s.reviewedAt)}
                 </b>
                 {s.feedback}
               </div>

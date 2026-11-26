@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { exportCsv } from "@/components/admin/csv";
+import { exportCsv } from "@/lib/csv";
 import ReasonDialog from "@/components/admin/dialogs/ReasonDialog";
-import { formatDateTime, isRefundable } from "@/components/admin/format";
+import { isRefundable } from "@/lib/admin";
+import { formatDateTimeGB } from "@/lib/dates";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, InfoList } from "@/components/admin/Panel";
 import Pill from "@/components/admin/Pill";
@@ -60,7 +61,7 @@ const PaymentView = ({ detail: { order, timeline } }: { detail: Detail }) => {
       desc={
         <span className="inline-flex flex-wrap items-center gap-2">
           <Pill status={order.status} />
-          {formatTaka(order.total)} · {order.method} · {formatDateTime(order.createdAt)}
+          {formatTaka(order.total)} · {order.method} · {formatDateTimeGB(order.createdAt)}
         </span>
       }
       actions={
@@ -100,7 +101,7 @@ const PaymentView = ({ detail: { order, timeline } }: { detail: Detail }) => {
                 <span className="flex min-w-0 flex-col gap-0.5">
                   <span className="text-xs font-extrabold text-ink">{e.label}</span>
                   {e.detail && <span className="text-[11.5px] font-semibold wrap-break-word text-muted">{e.detail}</span>}
-                  {e.at && <span className="text-[10.5px] font-bold text-soft">{formatDateTime(e.at)}</span>}
+                  {e.at && <span className="text-[10.5px] font-bold text-soft">{formatDateTimeGB(e.at)}</span>}
                 </span>
               </li>
             ))}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
 import { formatTaka } from "@/lib/utils";

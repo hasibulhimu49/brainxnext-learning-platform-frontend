@@ -6,7 +6,7 @@ import { syncCertificates } from "../db/entitlement";
 import { LESSON_IDS, enroll, findEnrollment, listEnrollments, progressOf, updateProgress } from "../db/learning";
 import { findUser, toProfile, updateUser } from "../db/users";
 import { bodyOf, fail, ok, str, type MockRoute } from "../http";
-import { findCourse } from "./catalog";
+import { findCourse } from "../db/courses";
 import { accountRoutes } from "./account";
 import { achievementRoutes } from "./achievements";
 import { billingRoutes } from "./billing";

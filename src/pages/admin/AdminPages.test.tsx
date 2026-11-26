@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { resetMockAdmin } from "@/api/mock/db/admin";
-import Sidebar from "@/components/layout/Sidebar";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "@/stores/authStore";
 import { renderWithProviders } from "@/test/render";
@@ -67,7 +67,7 @@ describe("admin page details", () => {
   });
 
   it("shows live counts in the sidebar", async () => {
-    renderWithProviders(<Sidebar />, { route: "/admin/submissions/SUB-1001" });
+    renderWithProviders(<AdminSidebar />, { route: "/admin/submissions/SUB-1001" });
     expect(await screen.findByRole("link", { name: "Submissions, 2 pending" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Inbox, 1 pending" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Reviews, 6 pending" })).toBeInTheDocument();

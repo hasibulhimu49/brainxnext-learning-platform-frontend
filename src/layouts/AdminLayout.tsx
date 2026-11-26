@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "@/components/layout/Sidebar";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
 /** Admin shell: fixed sidebar + scrolling content. Admin pages render their own <main>, so the skip-link target is a div. */
 const AdminLayout = () => (
@@ -7,7 +7,7 @@ const AdminLayout = () => (
     <a href="#main" className="skip-link">
       Skip to content
     </a>
-    <Sidebar />
+    <AdminSidebar />
     <div id="main" tabIndex={-1} className="min-w-0 outline-none">
       <Outlet />
     </div>

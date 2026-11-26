@@ -26,8 +26,12 @@ Components never import Axios or call `fetch`; ESLint enforces this.
 
 ## Folders
 
-See the layout in `CLAUDE.md`. Rule of thumb: `types/` are API contracts, `schemas/` are Zod validation (forms + mock request checks), `constants/` are UI copy that never comes from the server.
+Layer-based: `pages → queries → services → api`. The full tree is in `CLAUDE.md` §9. Rule of thumb: `types/` are API contracts, `schemas/` are Zod validation (forms + mock request checks), `constants/` are UI copy that never comes from the server, `lib/` holds pure helpers (dates, CSV, admin filters), `hooks/` shared hooks.
+
+- **Pages** (`src/pages/<area>/`): `auth`, `courses` (catalog, course, player, quiz, project), `dashboard` (Dashboard, My courses, My reviews), `account` (Settings), `certificates` (list, single, public verify), `billing` (order receipt), `checkout` (course, cart, plan), `shop` (cart, wishlist), `paths`, `support` (support form, thank-you), `marketing`, `legal`, `admin`, `errors` (403 / 404 / 500).
+- **Components** (`src/components/<area>/`): `ui` (shadcn), `common` (app-wide, incl. `FormFeedback` — `Alert`, `FieldError`, `SubmitButton`, `SuccessState`), `auth` (`AuthCard`, `AuthHeader`, `OrDivider`, inputs), `admin` (`AdminSidebar`, tables, `dialogs/`, `course-editor/`), `learner`, `course`, `player`, `checkout`, `billing`, `shop` (cart + wishlist buttons), `marketing`, `assistant`.
+- **Tests** sit next to the code they cover (`Foo.test.tsx` beside `Foo.tsx`; mock API tests beside the route file, e.g. `mock/routes/orders.test.ts`). Playwright specs in `e2e/` are named by flow (`enroll-checkout`, `billing`, `cart`, `reviews-quizzes-paths`, …).
 
 ## Mock API
 
-`src/api/mock` replaces the Axios adapter, so requests still go through interceptors and the envelope check. Handlers (`routes.ts`) return the same status codes and error codes the backend will. Seeded data lives in `mock/db`. Turn it off with `VITE_USE_MOCK_API=false`.
+`src/api/mock` replaces the Axios adapter, so requests still go through interceptors and the envelope check. Handlers (`mock/routes/*.ts`) return the same status codes and error codes the backend will. Seeded data and lookups (e.g. `findCourse`) live in `mock/db`. Turn it off with `VITE_USE_MOCK_API=false`.

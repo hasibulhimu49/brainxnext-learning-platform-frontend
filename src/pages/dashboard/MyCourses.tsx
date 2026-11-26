@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
-import EnrolledCourseRow from "@/components/dashboard/EnrolledCourseRow";
+import EnrolledCourseRow from "@/components/learner/EnrolledCourseRow";
 import LearnerPage, { EmptyCard } from "@/components/learner/LearnerPage";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useDashboard } from "@/queries/account";

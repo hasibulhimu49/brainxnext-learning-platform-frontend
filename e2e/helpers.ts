@@ -16,3 +16,12 @@ export async function login(page: Page, account = STUDENT) {
   await submitLogin(page, account);
   await expect(page).toHaveURL(account === ADMIN ? /\/admin$/ : /\/dashboard$/);
 }
+
+/** Fill the card form with the test card and pay (`total` as shown on the button, e.g. "৳1,900"). */
+export async function payByCard(page: Page, total: string) {
+  await page.getByLabel("Name on card").fill("Test Learner");
+  await page.getByLabel("Card number").fill("4242424242424242");
+  await page.getByLabel("Expiry").fill("1230");
+  await page.getByLabel("CVC").fill("123");
+  await page.getByRole("button", { name: `Pay ${total}` }).click();
+}

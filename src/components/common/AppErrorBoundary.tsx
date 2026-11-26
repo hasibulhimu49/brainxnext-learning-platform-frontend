@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
-import ServerError from "@/pages/ServerError";
+import ServerError from "@/pages/errors/ServerError";
 
 interface BoundaryProps {
   /** changing this (the current path) clears a caught error */

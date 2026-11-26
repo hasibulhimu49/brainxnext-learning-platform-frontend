@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { ADMIN_NAV } from "@/constants/admin";
-import useTheme from "../../hooks/useTheme";
-import Icon from "../common/Icon";
+import useTheme from "@/hooks/useTheme";
+import Icon from "@/components/common/Icon";
 import LogoMark from "@/components/common/LogoMark";
 import { useAdminCounts } from "@/queries/admin";
 import { useLogout } from "@/queries/auth";
@@ -16,7 +16,7 @@ const itemClass = ({ isActive }: { isActive: boolean }) =>
   }`;
 
 /** Admin panel sidebar — stacks horizontally on narrow screens */
-const Sidebar = () => {
+const AdminSidebar = () => {
   const { theme, toggleTheme } = useTheme();
   const user = useSessionUser();
   const logout = useLogout();
@@ -84,4 +84,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

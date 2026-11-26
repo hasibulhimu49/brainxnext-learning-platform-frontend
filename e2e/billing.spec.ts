@@ -1,15 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { login } from "./helpers";
+import { login, payByCard } from "./helpers";
 
 /** F-002 Phase 2: plans, failed wallet payments, certificates, verification, project reviews, notifications. */
-
-async function payByCard(page: Page, total: string) {
-  await page.getByLabel("Name on card").fill("Test Learner");
-  await page.getByLabel("Card number").fill("4242424242424242");
-  await page.getByLabel("Expiry").fill("1230");
-  await page.getByLabel("CVC").fill("123");
-  await page.getByRole("button", { name: `Pay ${total}` }).click();
-}
 
 async function goPro(page: Page) {
   await page.goto("/checkout/plan/pro?cycle=monthly");

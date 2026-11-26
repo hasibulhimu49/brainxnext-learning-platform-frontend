@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { exportCsv, type CsvColumn } from "@/components/admin/csv";
+import { exportCsv, type CsvColumn } from "@/lib/csv";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import ReasonDialog from "@/components/admin/dialogs/ReasonDialog";
 import EmptyState from "@/components/admin/EmptyState";
 import { FilterMenu, SearchFilter } from "@/components/admin/Filters";
-import { formatDate, isRefundable, matches } from "@/components/admin/format";
+import { isRefundable, matches } from "@/lib/admin";
+import { formatDateGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, Name } from "@/components/admin/Panel";
@@ -52,7 +53,7 @@ const COLUMNS: Column<OrderRecord>[] = [
     render: (o) => formatTaka(o.total),
   },
   { key: "status", header: "Status", sort: (o) => o.status, render: (o) => <Pill status={o.status} /> },
-  { key: "date", header: "Date", sort: (o) => o.createdAt, className: "whitespace-nowrap", render: (o) => formatDate(o.createdAt) },
+  { key: "date", header: "Date", sort: (o) => o.createdAt, className: "whitespace-nowrap", render: (o) => formatDateGB(o.createdAt) },
 ];
 
 const CSV: CsvColumn<OrderRecord>[] = [

@@ -1,5 +1,5 @@
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import { Switch } from "@/components/ui/switch";

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_ERROR_CODES, errorMessage, isApiError } from "@/api/envelope";
-import { FieldError } from "@/components/auth/AuthCard";
+import { FieldError } from "@/components/common/FormFeedback";
 import HeroBand from "@/components/common/HeroBand";
 import Icon from "@/components/common/Icon";
 import { LoadingState } from "@/components/common/QueryStatus";

@@ -3,7 +3,8 @@ import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, typ
 import { useForm } from "react-hook-form";
 import { Link, Navigate } from "react-router-dom";
 import { API_ERROR_CODES, errorMessage, isApiError } from "@/api/envelope";
-import { Alert, AuthCard, AuthHeader, SubmitButton, SuccessState } from "@/components/auth/AuthCard";
+import { AuthCard, AuthHeader } from "@/components/auth/AuthCard";
+import { Alert, SubmitButton, SuccessState } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import AuthLayout from "@/layouts/AuthLayout";
 import { useResendOtp, useVerifyOtp } from "@/queries/auth";

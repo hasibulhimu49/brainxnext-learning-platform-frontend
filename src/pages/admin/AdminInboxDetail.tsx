@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import { Field } from "@/components/admin/dialogs/FormDialog";
-import { formatDateTime } from "@/components/admin/format";
+import { formatDateTimeGB } from "@/lib/dates";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, InfoList } from "@/components/admin/Panel";
 import Pill from "@/components/admin/Pill";
@@ -23,7 +23,7 @@ import type { Ticket } from "@/types/commerce";
 const Bubble = ({ from, at, children, admin }: { from: string; at: string; children: string; admin?: boolean }) => (
   <div className={`flex flex-col gap-1.5 ${admin ? "items-end" : "items-start"}`}>
     <span className="text-[10.5px] font-bold text-soft">
-      {from} · {formatDateTime(at)}
+      {from} · {formatDateTimeGB(at)}
     </span>
     <p
       className={`m-0 max-w-140 rounded-2xl px-4 py-3 text-[13px] leading-relaxed font-semibold whitespace-pre-line ${
@@ -106,7 +106,7 @@ const TicketView = ({ ticket }: { ticket: Ticket }) => {
       desc={
         <span className="inline-flex flex-wrap items-center gap-2">
           <Pill status={ticket.status} />
-          {ticket.email} · {formatDateTime(ticket.createdAt)}
+          {ticket.email} · {formatDateTimeGB(ticket.createdAt)}
         </span>
       }
       actions={

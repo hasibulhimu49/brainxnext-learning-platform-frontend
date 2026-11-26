@@ -32,3 +32,38 @@ export const addMonths = (date: Date, months: number) => {
   d.setUTCDate(Math.min(day, last));
   return d;
 };
+
+/*
+ * Admin-panel formats (en-GB, "24 Nov 2026"). They differ from the learner-facing ones above on
+ * purpose, and accept a missing date ("—").
+ */
+
+const dateFmtGB = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
+const dateTimeFmtGB = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+const validIso = (iso: string | null | undefined): iso is string => !!iso && !Number.isNaN(new Date(iso).getTime());
+
+/** "24 Nov 2026" */
+export const formatDateGB = (iso: string | null | undefined) => (validIso(iso) ? dateFmtGB.format(new Date(iso)) : "—");
+
+/** "24 Nov 2026, 09:36" */
+export const formatDateTimeGB = (iso: string | null | undefined) => (validIso(iso) ? dateTimeFmtGB.format(new Date(iso)) : "—");
+
+/** "just now", "12 min ago", "3 h ago", "Yesterday", "2 days ago", then the date. */
+export const timeAgoGB = (iso: string | null | undefined, now = Date.now()) => {
+  if (!validIso(iso)) return "—";
+  const min = Math.round((now - new Date(iso).getTime()) / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h ago`;
+  const d = Math.round(h / 24);
+  if (d < 7) return d === 1 ? "Yesterday" : `${d} days ago`;
+  return formatDateGB(iso);
+};

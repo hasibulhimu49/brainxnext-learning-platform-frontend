@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
 import TypeToConfirmDialog from "@/components/admin/dialogs/TypeToConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
-import { formatDate, timeAgo } from "@/components/admin/format";
+import { formatDateGB, timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, ListItem, Name } from "@/components/admin/Panel";
@@ -47,7 +47,7 @@ const CourseView = ({ course }: { course: Detail }) => {
       desc={
         <span className="inline-flex flex-wrap items-center gap-2">
           <Pill status={course.status} />
-          {plural(course.modules, "module")} · {plural(lessons, "class", "es")} · Updated {timeAgo(course.updatedAt)}
+          {plural(course.modules, "module")} · {plural(lessons, "class", "es")} · Updated {timeAgoGB(course.updatedAt)}
         </span>
       }
       actions={
@@ -119,7 +119,7 @@ const CourseView = ({ course }: { course: Detail }) => {
             course.recentEnrollments.map((e) => (
               <ListItem key={e.studentId}>
                 <Link to={`/admin/students/${e.studentId}`} className="min-w-0 text-ink hover:text-brand">
-                  <Name title={e.name} sub={`${e.email} · ${formatDate(e.enrolledAt)}`} />
+                  <Name title={e.name} sub={`${e.email} · ${formatDateGB(e.enrolledAt)}`} />
                 </Link>
                 <b className="font-extrabold">{e.pct}%</b>
               </ListItem>

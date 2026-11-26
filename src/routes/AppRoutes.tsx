@@ -1,58 +1,60 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoadingState } from "@/components/common/QueryStatus";
-import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
 import Home from "@/pages/Home";
 import { GuestOnly, RequireAuth, RequireRole } from "./guards";
 
-/* Home ships in the main bundle; every other page is split into its own chunk. */
-const NotFound = lazy(() => import("@/pages/NotFound"));
-const Forbidden = lazy(() => import("@/pages/Forbidden"));
+/*
+ * Home and the public layout ship in the main bundle; every other page (and the admin shell) is
+ * split into its own chunk. Grouped in the same order as the routes below.
+ */
 
-const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
-const Login = lazy(() => import("@/pages/auth/Login"));
-const Register = lazy(() => import("@/pages/auth/Register"));
-const ResetPassword = lazy(() => import("@/pages/auth/ResetPassword"));
-const VerifyOtp = lazy(() => import("@/pages/auth/VerifyOtp"));
-
+/* Public pages */
 const Catalog = lazy(() => import("@/pages/courses/Catalog"));
 const CourseDetail = lazy(() => import("@/pages/courses/CourseDetail"));
-const LearnIndex = lazy(() => import("@/pages/courses/LearnIndex"));
-const Player = lazy(() => import("@/pages/courses/Player"));
-const ProjectSubmission = lazy(() => import("@/pages/courses/ProjectSubmission"));
-
-const About = lazy(() => import("@/pages/marketing/About"));
-const Checkout = lazy(() => import("@/pages/marketing/Checkout"));
-const Contact = lazy(() => import("@/pages/marketing/Contact"));
 const Notes = lazy(() => import("@/pages/marketing/Notes"));
-const PlanCheckout = lazy(() => import("@/pages/marketing/PlanCheckout"));
-const Wishlist = lazy(() => import("@/pages/marketing/Wishlist"));
-const Cart = lazy(() => import("@/pages/marketing/Cart"));
-const CartCheckout = lazy(() => import("@/pages/marketing/CartCheckout"));
-const ModuleQuiz = lazy(() => import("@/pages/courses/ModuleQuiz"));
-const Paths = lazy(() => import("@/pages/marketing/Paths"));
-const PathDetail = lazy(() => import("@/pages/marketing/PathDetail"));
 const Pricing = lazy(() => import("@/pages/marketing/Pricing"));
-const Support = lazy(() => import("@/pages/marketing/Support"));
-const ThankYou = lazy(() => import("@/pages/marketing/ThankYou"));
+const About = lazy(() => import("@/pages/marketing/About"));
+const Contact = lazy(() => import("@/pages/marketing/Contact"));
 const Help = lazy(() => import("@/pages/marketing/Help"));
-const OrderReceipt = lazy(() => import("@/pages/marketing/OrderReceipt"));
-const VerifyCertificate = lazy(() => import("@/pages/marketing/VerifyCertificate"));
-
 const Privacy = lazy(() => import("@/pages/legal/Privacy"));
-const Refunds = lazy(() => import("@/pages/legal/Refunds"));
 const Terms = lazy(() => import("@/pages/legal/Terms"));
+const Refunds = lazy(() => import("@/pages/legal/Refunds"));
+const VerifyCertificate = lazy(() => import("@/pages/certificates/VerifyCertificate"));
+const Wishlist = lazy(() => import("@/pages/shop/Wishlist"));
+const Cart = lazy(() => import("@/pages/shop/Cart"));
+const Paths = lazy(() => import("@/pages/paths/Paths"));
+const PathDetail = lazy(() => import("@/pages/paths/PathDetail"));
 
-const Certificate = lazy(() => import("@/pages/dashboard/Certificate"));
-const Certificates = lazy(() => import("@/pages/dashboard/Certificates"));
+/* Signed-in area */
+const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
 const MyCourses = lazy(() => import("@/pages/dashboard/MyCourses"));
 const MyReviews = lazy(() => import("@/pages/dashboard/MyReviews"));
-const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
-const Settings = lazy(() => import("@/pages/dashboard/Settings"));
+const Certificates = lazy(() => import("@/pages/certificates/Certificates"));
+const Settings = lazy(() => import("@/pages/account/Settings"));
+const LearnIndex = lazy(() => import("@/pages/courses/LearnIndex"));
+const ProjectSubmission = lazy(() => import("@/pages/courses/ProjectSubmission"));
+const ModuleQuiz = lazy(() => import("@/pages/courses/ModuleQuiz"));
+const Player = lazy(() => import("@/pages/courses/Player"));
+const Certificate = lazy(() => import("@/pages/certificates/Certificate"));
+const OrderReceipt = lazy(() => import("@/pages/billing/OrderReceipt"));
+const PlanCheckout = lazy(() => import("@/pages/checkout/PlanCheckout"));
+const CartCheckout = lazy(() => import("@/pages/checkout/CartCheckout"));
+const Checkout = lazy(() => import("@/pages/checkout/Checkout"));
 
+/* Guest-only and single-card screens */
+const Login = lazy(() => import("@/pages/auth/Login"));
+const Register = lazy(() => import("@/pages/auth/Register"));
+const VerifyOtp = lazy(() => import("@/pages/auth/VerifyOtp"));
+const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/auth/ResetPassword"));
+const Support = lazy(() => import("@/pages/support/Support"));
+const ThankYou = lazy(() => import("@/pages/support/ThankYou"));
+
+/* Admin */
+const AdminLayout = lazy(() => import("@/layouts/AdminLayout"));
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
-const AdminNewCourse = lazy(() => import("@/pages/admin/AdminNewCourse"));
 const AdminCourseDetail = lazy(() => import("@/pages/admin/AdminCourseDetail"));
 const AdminStudentDetail = lazy(() => import("@/pages/admin/AdminStudentDetail"));
 const AdminPaymentDetail = lazy(() => import("@/pages/admin/AdminPaymentDetail"));
@@ -61,6 +63,11 @@ const AdminSubmissionDetail = lazy(() => import("@/pages/admin/AdminSubmissionDe
 const AdminPromos = lazy(() => import("@/pages/admin/AdminPromos"));
 const AdminInbox = lazy(() => import("@/pages/admin/AdminInbox"));
 const AdminInboxDetail = lazy(() => import("@/pages/admin/AdminInboxDetail"));
+const AdminNewCourse = lazy(() => import("@/pages/admin/AdminNewCourse"));
+
+/* Errors */
+const Forbidden = lazy(() => import("@/pages/errors/Forbidden"));
+const NotFound = lazy(() => import("@/pages/errors/NotFound"));
 
 /** Each guest screen gets its own guard, so it re-checks the session whenever it opens. */
 const guest = (page: ReactNode) => <GuestOnly>{page}</GuestOnly>;

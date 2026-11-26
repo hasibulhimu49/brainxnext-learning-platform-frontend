@@ -5,10 +5,10 @@
 | Level | File | What it covers |
 | ----- | ---- | -------------- |
 | Unit (Vitest) | `src/schemas/learner.test.ts` | Phase 2 schemas: project submission, refund reason, preference patch, confirm-password refine, DELETE confirmation, email change, profile without email |
-| Unit (Vitest) | `src/api/mock/routes/phase2.test.ts` | Phase 2 mock: orders (card paid + promo usage, expired promo, wallet decline / cancel, receipts), refund window, donations, Pro subscribe / cancel / resume / cycle, Pro enrolment, certificate issuing + public verify, submissions, notification read state, preferences, email change, account deletion |
-| Component (RTL) | `src/pages/learnerPhase2.test.tsx` | receipt page, certificates list + empty state, notifications dropdown (unread, mark all read, Escape), plan checkout (cycle, card → receipt, already Pro, Teams), refund dialog |
-| End-to-end (Playwright) | `e2e/learner.spec.ts` | Pro checkout → billing Pro → cancel / resume; declined wallet → failed → retry; complete course → certificate → public verify; submit project → My reviews; notifications; donation → handbook download |
-| End-to-end (Playwright) | `e2e/learning.spec.ts`, `e2e/smoke.spec.ts` | bKash → pending → approve → receipt → player; smoke covers every new learner / public route incl. `/privacy`, `/terms`, `/refunds`, `/help`, `/verify` |
+| Unit (Vitest) | `src/api/mock/routes/{orders,billing,achievements,account}.test.ts` | Phase 2 mock: orders (card paid + promo usage, expired promo, wallet decline / cancel, receipts), refund window, donations, Pro subscribe / cancel / resume / cycle, Pro enrolment, certificate issuing + public verify, submissions, notification read state, preferences, email change, account deletion |
+| Component (RTL) | `src/pages/billing/OrderReceipt.test.tsx`, `src/pages/certificates/Certificates.test.tsx`, `src/components/learner/NotificationsMenu.test.tsx`, `src/pages/checkout/PlanCheckout.test.tsx`, `src/components/billing/OrderHistory.test.tsx` | receipt page, certificates list + empty state, notifications dropdown (unread, mark all read, Escape), plan checkout (cycle, card → receipt, already Pro, Teams), refund dialog |
+| End-to-end (Playwright) | `e2e/billing.spec.ts` | Pro checkout → billing Pro → cancel / resume; declined wallet → failed → retry; complete course → certificate → public verify; submit project → My reviews; notifications; donation → handbook download |
+| End-to-end (Playwright) | `e2e/enroll-checkout.spec.ts`, `e2e/smoke.spec.ts` | bKash → pending → approve → receipt → player; smoke covers every new learner / public route incl. `/privacy`, `/terms`, `/refunds`, `/help`, `/verify` |
 | Unit (Vitest) | `src/schemas/….test.ts` | |
 | Component (RTL) | `src/pages/….test.tsx` | |
 | End-to-end (Playwright) | `e2e/….spec.ts` | |

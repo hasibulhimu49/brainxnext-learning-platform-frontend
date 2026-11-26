@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import { PillBtn, SettingsCard } from "@/components/learner/settings/SettingsBlocks";
 import { PRO_FEATURES, PRO_PRICE, PRO_YEARLY_PER_MONTH } from "@/constants/plans";

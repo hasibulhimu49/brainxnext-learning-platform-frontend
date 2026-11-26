@@ -244,6 +244,8 @@ export const COURSES: Course[] = [
   },
 ];
 
+export const findCourse = (id: string | undefined) => COURSES.find((c) => c.id === id);
+
 /* Java Generics is the only course with a full curriculum in the designs; other courses reuse it as placeholder content. */
 export const JAVA_GENERICS_DESCRIPTION =
   "The complete Java generics series in Bangla — type parameters, bounded types, wildcards, type erasure and generic methods, taught with real code in every class.";

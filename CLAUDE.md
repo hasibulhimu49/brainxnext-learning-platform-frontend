@@ -67,7 +67,7 @@ Current owners:
 
 Conventions:
 
-- shadcn/ui primitives live in `src/components/ui`, themed with the design tokens; shared components in `src/components/common`, feature components in `auth/`, `course/`, `marketing/`, `layout/`.
+- shadcn/ui primitives live in `src/components/ui`, themed with the design tokens; shared components in `src/components/common`, feature components in `auth/`, `admin/`, `learner/`, `course/`, `player/`, `checkout/`, `billing/`, `shop/`, `marketing/`, `assistant/`.
 - Pages are split into a data wrapper (query + `<QueryStatus>`) and a typed view that receives the loaded data (see `CourseDetail`, `Player`, `Dashboard`).
 - Styling: Tailwind CSS v4. Design tokens in `src/index.css` map to `bg-page`, `bg-surface`, `text-ink`, `text-muted`, `text-soft`, `border-line`, `bg-chip`. Add shadcn components with `npx shadcn@latest add <name>` (config: `components.json`) and restyle them to the tokens. `text-muted` is our secondary text colour, so don't use shadcn's `bg-muted` — use `bg-surface2`.
 
@@ -110,19 +110,29 @@ Before finishing any change: `npm run typecheck && npm run lint && npm test`. Ru
 
 ```
 src/
-  api/          client.ts (Axios), envelope.ts, config.ts, mock/ (adapter, routes, db)
+  api/          client.ts (Axios), envelope.ts, config.ts, mock/ (adapter, routes/, db/)
   services/     endpoint functions (only place besides api/ that talks to the client)
   queries/      TanStack Query hooks + keys
-  stores/       Zustand stores (auth, ui)
+  stores/       Zustand stores (auth, ui, shop)
   schemas/      Zod schemas + form value types
   types/        domain types (API contracts)
   constants/    UI copy/config that is not server data
-  components/   ui/ (shadcn), common/, auth/, course/, marketing/, layout/
+  hooks/        shared hooks (useCart, useWalletCheckout, usePageTitle, useTheme, …)
+  lib/          pure helpers (utils, dates, billing, lessons, csv, admin, queryClient)
+  components/
+    ui/         shadcn primitives
+    common/     app-wide pieces (Navbar, Footer, Icon, QueryStatus, FormFeedback, …)
+    auth/       AuthCard / AuthHeader / OrDivider, AuthInputs
+    admin/      admin panel (AdminSidebar, DataTable, dialogs/, course-editor/)
+    learner/    signed-in learner pieces (dashboard rows, certificates, notifications, settings/)
+    course/  player/  checkout/  billing/  shop/  marketing/  assistant/   feature components
   layouts/      PublicLayout, AuthLayout, AdminLayout
-  pages/        route screens
-  routes/       AppRoutes.tsx (React Router, lazy-loaded pages — not Next.js)
+  pages/        route screens, one folder per area:
+                auth/ courses/ dashboard/ account/ certificates/ billing/ checkout/ shop/
+                paths/ support/ marketing/ legal/ admin/ errors/ (+ Home.tsx)
+  routes/       AppRoutes.tsx (React Router, lazy-loaded pages — not Next.js), guards, redirects
   test/         Vitest setup + render helper
-e2e/            Playwright specs
+e2e/            Playwright specs (+ helpers.ts: STUDENT/ADMIN, login, payByCard)
 docs/project/   architecture & guideline docs
 docs/features/  one folder per feature (F-XXX-name): feature, plan, testing, review, changelog
 ```

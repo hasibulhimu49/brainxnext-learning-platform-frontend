@@ -4,7 +4,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

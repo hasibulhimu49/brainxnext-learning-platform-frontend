@@ -2,7 +2,8 @@ import { useState } from "react";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import EmptyState from "@/components/admin/EmptyState";
 import { ChipFilter, SearchFilter } from "@/components/admin/Filters";
-import { matches, timeAgo } from "@/components/admin/format";
+import { matches } from "@/lib/admin";
+import { timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage from "@/components/admin/PageHeader";
 import { AdminCard, Name } from "@/components/admin/Panel";
@@ -25,7 +26,7 @@ const COLUMNS: Column<Ticket>[] = [
     header: "Message",
     render: (t) => <span className="line-clamp-2 max-w-90 text-muted">{t.message}</span>,
   },
-  { key: "received", header: "Received", sort: (t) => t.createdAt, className: "whitespace-nowrap", render: (t) => timeAgo(t.createdAt) },
+  { key: "received", header: "Received", sort: (t) => t.createdAt, className: "whitespace-nowrap", render: (t) => timeAgoGB(t.createdAt) },
   { key: "status", header: "Status", sort: (t) => t.status, render: (t) => <Pill status={t.status} /> },
 ];
 

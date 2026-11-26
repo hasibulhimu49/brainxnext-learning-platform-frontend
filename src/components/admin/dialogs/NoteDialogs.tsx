@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Icon from "@/components/common/Icon";
-import { FieldError } from "@/components/auth/AuthCard";
+import { FieldError } from "@/components/common/FormFeedback";
 import { Input } from "@/components/ui/input";
 import { useCreateNote, useUploadNoteVersion } from "@/queries/admin";
 import { NOTE_TYPES, noteFileSchema, noteSchema, type NoteValues } from "@/schemas/admin";
 import type { AdminNote } from "@/types/admin";
-import { formatBytes } from "../format";
+import { formatBytes } from "@/lib/admin";
 import FormDialog, { Field, selectCls } from "./FormDialog";
 
 interface DialogProps {

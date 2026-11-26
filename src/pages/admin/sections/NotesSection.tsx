@@ -3,7 +3,8 @@ import { CreateNoteDialog, UploadVersionDialog } from "@/components/admin/dialog
 import ImportDialog from "@/components/admin/dialogs/ImportDialog";
 import EmptyState, { NoMatches } from "@/components/admin/EmptyState";
 import { SearchFilter, SelectFilter } from "@/components/admin/Filters";
-import { formatBytes, matches, timeAgo } from "@/components/admin/format";
+import { formatBytes, matches } from "@/lib/admin";
+import { timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import Pagination from "@/components/admin/Pagination";
@@ -95,7 +96,7 @@ const NotesSection = () => {
                       <div className="min-w-0">
                         <Name
                           title={n.name}
-                          sub={`${n.category} • ${n.pages} pages • v${n.version} • Updated ${timeAgo(n.updatedAt)}${n.fileName ? ` • ${n.fileName} (${formatBytes(n.fileSize ?? 0)})` : ""}`}
+                          sub={`${n.category} • ${n.pages} pages • v${n.version} • Updated ${timeAgoGB(n.updatedAt)}${n.fileName ? ` • ${n.fileName} (${formatBytes(n.fileSize ?? 0)})` : ""}`}
                         />
                       </div>
                     </div>

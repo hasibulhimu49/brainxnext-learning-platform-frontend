@@ -2,7 +2,8 @@ import { useState } from "react";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import EmptyState from "@/components/admin/EmptyState";
 import { ChipFilter, SearchFilter } from "@/components/admin/Filters";
-import { formatDateTime, matches, slaHoursLeft } from "@/components/admin/format";
+import { matches, slaHoursLeft } from "@/lib/admin";
+import { formatDateTimeGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage from "@/components/admin/PageHeader";
 import { AdminCard, Name } from "@/components/admin/Panel";
@@ -26,7 +27,7 @@ const COLUMNS: Column<Submission>[] = [
     header: "Submitted",
     sort: (s) => s.submittedAt,
     className: "whitespace-nowrap",
-    render: (s) => formatDateTime(s.submittedAt),
+    render: (s) => formatDateTimeGB(s.submittedAt),
   },
   {
     key: "sla",

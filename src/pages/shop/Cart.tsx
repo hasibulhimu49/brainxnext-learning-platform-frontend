@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import LearnerPage, { EmptyCard } from "@/components/learner/LearnerPage";

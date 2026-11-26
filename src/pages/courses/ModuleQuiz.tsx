@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { API_ERROR_CODES, errorMessage, isApiError } from "@/api/envelope";
-import { Alert, AuthCard, AuthHeader } from "@/components/auth/AuthCard";
+import { AuthCard, AuthHeader } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import { Button } from "@/components/ui/button";

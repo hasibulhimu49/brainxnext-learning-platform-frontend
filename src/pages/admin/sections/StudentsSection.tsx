@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { exportCsv, type CsvColumn } from "@/components/admin/csv";
+import { exportCsv, type CsvColumn } from "@/lib/csv";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import { AddStudentDialog } from "@/components/admin/dialogs/StudentDialogs";
 import EmptyState from "@/components/admin/EmptyState";
 import { SearchFilter, SelectFilter } from "@/components/admin/Filters";
-import { formatDate, matches, timeAgo } from "@/components/admin/format";
+import { matches } from "@/lib/admin";
+import { formatDateGB, timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, Name } from "@/components/admin/Panel";
@@ -25,8 +26,8 @@ const COLUMNS: Column<AdminStudentRow>[] = [
   { key: "courses", header: "Courses", sort: (s) => s.courses, render: (s) => s.courses },
   { key: "progress", header: "Progress", sort: (s) => s.progress, render: (s) => `${s.progress}%` },
   { key: "status", header: "Status", sort: (s) => s.status, render: (s) => <Pill status={s.status} /> },
-  { key: "active", header: "Last active", sort: (s) => s.lastActiveAt, render: (s) => timeAgo(s.lastActiveAt) },
-  { key: "joined", header: "Joined", sort: (s) => s.joinedAt, render: (s) => formatDate(s.joinedAt) },
+  { key: "active", header: "Last active", sort: (s) => s.lastActiveAt, render: (s) => timeAgoGB(s.lastActiveAt) },
+  { key: "joined", header: "Joined", sort: (s) => s.joinedAt, render: (s) => formatDateGB(s.joinedAt) },
 ];
 
 const CSV: CsvColumn<AdminStudentRow>[] = [

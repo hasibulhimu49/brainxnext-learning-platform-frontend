@@ -5,7 +5,7 @@ import CheckoutShell, { CheckoutGrid } from "@/components/checkout/CheckoutShell
 import OrderSummary, { SummaryItem } from "@/components/checkout/OrderSummary";
 import PaymentFailed from "@/components/checkout/PaymentFailed";
 import PaymentForm from "@/components/checkout/PaymentForm";
-import { useWalletCheckout } from "@/components/checkout/useWalletCheckout";
+import { useWalletCheckout } from "@/hooks/useWalletCheckout";
 import WalletPending from "@/components/checkout/WalletPending";
 import Icon from "@/components/common/Icon";
 import { useCart } from "@/hooks/useCart";

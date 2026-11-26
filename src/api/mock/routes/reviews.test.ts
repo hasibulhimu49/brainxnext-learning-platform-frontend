@@ -3,8 +3,6 @@ import { API_ERROR_CODES } from "@/api/envelope";
 import { adminService } from "@/services/adminService";
 import { authService } from "@/services/authService";
 import { courseService } from "@/services/courseService";
-import { pathService } from "@/services/pathService";
-import { quizService } from "@/services/quizService";
 import { reviewService } from "@/services/reviewService";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -55,53 +53,5 @@ describe("course reviews (F-006)", () => {
     await expect(reviewService.save("python-data-analysis", { stars: 0, text: "short" })).rejects.toMatchObject({
       code: API_ERROR_CODES.validation,
     });
-  });
-});
-
-describe("module quizzes (F-007)", () => {
-  beforeEach(asStudent);
-
-  it("sends questions without the answers", async () => {
-    const quiz = await quizService.quiz("java-generics", 1);
-    expect(quiz).toMatchObject({ module: 1, moduleTitle: "Bounded Types", passPct: 70 });
-    expect(quiz.questions).toHaveLength(4);
-    expect(JSON.stringify(quiz)).not.toContain("answer");
-    expect(JSON.stringify(quiz)).not.toContain("explanation");
-  });
-
-  it("grades a submission, explains every answer and keeps the best score", async () => {
-    const fail = await quizService.submit("java-generics", 1, [0, 0, 0, 0]);
-    expect(fail).toMatchObject({ score: 0, total: 4, passed: false });
-    expect(fail.results[0]).toMatchObject({ correct: false, correctIndex: 1 });
-    expect(fail.results[0]?.explanation).toBeTruthy();
-
-    const pass = await quizService.submit("java-generics", 1, [1, 1, 1, 1]);
-    expect(pass).toMatchObject({ score: 4, passed: true, best: 4 });
-    await quizService.submit("java-generics", 1, [0, 0, 0, 0]);
-
-    const scores = await quizService.scores("java-generics");
-    expect(scores.find((s) => s.module === 1)).toMatchObject({ best: 4, passed: true, attempts: 3 });
-    // seeded: module 1 already passed
-    expect(scores.find((s) => s.module === 0)).toMatchObject({ passed: true });
-  });
-
-  it("needs an enrolment and a full set of answers", async () => {
-    await expect(quizService.quiz("applied-ml", 0)).rejects.toMatchObject({ code: API_ERROR_CODES.notEnrolled });
-    await expect(quizService.submit("java-generics", 0, [1])).rejects.toMatchObject({ code: API_ERROR_CODES.validation });
-    await expect(quizService.quiz("java-generics", 9)).rejects.toMatchObject({ code: API_ERROR_CODES.notFound });
-  });
-});
-
-describe("learning paths (F-008)", () => {
-  it("lists paths whose steps are real catalog courses", async () => {
-    const [paths, courses] = await Promise.all([pathService.list(), courseService.list()]);
-    expect(paths.map((p) => p.id)).toEqual(["backend-developer", "data-analyst", "ai-engineer", "product-designer"]);
-    const ids = new Set(courses.map((c) => c.id));
-    expect(paths.flatMap((p) => p.steps).every((s) => ids.has(s.courseId))).toBe(true);
-  });
-
-  it("serves one path and 404s an unknown one", async () => {
-    await expect(pathService.detail("data-analyst")).resolves.toMatchObject({ title: "Data Analyst" });
-    await expect(pathService.detail("nope")).rejects.toMatchObject({ code: API_ERROR_CODES.notFound });
   });
 });

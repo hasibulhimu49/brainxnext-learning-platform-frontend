@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { previewCsv, type CsvPreview } from "../csv";
-import { formatBytes } from "../format";
+import { previewCsv, type CsvPreview } from "@/lib/csv";
+import { formatBytes } from "@/lib/admin";
 
 interface ImportDialogProps {
   open: boolean;

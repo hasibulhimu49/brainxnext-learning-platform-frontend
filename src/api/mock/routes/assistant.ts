@@ -4,9 +4,8 @@ import { flattenLessons } from "@/lib/lessons";
 import { formatTaka } from "@/lib/utils";
 import type { AssistantCourseCard, AssistantReply } from "@/types/assistant";
 import type { Course } from "@/types/course";
-import { COURSES, CURRICULUM } from "../db/courses";
+import { COURSES, CURRICULUM, findCourse } from "../db/courses";
 import { bodyOf, ok, str, type MockRequest, type MockRoute } from "../http";
-import { findCourse } from "./catalog";
 import { invalid } from "./shared";
 
 /*

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { exportCsv, type CsvColumn } from "@/components/admin/csv";
+import { exportCsv, type CsvColumn } from "@/lib/csv";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import ImportDialog from "@/components/admin/dialogs/ImportDialog";
 import EmptyState from "@/components/admin/EmptyState";
 import { SearchFilter, SelectFilter } from "@/components/admin/Filters";
-import { matches, timeAgo } from "@/components/admin/format";
+import { matches } from "@/lib/admin";
+import { timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, Name, ProgressBar } from "@/components/admin/Panel";
@@ -41,7 +42,7 @@ const COLUMNS: Column<AdminCourseRow>[] = [
     render: (c) => <ProgressBar pct={c.completion} label={`${c.title} completion`} />,
   },
   { key: "status", header: "Status", sort: (c) => c.status, render: (c) => <Pill status={c.status} /> },
-  { key: "updated", header: "Updated", sort: (c) => c.updatedAt, render: (c) => timeAgo(c.updatedAt) },
+  { key: "updated", header: "Updated", sort: (c) => c.updatedAt, render: (c) => timeAgoGB(c.updatedAt) },
 ];
 
 const CSV: CsvColumn<AdminCourseRow>[] = [

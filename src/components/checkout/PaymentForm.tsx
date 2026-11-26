@@ -3,7 +3,7 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import type { ChangeEvent, ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { errorMessage } from "@/api/envelope";
-import { Alert, FieldError } from "@/components/auth/AuthCard";
+import { Alert, FieldError } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

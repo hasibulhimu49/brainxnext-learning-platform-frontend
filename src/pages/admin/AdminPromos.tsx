@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
-import { exportCsv, type CsvColumn } from "@/components/admin/csv";
+import { exportCsv, type CsvColumn } from "@/lib/csv";
 import DataTable, { type Column } from "@/components/admin/DataTable";
 import PromoDialog from "@/components/admin/dialogs/PromoDialog";
 import EmptyState from "@/components/admin/EmptyState";
 import { SearchFilter, SelectFilter } from "@/components/admin/Filters";
-import { formatDate, matches } from "@/components/admin/format";
+import { matches } from "@/lib/admin";
+import { formatDateGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard } from "@/components/admin/Panel";
@@ -34,7 +35,7 @@ const COLUMNS: Column<AdminPromo>[] = [
     key: "expiry",
     header: "Expires",
     sort: (p) => p.expiresAt ?? "9999",
-    render: (p) => (p.expiresAt ? formatDate(`${p.expiresAt}T12:00:00`) : "Never"),
+    render: (p) => (p.expiresAt ? formatDateGB(`${p.expiresAt}T12:00:00`) : "Never"),
   },
   { key: "status", header: "Status", sort: (p) => p.status, render: (p) => <Pill status={p.status} /> },
 ];

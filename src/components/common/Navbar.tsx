@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Icon from "./Icon";
 import Logo from "./Logo";
-import CartButton from "./CartButton";
+import CartButton from "@/components/shop/CartButton";
 import ThemeToggle from "./ThemeToggle";
 import useTheme from "@/hooks/useTheme";
 import NotificationsMenu from "@/components/learner/NotificationsMenu";

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
-import DashboardEmptyState from "@/components/dashboard/DashboardEmptyState";
-import EnrolledCourseRow from "@/components/dashboard/EnrolledCourseRow";
+import DashboardEmptyState from "@/components/learner/DashboardEmptyState";
+import EnrolledCourseRow from "@/components/learner/EnrolledCourseRow";
 import { courseCover } from "@/lib/utils";
 import { useDashboard } from "@/queries/account";
 import { useSessionUser } from "@/stores/authStore";

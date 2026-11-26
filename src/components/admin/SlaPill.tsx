@@ -1,6 +1,6 @@
 import { SUBMISSION_SLA_HOURS } from "@/constants/admin";
 import type { Submission } from "@/types/commerce";
-import { slaHoursLeft } from "./format";
+import { slaHoursLeft } from "@/lib/admin";
 import Pill from "./Pill";
 
 /** "Due in 12 h" / "Overdue by 3 h" for pending work (submittedAt + 48 h); a dash once reviewed. */

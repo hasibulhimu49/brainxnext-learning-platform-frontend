@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/envelope";
 import { GrantCourseDialog } from "@/components/admin/dialogs/StudentDialogs";
-import { formatDate, timeAgo } from "@/components/admin/format";
+import { formatDateGB, timeAgoGB } from "@/lib/dates";
 import { StatStrip } from "@/components/admin/KpiStrip";
 import AdminPage, { HeaderButton } from "@/components/admin/PageHeader";
 import { AdminCard, InfoList, ListItem, Name, ProgressBar } from "@/components/admin/Panel";
@@ -37,7 +37,7 @@ const StudentView = ({ student }: { student: Detail }) => {
       desc={
         <span className="inline-flex flex-wrap items-center gap-2">
           <Pill status={student.status} />
-          {student.email} · Joined {formatDate(student.joinedAt)}
+          {student.email} · Joined {formatDateGB(student.joinedAt)}
         </span>
       }
       actions={
@@ -84,7 +84,7 @@ const StudentView = ({ student }: { student: Detail }) => {
             {student.enrollments.map((e) => (
               <ListItem key={e.courseId}>
                 <Link to={`/admin/courses/${e.courseId}`} className="min-w-0 text-ink hover:text-brand">
-                  <Name title={e.title} sub={`${SOURCE_LABEL[e.source] ?? e.source} · since ${formatDate(e.enrolledAt)}`} />
+                  <Name title={e.title} sub={`${SOURCE_LABEL[e.source] ?? e.source} · since ${formatDateGB(e.enrolledAt)}`} />
                 </Link>
                 <span className="flex flex-none items-center gap-2.5">
                   <ProgressBar pct={e.pct} label={`${e.title} progress`} />
@@ -99,7 +99,7 @@ const StudentView = ({ student }: { student: Detail }) => {
             {student.orders.map((o) => (
               <ListItem key={o.id}>
                 <Link to={`/admin/payments/${o.id}`} className="min-w-0 text-ink hover:text-brand">
-                  <Name title={o.itemTitle} sub={`${o.id} · ${o.method} · ${formatDate(o.createdAt)}`} />
+                  <Name title={o.itemTitle} sub={`${o.id} · ${o.method} · ${formatDateGB(o.createdAt)}`} />
                 </Link>
                 <span className="flex flex-none items-center gap-2.5">
                   <Pill status={o.status} />
@@ -123,8 +123,8 @@ const StudentView = ({ student }: { student: Detail }) => {
                 { label: "Student ID", value: student.id },
                 { label: "Plan", value: PLAN_LABEL[student.plan] },
                 { label: "Status", value: <Pill status={student.status} /> },
-                { label: "Last active", value: timeAgo(student.lastActiveAt) },
-                { label: "Joined", value: formatDate(student.joinedAt) },
+                { label: "Last active", value: timeAgoGB(student.lastActiveAt) },
+                { label: "Joined", value: formatDateGB(student.joinedAt) },
               ]}
             />
           </AdminCard>
@@ -132,7 +132,7 @@ const StudentView = ({ student }: { student: Detail }) => {
             {student.certificates.length === 0 && <Empty>No certificates yet.</Empty>}
             {student.certificates.map((c) => (
               <ListItem key={c.courseId}>
-                <Name title={c.title} sub={`Completed ${formatDate(c.completedAt)}`} />
+                <Name title={c.title} sub={`Completed ${formatDateGB(c.completedAt)}`} />
                 <Pill label="Issued" tone="success" />
               </ListItem>
             ))}

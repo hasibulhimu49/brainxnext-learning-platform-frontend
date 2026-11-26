@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Alert } from "@/components/auth/AuthCard";
+import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
 import { courseCover, formatTaka } from "@/lib/utils";
 import { useInCart, useShopStore } from "@/stores/shopStore";
 import type { CourseDetail } from "@/types/course";
-import WishlistButton from "./WishlistButton";
+import WishlistButton from "@/components/shop/WishlistButton";
 
 const INCLUDES: { icon: string; color: string; text?: string }[] = [
   { icon: "smart_display", color: "#1B6FD0" },

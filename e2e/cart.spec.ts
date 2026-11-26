@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { submitLogin } from "./helpers";
+import { STUDENT, payByCard, submitLogin } from "./helpers";
 
 /** F-004: wishlist and cart — guests can fill both; checkout asks them to log in. */
 test.describe("wishlist and cart", () => {
@@ -27,15 +27,11 @@ test.describe("wishlist and cart", () => {
 
     // guests sign in, then land straight back on cart checkout
     await expect(page).toHaveURL(/\/login\?next=/);
-    await submitLogin(page, { email: "hasibulx26@gmail.com", password: "12345678" });
+    await submitLogin(page, STUDENT);
     await expect(page).toHaveURL(/\/checkout\/cart\?promo=LEARN20$/);
     await expect(page.getByText("Subtotal (2 courses)")).toBeVisible();
 
-    await page.getByLabel("Name on card").fill("Test Learner");
-    await page.getByLabel("Card number").fill("4242424242424242");
-    await page.getByLabel("Expiry").fill("1230");
-    await page.getByLabel("CVC").fill("123");
-    await page.getByRole("button", { name: "Pay ৳7,040" }).click();
+    await payByCard(page, "৳7,040");
 
     await expect(page).toHaveURL(/\/orders\/ORD-/);
     await expect(page.getByText(/enrolled in 2 new courses/)).toBeVisible();

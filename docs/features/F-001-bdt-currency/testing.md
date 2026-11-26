@@ -5,10 +5,10 @@
 | Level | File | What it covers |
 | --- | --- | --- |
 | Unit (Vitest) | `src/lib/utils.test.ts` | `formatTaka`: 0, 999, 4900, 124000, rounding |
-| Unit (Vitest) | `src/schemas/schemas.test.ts` | admin price accepts up to 6 digits, rejects empty for paid courses |
+| Unit (Vitest) | `src/schemas/course.test.ts` | admin price accepts up to 6 digits, rejects empty for paid courses |
 | Component (RTL) | `src/pages/courses/Catalog.test.tsx` | cards show `৳4,900` and "Free" |
-| Unit (Vitest) | `src/api/mock/routes/routes.test.ts` | order total with `LEARN20` is `3920` |
-| End-to-end (Playwright) | `e2e/learning.spec.ts` | checkout with `LEARN20` + bKash shows and pays `৳3,920` |
+| Unit (Vitest) | `src/api/mock/routes/learner.test.ts` | order total with `LEARN20` is `3920` |
+| End-to-end (Playwright) | `e2e/enroll-checkout.spec.ts` | checkout with `LEARN20` + bKash shows and pays `৳3,920` |
 | End-to-end (Playwright) | `e2e/smoke.spec.ts` | every route still renders without errors |
 
 ## Scenarios

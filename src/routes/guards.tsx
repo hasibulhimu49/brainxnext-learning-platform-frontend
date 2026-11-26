@@ -5,7 +5,7 @@ import { useAuthStore } from "@/stores/authStore";
 import type { UserRole } from "@/types/auth";
 import { homeFor, loginPath, safeNext } from "./redirects";
 
-const Forbidden = lazy(() => import("@/pages/Forbidden"));
+const Forbidden = lazy(() => import("@/pages/errors/Forbidden"));
 
 /*
  * Route guards. They only shape the experience — the backend (here: the mock API) still checks

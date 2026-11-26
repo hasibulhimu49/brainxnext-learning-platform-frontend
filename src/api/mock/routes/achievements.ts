@@ -8,7 +8,7 @@ import { hasCourseExtras, syncCertificates } from "../db/entitlement";
 import { findEnrollment, toPublicCertificate } from "../db/learning";
 import { readNotificationsOf, updateUser } from "../db/users";
 import { bodyOf, fail, ok, str, type MockRoute } from "../http";
-import { findCourse } from "./catalog";
+import { findCourse } from "../db/courses";
 import { invalid, requireUser, unauthorized } from "./shared";
 
 /** Certificates, project submissions and notifications of the signed-in learner. PROVISIONAL. */
