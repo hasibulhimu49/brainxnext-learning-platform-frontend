@@ -58,7 +58,7 @@ const Overview = () => {
                 <Panel className="px-6 py-5.5">
                   <div className="mb-4.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                     <span className="min-w-0 font-display text-[15px] font-extrabold text-ink">Revenue — last 8 weeks</span>
-                    <span className="flex-none text-xs font-bold whitespace-nowrap text-soft">৳ thousand</span>
+                    <span className="flex-none font-display text-xs font-bold whitespace-nowrap text-soft">৳ thousands</span>
                   </div>
                   <div className="flex h-37.5 items-end gap-2.5" role="img" aria-label="Weekly revenue bar chart">
                     {revenue.map((v, i) => (
