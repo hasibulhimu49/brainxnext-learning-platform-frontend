@@ -27,7 +27,7 @@ Never put secrets in `VITE_*` variables; everything in them is visible in the br
 
 ## Hosting requirements
 
-- **SPA fallback:** every unknown path must serve `index.html` so React Router can handle `/courses/java-generics`, `/settings/billing`, etc. (Netlify `_redirects`: `/* /index.html 200`; Vercel rewrite to `/index.html`; Nginx `try_files $uri /index.html;`).
+- **SPA fallback:** every unknown path must serve `index.html` so React Router can handle `/courses/java-generics`, `/settings/billing`, etc. (Netlify `_redirects`: `/* /index.html 200`; Vercel rewrite to `/index.html` — already set in `vercel.json` (real files like `/assets/*` and `/favicon.ico` are still served first); Nginx `try_files $uri /index.html;`).
 - **Caching:** `assets/*` files are content-hashed — cache them for a year (`Cache-Control: public, max-age=31536000, immutable`). Serve `index.html` with `no-cache` so new releases are picked up.
 - **HTTPS** everywhere; enable gzip/brotli compression.
 - **CORS:** the API must allow the site's origin (or serve both from the same domain behind a reverse proxy at `/api/v1`).
