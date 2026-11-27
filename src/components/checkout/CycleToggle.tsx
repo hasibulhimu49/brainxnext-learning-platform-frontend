@@ -1,4 +1,5 @@
 import type { BillingCycle } from "@/types/commerce";
+import { PRO_YEARLY_SAVING_PCT } from "@/constants/plans";
 
 interface CycleToggleProps {
   cycle: BillingCycle;
@@ -31,7 +32,7 @@ const CycleToggle = ({ cycle, onChange, disabled }: CycleToggleProps) => (
       className={btn(cycle === "yearly")}
     >
       Yearly
-      <span className="bg-grad-gold rounded-full px-2 py-0.75 text-[10.5px] font-extrabold text-cocoa">−25%</span>
+      <span className="bg-grad-gold rounded-full px-2 py-0.75 text-[10.5px] font-extrabold text-cocoa">−{PRO_YEARLY_SAVING_PCT}%</span>
     </button>
   </div>
 );

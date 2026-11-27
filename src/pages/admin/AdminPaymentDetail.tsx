@@ -85,7 +85,7 @@ const PaymentView = ({ detail: { order, timeline } }: { detail: Detail }) => {
       {requested && order.refundReason && (
         <div
           role="status"
-          className="mb-5 flex items-start gap-2.5 rounded-[14px] border border-amber/40 bg-[#FFF5DB] px-4 py-3 text-xs font-semibold text-[#A16C00] dark:bg-amber/15 dark:text-amber"
+          className="mb-5 flex items-start gap-2.5 rounded-[14px] border border-amber/40 bg-[#FFF5DB] px-4 py-3 text-xs font-semibold text-amber dark:bg-amber/15"
         >
           <b className="font-extrabold">Refund requested:</b> “{order.refundReason}”
         </div>

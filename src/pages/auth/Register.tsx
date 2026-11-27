@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { API_ERROR_CODES, errorMessage, isApiError } from "@/api/envelope";
 import { AuthCard, OrDivider } from "@/components/auth/AuthCard";
 import { Alert, FieldError, SubmitButton } from "@/components/common/FormFeedback";
 import { AuthInput, PasswordInput, PasswordStrength, SocialButtons } from "@/components/auth/AuthInputs";
+import useCatalogStats from "@/components/marketing/useCatalogStats";
 import AuthLayout from "@/layouts/AuthLayout";
 import { useRegister } from "@/queries/auth";
 import { emailField, registerSchema, type RegisterValues } from "@/schemas/auth";
@@ -13,12 +14,18 @@ import usePageTitle from "@/hooks/usePageTitle";
 const Register = () => {
   usePageTitle("Create your account");
   const signUp = useRegister();
+  const stats = useCatalogStats();
+  // Home's "Get started" form passes the email along (/register?email=)
+  const [params] = useSearchParams();
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<RegisterValues>({ resolver: zodResolver(registerSchema), defaultValues: { name: "", email: "", password: "" } });
+  } = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", email: params.get("email")?.trim() ?? "", password: "" },
+  });
 
   const values = useWatch({ control });
   const ready = registerSchema.safeParse(values).success;
@@ -43,7 +50,9 @@ const Register = () => {
       <AuthCard>
         <div className="mb-0.5 flex flex-col gap-2 text-center">
           <h1 className="m-0 font-display text-[25px] font-extrabold tracking-[-0.02em] text-ink">Create your account</h1>
-          <p className="m-0 text-sm font-medium text-muted">Start free — 12 courses, no card needed</p>
+          <p className="m-0 text-sm font-medium text-muted">
+            {stats ? `Start free — ${stats.free} courses, no card needed` : "Start free — no card needed"}
+          </p>
         </div>
 
         <SocialButtons />

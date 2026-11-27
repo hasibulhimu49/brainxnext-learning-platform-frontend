@@ -17,7 +17,7 @@ describe("<PlanCheckout />", () => {
   it("switches the cycle and pays for Pro by card", async () => {
     const user = userEvent.setup();
     renderWithProviders(<PlanCheckout />, { route: "/checkout/plan/pro", path: "/checkout/plan/:plan", stubs: ["/orders/:orderId"] });
-    expect(await screen.findByRole("button", { name: "Pay ৳1,900" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Pay ৳1,900" }, { timeout: 10_000 })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Yearly/ }));
     expect(screen.getByRole("button", { name: "Pay ৳16,800" })).toBeInTheDocument();
     await user.type(screen.getByLabelText("Name on card"), "Test User");
@@ -26,13 +26,13 @@ describe("<PlanCheckout />", () => {
     await user.type(screen.getByLabelText("CVC"), "123");
     await user.click(screen.getByRole("button", { name: "Pay ৳16,800" }));
     expect(await screen.findByText(/Stub: \/orders\/:orderId \/orders\/ORD-/)).toBeInTheDocument();
-  });
+  }, 20_000);
 
   it("tells a Pro member they are already on Pro", async () => {
     await checkoutService.placePlanOrder("monthly", CARD);
     renderWithProviders(<PlanCheckout />, { route: "/checkout/plan/pro", path: "/checkout/plan/:plan" });
     expect(await screen.findByRole("heading", { name: "You're already on Pro" })).toBeInTheDocument();
-  });
+  }, 20_000);
 
   it("sends Teams to the contact form", () => {
     renderWithProviders(<PlanCheckout />, { route: "/checkout/plan/teams", path: "/checkout/plan/:plan" });

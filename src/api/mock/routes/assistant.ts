@@ -1,10 +1,10 @@
 import { HELP_QUESTIONS } from "@/constants/help";
 import { PRO_PRICE } from "@/constants/plans";
-import { flattenLessons } from "@/lib/lessons";
 import { formatTaka } from "@/lib/utils";
 import type { AssistantCourseCard, AssistantReply } from "@/types/assistant";
 import type { Course } from "@/types/course";
-import { COURSES, CURRICULUM, findCourse } from "../db/courses";
+import { COURSES, findCourse } from "../db/courses";
+import { lessonsOf } from "../db/curricula";
 import { bodyOf, ok, str, type MockRequest, type MockRoute } from "../http";
 import { invalid } from "./shared";
 
@@ -55,7 +55,7 @@ const helpAnswer = (q: string) => {
 
 const lessonContext = (courseId: string, lessonId: string): string | undefined => {
   const course = findCourse(courseId);
-  const lesson = flattenLessons(CURRICULUM).find((l) => l.id === lessonId);
+  const lesson = lessonsOf(courseId).find((l) => l.id === lessonId);
   if (!course || !lesson) return undefined;
   return `You're on “${lesson.lesson.title}” (Class ${lesson.number}) in ${course.title}.`;
 };

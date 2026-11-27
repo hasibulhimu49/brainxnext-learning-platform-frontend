@@ -16,6 +16,8 @@ export interface Quiz {
   /** 0-based module index */
   module: number;
   moduleTitle: string;
+  /** how many modules (and quizzes) the course has */
+  moduleCount: number;
   questions: QuizQuestion[];
   /** % correct needed to pass */
   passPct: number;

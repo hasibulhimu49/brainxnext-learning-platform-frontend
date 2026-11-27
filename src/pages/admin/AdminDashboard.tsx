@@ -1,5 +1,6 @@
 import { useState, type ComponentType } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import EmptyState from "@/components/admin/EmptyState";
 import { KpiStrip } from "@/components/admin/KpiStrip";
 import { Panel } from "@/components/admin/Panel";
 import Icon from "@/components/common/Icon";
@@ -40,8 +41,7 @@ const Overview = () => {
             />
           </label>
           <Link to="/admin/courses/new" className="btn btn-primary px-5 py-2.75 text-[13px]">
-            <Icon name="add" size={17} />
-            New course
+            + New course
           </Link>
         </div>
       </div>
@@ -49,16 +49,16 @@ const Overview = () => {
       <QueryStatus query={overview}>
         {({ kpis, revenue, topCourses, activity: allActivity }) => {
           const activity = allActivity.filter((a) => !query || `${a.who} ${a.what}`.toLowerCase().includes(query));
-          const peak = Math.max(...revenue);
+          const peak = Math.max(1, ...revenue);
           return (
             <>
               <KpiStrip items={kpis} />
 
               <div className="grid grid-cols-1 gap-4 min-[641px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <Panel className="px-6 py-5.5">
-                  <div className="mb-4.5 flex items-baseline justify-between">
-                    <span className="font-display text-[15px] font-extrabold text-ink">Revenue — last 8 weeks</span>
-                    <span className="text-xs font-bold text-soft">৳ thousand</span>
+                  <div className="mb-4.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <span className="min-w-0 font-display text-[15px] font-extrabold text-ink">Revenue — last 8 weeks</span>
+                    <span className="flex-none text-xs font-bold whitespace-nowrap text-soft">৳ thousand</span>
                   </div>
                   <div className="flex h-37.5 items-end gap-2.5" role="img" aria-label="Weekly revenue bar chart">
                     {revenue.map((v, i) => (
@@ -142,10 +142,32 @@ const SECTION_VIEWS: Record<AdminSection, ComponentType> = {
 
 const isSection = (s: string): s is AdminSection => (ADMIN_SECTIONS as readonly string[]).includes(s);
 
+/** /admin/<anything unknown> */
+const UnknownSection = () => {
+  usePageTitle("Page not found");
+  return (
+    <main className="flex min-w-0 flex-col px-3.5 pt-4.5 pb-16 sm:px-7.5 sm:pt-6.5">
+      <Panel>
+        <EmptyState
+          icon="search"
+          title="This admin page doesn't exist"
+          action={
+            <Link to="/admin" className="btn btn-primary px-5 py-2.75 text-[13px]">
+              Back to overview
+            </Link>
+          }
+        >
+          Check the address, or pick a section from the sidebar.
+        </EmptyState>
+      </Panel>
+    </main>
+  );
+};
+
 const AdminDashboard = () => {
   const { section = "overview" } = useParams();
   if (section === "overview") return <Overview />;
-  if (!isSection(section)) return <Navigate to="/admin" replace />;
+  if (!isSection(section)) return <UnknownSection />;
   const View = SECTION_VIEWS[section];
   // key resets search and filters when switching sections
   return <View key={section} />;

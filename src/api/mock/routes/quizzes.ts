@@ -1,8 +1,8 @@
 import type { Quiz, QuizResult, QuizScore } from "@/types/quiz";
 import { API_ERROR_CODES as CODES } from "../../envelope";
-import { CURRICULUM } from "../db/courses";
 import { findEnrollment } from "../db/learning";
-import { QUIZ_BANK, QUIZ_PASS_PCT, quizScores } from "../db/quizzes";
+import { curriculumOf } from "../db/curricula";
+import { QUIZ_PASS_PCT, quizFor, quizScores } from "../db/quizzes";
 import { bodyOf, fail, ok, type MockRequest, type MockRoute } from "../http";
 import { findCourse } from "../db/courses";
 import { invalid, requireUser, unauthorized } from "./shared";
@@ -19,9 +19,10 @@ const guard = (req: MockRequest) => {
   if (!user) return { error: unauthorized() };
   const course = findCourse(req.params.courseId);
   const module = Number(req.params.module);
-  if (!course || !Number.isInteger(module) || !QUIZ_BANK[module]) return { error: fail(404, CODES.notFound, "That quiz doesn't exist.") };
+  const bank = course ? quizFor(course.id, module) : undefined;
+  if (!course || !bank) return { error: fail(404, CODES.notFound, "That quiz doesn't exist.") };
   if (!findEnrollment(user.email, course.id)) return { error: fail(403, CODES.notEnrolled, "Enrol in this course to take its quizzes.") };
-  return { user, course, module, bank: QUIZ_BANK[module] };
+  return { user, course, module, bank };
 };
 
 const getQuiz = (req: MockRequest) => {
@@ -30,7 +31,8 @@ const getQuiz = (req: MockRequest) => {
   const quiz: Quiz = {
     courseId: g.course.id,
     module: g.module,
-    moduleTitle: CURRICULUM[g.module]?.title ?? `Module ${g.module + 1}`,
+    moduleTitle: curriculumOf(g.course.id)[g.module]?.title ?? `Module ${g.module + 1}`,
+    moduleCount: curriculumOf(g.course.id).length,
     passPct: QUIZ_PASS_PCT,
     questions: g.bank.map(({ id, prompt, code, options }) => ({ id, prompt, code, options })),
   };

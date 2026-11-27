@@ -41,7 +41,7 @@ Project documentation lives in `docs/project/`. Each feature has a folder in `do
 
 The base path is set by `VITE_API_BASE_URL` (default `/api/v1`, see `src/api/config.ts` and `.env.example`).
 
-**About the mock API:** `src/api/mock` (on by default via `VITE_USE_MOCK_API`) stands in for the backend while there is none. Its endpoints, fields and error codes are **provisional placeholders, not backend documentation**. When the backend API docs arrive they win: update `src/types`, `src/services` and the mock to match them, and do not add new mock endpoints that the backend docs don't describe.
+**About the mock API:** `src/api/mock` (on by default via `VITE_USE_MOCK_API`) stands in for the backend while there is none. `src/api/client.ts` loads it with a dynamic `import()`, so it is its own chunk and is left out of builds with `VITE_USE_MOCK_API=false`. Its endpoints, fields and error codes are **provisional placeholders, not backend documentation**. When the backend API docs arrive they win: update `src/types`, `src/services` and the mock to match them, and do not add new mock endpoints that the backend docs don't describe.
 
 ## 4. State Management
 
@@ -53,7 +53,7 @@ The base path is set by `VITE_API_BASE_URL` (default `/api/v1`, see `src/api/con
 Current owners:
 
 - **Server state** — TanStack Query hooks in `src/queries/*`; keys are centralised in `src/queries/keys.ts`.
-- `src/stores/authStore.ts` — session token, signed-in user summary, pending sign-up email. Written only by the auth mutations (`src/queries/auth.ts`), `useUpdateProfile` (name sync) and the 401 interceptor.
+- `src/stores/authStore.ts` — session token, signed-in user summary, pending sign-up email (persisted as `bxn-auth`). Written only by the auth mutations (`src/queries/auth.ts`), `useUpdateProfile` (name sync) and the 401 interceptor. When a session expires or another user signs in, `watchSessionChanges` (`src/queries/auth.ts`) removes the cached `me` / `admin` queries.
 - `src/stores/uiStore.ts` — theme (persisted as `bx-theme`; `index.html` applies it before first paint).
 - Page-local UI state (tabs, accordions, filters) stays in component state.
 - `src/stores/shopStore.ts` — wishlist and cart course ids (persisted as `bx-shop`, F-004). Client-only until the backend has a wishlist/cart API; course data and ownership still come from queries (`src/hooks/useCart.ts`).
@@ -67,9 +67,9 @@ Current owners:
 
 Conventions:
 
-- shadcn/ui primitives live in `src/components/ui`, themed with the design tokens; shared components in `src/components/common`, feature components in `auth/`, `admin/`, `learner/`, `course/`, `player/`, `checkout/`, `billing/`, `shop/`, `marketing/`, `assistant/`.
+- shadcn/ui primitives live in `src/components/ui`, themed with the design tokens; shared components in `src/components/common` (incl. `FormFeedback` — `Alert`, `FieldError`, `SubmitButton`, `SuccessState` — and `useFocusTrap`), feature components in `auth/`, `admin/`, `learner/`, `course/`, `player/`, `checkout/`, `billing/`, `shop/`, `marketing/`, `assistant/`.
 - Pages are split into a data wrapper (query + `<QueryStatus>`) and a typed view that receives the loaded data (see `CourseDetail`, `Player`, `Dashboard`).
-- Styling: Tailwind CSS v4. Design tokens in `src/index.css` map to `bg-page`, `bg-surface`, `text-ink`, `text-muted`, `text-soft`, `border-line`, `bg-chip`. Add shadcn components with `npx shadcn@latest add <name>` (config: `components.json`) and restyle them to the tokens. `text-muted` is our secondary text colour, so don't use shadcn's `bg-muted` — use `bg-surface2`.
+- Styling: Tailwind CSS v4. Design tokens in `src/index.css` map to `bg-page`, `bg-surface`, `text-ink`, `text-muted`, `text-soft`, `border-line`, `bg-chip`. Accent text (`text-brand`, `text-teal`, `text-success`, `text-amber`, `text-danger`) uses contrast-safe colours per theme; `text-brand-solid` never switches (for fixed white chips). Add shadcn components with `npx shadcn@latest add <name>` (config: `components.json`) and restyle them to the tokens. `text-muted` is our secondary text colour, so don't use shadcn's `bg-muted` — use `bg-surface2`.
 
 ## 6. API Layer
 
@@ -82,13 +82,13 @@ How this is implemented:
 
 - **Client:** the single Axios instance in `src/api/client.ts`. ESLint blocks `axios` imports outside `src/api` and the global `fetch`.
 - **Data-access layer:** endpoint functions in `src/services/*Service.ts`, wrapped by TanStack Query hooks in `src/queries/*`. Components only use the hooks.
-- **Envelope:** `src/api/envelope.ts` — `{ success: true, data }` or `{ success: false, error: { code, message, details? } }`. `request()` / `api.get|post|patch|delete` check `success` before returning `data`; pass a Zod schema as the last argument to validate the payload at runtime.
+- **Envelope:** `src/api/envelope.ts` — `{ success: true, data }` or `{ success: false, error: { code, message, details? } }`. `request()` / `api.get|post|put|patch|delete` check `success` before returning `data`; pass a Zod schema as the last argument to validate the payload at runtime.
 - **Types:** every service function declares its response type (`api.get<CourseDetail>(...)`) from `src/types`.
 - **Errors:** everything becomes an `ApiError` (`code`, `message`, `status`, `details`). Show `errorMessage(error)` to users, branch on `API_ERROR_CODES` (never on message text), render query failures with `<QueryStatus>`. A 401 clears the session automatically. See `docs/project/error-handling.md`.
 
 ## 7. Forms, Testing and Code Quality
 
-- **Forms:** React Hook Form + Zod (`zodResolver`). Schemas live in `src/schemas/*`. Labelled forms use the shadcn `Form` components; auth cards use `AuthInput` + `FieldError`.
+- **Forms:** React Hook Form + Zod (`zodResolver`). Schemas live in `src/schemas/*`. Labelled forms use the shadcn `Form` components; auth cards use `AuthInput` + `FieldError` (from `components/common/FormFeedback`).
 - **Testing:** Vitest + React Testing Library (`*.test.ts(x)` next to the code, `src/test/render.tsx` for providers). Playwright in `e2e/` for critical flows and the all-routes smoke test.
 - **Code quality:** TypeScript `strict` (+ `noUncheckedIndexedAccess`), ESLint, Prettier. **No `any`** unless explicitly justified with an `eslint-disable-next-line` comment explaining why. Prefer `unknown` + narrowing.
 
@@ -100,7 +100,9 @@ npm run build         # tsc -b && vite build
 npm run typecheck     # tsc -b
 npm run lint          # ESLint (typescript-eslint strict)
 npm run format        # Prettier (+ tailwind class sorting)
+npm run format:check  # Prettier, check only (CI)
 npm test              # Vitest + React Testing Library
+npm run test:watch    # Vitest in watch mode
 npm run test:e2e      # Playwright (builds + previews the app first)
 ```
 
@@ -110,14 +112,14 @@ Before finishing any change: `npm run typecheck && npm run lint && npm test`. Ru
 
 ```
 src/
-  api/          client.ts (Axios), envelope.ts, config.ts, mock/ (adapter, routes/, db/)
+  api/          client.ts (Axios), envelope.ts, config.ts, mock/ (adapter, http, routes/, db/ incl. curricula)
   services/     endpoint functions (only place besides api/ that talks to the client)
   queries/      TanStack Query hooks + keys
   stores/       Zustand stores (auth, ui, shop)
   schemas/      Zod schemas + form value types
   types/        domain types (API contracts)
   constants/    UI copy/config that is not server data
-  hooks/        shared hooks (useCart, useWalletCheckout, usePageTitle, useTheme, …)
+  hooks/        shared hooks (useCart, useWalletCheckout, usePathSteps, usePageTitle, useTheme)
   lib/          pure helpers (utils, dates, billing, lessons, csv, admin, queryClient)
   components/
     ui/         shadcn primitives
@@ -125,7 +127,8 @@ src/
     auth/       AuthCard / AuthHeader / OrDivider, AuthInputs
     admin/      admin panel (AdminSidebar, DataTable, dialogs/, course-editor/)
     learner/    signed-in learner pieces (dashboard rows, certificates, notifications, settings/)
-    course/  player/  checkout/  billing/  shop/  marketing/  assistant/   feature components
+    course/  player/  checkout/ (CheckoutFlow, …)  billing/  shop/  assistant/   feature components
+    marketing/  marketing pieces + planCards (pricing cards) + useCatalogStats (real catalog counts)
   layouts/      PublicLayout, AuthLayout, AdminLayout
   pages/        route screens, one folder per area:
                 auth/ courses/ dashboard/ account/ certificates/ billing/ checkout/ shop/
@@ -139,4 +142,4 @@ docs/features/  one folder per feature (F-XXX-name): feature, plan, testing, rev
 
 ## 10. Design Fidelity
 
-UI must match the Figma exports exactly (spacing, sizes, colours, breakpoints such as 1000/1080/960/640/560px). Images in `src/assets/images` are placeholders — replace files in place, keeping names. Demo mode: while the mock API is on, `/admin` is open to everyone (`OPEN_ADMIN`, see `src/api/config.ts`). Demo logins for the mock API: `hasibulx26@gmail.com` / `12345678` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` simulates a wrong code; promo `LEARN20` gives 20% off.
+UI must match the Figma exports exactly (spacing, sizes, colours, breakpoints such as 1000/1080/960/640/560px). Images in `src/assets/images` are placeholders (the photos are WebP) — replace files in place, keeping names. Icons are a Material Symbols subset: every new `<Icon name="…">` must also be added to `icon_names` in `index.html`, or it renders as plain text. Prices come from one source, `src/constants/plans.ts`. Demo mode: while the mock API is on, `/admin` is open to everyone (`OPEN_ADMIN`, see `src/api/config.ts`; set `VITE_OPEN_ADMIN=false` to lock it). Demo logins for the mock API: `hasibulx26@gmail.com` / `12345678` (student), `admin@brainxnext.com` / `admin12345` (admin). OTP `000000` simulates a wrong code; promo `LEARN20` gives 20% off.

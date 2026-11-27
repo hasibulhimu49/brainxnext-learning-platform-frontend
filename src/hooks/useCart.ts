@@ -10,6 +10,7 @@ import type { Course } from "@/types/course";
  * that can't be bought any more (owned, free, or gone from the catalog).
  * - `items`: what checkout will charge for
  * - `unavailable`: ids still in the store that should be dropped
+ * - `alreadyOwned`: true when every unavailable id is a course the learner already has
  * - `ready`: catalog (and, when signed in, enrolments) loaded
  */
 export const useCart = () => {
@@ -35,6 +36,7 @@ export const useCart = () => {
     courses,
     items,
     unavailable,
+    alreadyOwned: unavailable.length > 0 && unavailable.every((id) => owned.has(id)),
     ready,
     /** Pro already includes every course, so there is nothing to buy */
     isPro: isPro === true,

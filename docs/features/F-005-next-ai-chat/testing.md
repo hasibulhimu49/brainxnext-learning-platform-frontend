@@ -1,29 +1,15 @@
-# F-XXX — Testing
+# F-005 — Testing
 
 ## Automated
 
 | Level | File | What it covers |
 | ----- | ---- | -------------- |
-| Unit (Vitest) | `src/schemas/….test.ts` | |
-| Component (RTL) | `src/pages/….test.tsx` | |
-| End-to-end (Playwright) | `e2e/….spec.ts` | |
-
-## Scenarios
-
-- [ ] Happy path
-- [ ] Validation errors
-- [ ] Each backend error code the UI handles
-- [ ] Loading and empty states
-- [ ] Light and dark theme
-- [ ] Mobile (≤640px) and desktop layouts
-
-## Manual checks
-
-- Matches the Figma design (spacing, breakpoints).
+| Unit (Vitest) | `src/api/mock/routes/assistant.test.ts` | topic recommendations (free first), Pro price / promo / refunds, open-lesson help, Help + Contact fallback, empty message → `400` |
+| Component (RTL) | `src/components/assistant/AssistantWidget.test.tsx` | open → starter question → course suggestions, typed question, Escape closes; modal dialog with focus trap; hidden in the admin panel |
+| End-to-end (Playwright) | `e2e/smoke.spec.ts`, `e2e/responsive.spec.ts` | the widget doesn't break any route or widen the page at 360px |
 
 ## Results
 
 | Date | Command | Result |
-| ---- | ------- | ------ |
-| | `npm run typecheck && npm run lint && npm test` | |
-| | `npm run test:e2e` | |
+| ---- | ------ | ------ |
+| 2026-11-27 | `npm test` (F-009 final run) | 50 files, 246 tests pass |

@@ -1,4 +1,5 @@
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import { API_ERROR_CODES as CODES } from "../envelope";
 import { fail, type MockRequest, type MockResult, type MockRoute } from "./http";
 import { routes } from "./routes/index";
 
@@ -60,13 +61,13 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   let result: MockResult;
   if (!found) {
-    result = fail(404, "NOT_FOUND", `No mock route for ${method} ${path}`);
+    result = fail(404, CODES.notFound, `No mock route for ${method} ${path}`);
   } else {
     const req: MockRequest = { params: found.params, query, body: parseBody(config.data), token: tokenOf(config) };
     try {
       result = await found.route.handler(req);
     } catch (e) {
-      result = fail(500, "INTERNAL_ERROR", e instanceof Error ? e.message : "Mock handler crashed");
+      result = fail(500, CODES.internal, e instanceof Error ? e.message : "Mock handler crashed");
     }
   }
 

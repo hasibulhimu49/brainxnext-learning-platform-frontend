@@ -11,9 +11,6 @@ interface WishlistButtonProps {
   className?: string;
 }
 
-/** solid heart when saved (Material Symbols FILL axis) */
-const FILLED = { fontVariationSettings: "'FILL' 1" };
-
 /** Heart toggle that saves a course to the wishlist (F-004). Works for guests too. */
 const WishlistButton = ({ courseId, title, variant = "icon", className = "" }: WishlistButtonProps) => {
   const navigate = useNavigate();
@@ -36,7 +33,7 @@ const WishlistButton = ({ courseId, title, variant = "icon", className = "" }: W
         aria-pressed={saved}
         className={`btn btn-outline rounded-[13px] bg-transparent! px-4.5 py-3 ${saved ? "border-danger/50! text-danger!" : ""} ${className}`}
       >
-        <Icon name="favorite" size={17} style={saved ? FILLED : undefined} />
+        <Icon name="favorite" size={17} filled={saved} />
         {saved ? "Saved to wishlist" : "Save to wishlist"}
       </button>
     );
@@ -51,7 +48,7 @@ const WishlistButton = ({ courseId, title, variant = "icon", className = "" }: W
       title={saved ? "Remove from wishlist" : "Save to wishlist"}
       className={`flex h-9 w-9 items-center justify-center rounded-full border-0 bg-white/92 shadow-[0_6px_16px_rgba(0,0,0,.22)] transition-transform hover:scale-110 ${saved ? "text-danger" : "text-[#41566F]"} ${className}`}
     >
-      <Icon name="favorite" size={19} style={saved ? FILLED : undefined} />
+      <Icon name="favorite" size={19} filled={saved} />
     </button>
   );
 };

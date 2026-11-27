@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Icon from "./Icon";
 import Logo from "./Logo";
 import CartButton from "@/components/shop/CartButton";
 import ThemeToggle from "./ThemeToggle";
+import useFocusTrap from "./useFocusTrap";
 import useTheme from "@/hooks/useTheme";
 import NotificationsMenu from "@/components/learner/NotificationsMenu";
 import { useLogout } from "@/queries/auth";
@@ -18,16 +19,16 @@ interface NavItem {
 
 /*
  * The navbar depends only on whether you're signed in — never on the page — so it looks the same everywhere:
- * - signed out: Home · Courses · Notes · Pricing · About · Help · Contact, then Login / Sign up
- * - signed in:  Dashboard (or Admin) · Courses · Notes · Pricing · Help · Contact, then notifications, avatar, log out
+ * - signed out: Home · Courses · Roadmaps · Notes · Pricing · Help · Contact, then Log in / Sign up (About is in the footer)
+ * - signed in:  Dashboard (or Admin) · Courses · Roadmaps · Notes · Pricing · Help · Contact, then notifications, avatar, log out
  * The lesson player, checkout and auth screens use their own focused headers on purpose.
  */
 const PUBLIC_LINKS: NavItem[] = [
   { to: "/", label: "Home", end: true },
   { to: "/courses", label: "Courses" },
+  { to: "/paths", label: "Roadmaps" },
   { to: "/notes", label: "Notes" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/about", label: "About" },
   { to: "/help", label: "Help" },
   { to: "/contact", label: "Contact" },
 ];
@@ -35,6 +36,7 @@ const PUBLIC_LINKS: NavItem[] = [
 const signedInLinks = (home: string, homeLabel: string): NavItem[] => [
   { to: home, label: homeLabel },
   { to: "/courses", label: "Courses" },
+  { to: "/paths", label: "Roadmaps" },
   { to: "/notes", label: "Notes" },
   { to: "/pricing", label: "Pricing" },
   { to: "/help", label: "Help" },
@@ -42,7 +44,7 @@ const signedInLinks = (home: string, homeLabel: string): NavItem[] => [
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `whitespace-nowrap rounded-[10px] px-3.75 py-2.25 text-sm transition-all duration-200 min-[1001px]:max-[1199px]:px-2.5 ${
+  `whitespace-nowrap rounded-[10px] px-3.75 py-2.25 text-sm transition-all duration-200 min-[1001px]:max-[1199px]:px-2.5 min-[1001px]:max-[1099px]:px-2 ${
     isActive ? "bg-chip font-bold text-brand" : "font-semibold text-muted hover:bg-chip hover:text-brand"
   }`;
 
@@ -53,18 +55,9 @@ const Navbar = () => {
   const [openOn, setOpenOn] = useState<string | null>(null);
   const open = openOn === pathname;
   const toggleRef = useRef<HTMLButtonElement>(null);
-
-  // Escape closes the mobile menu and puts focus back on its toggle
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpenOn(null);
-      toggleRef.current?.focus();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  const navRef = useRef<HTMLElement>(null);
+  // while the mobile menu is open, Tab stays in the navbar + menu; Escape closes it and refocuses the toggle
+  useFocusTrap(navRef, open, () => setOpenOn(null), toggleRef);
   const user = useSessionUser();
   const handleLogout = useLogout();
   const { theme, toggleTheme } = useTheme();
@@ -85,8 +78,8 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="sticky top-0 z-60 border-b border-line bg-nav backdrop-blur-[14px]">
-      <div className="mx-auto flex max-w-310 items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
+    <nav ref={navRef} className="sticky top-0 z-60 border-b border-line bg-nav backdrop-blur-[14px]">
+      <div className="mx-auto flex max-w-310 items-center gap-3 px-4 py-3 min-[1001px]:max-[1099px]:gap-3 sm:gap-6 sm:px-6">
         <Logo size="lg" tagline />
 
         <div className="ml-auto hidden items-center gap-0.5 min-[1001px]:flex">
@@ -131,7 +124,7 @@ const Navbar = () => {
                 to="/login"
                 className="hidden rounded-full border-[1.5px] border-line px-4.5 py-2.5 text-sm font-bold whitespace-nowrap text-ink transition-all hover:border-brand hover:text-brand min-[1001px]:max-[1099px]:px-3.5 sm:inline-flex"
               >
-                Login
+                Log in
               </Link>
               <Link
                 to="/register"
@@ -177,7 +170,7 @@ const Navbar = () => {
             </button>
             {!user ? (
               <NavLink to="/login" className={linkClass}>
-                Login
+                Log in
               </NavLink>
             ) : (
               <button

@@ -49,21 +49,22 @@ test.describe("learner money and achievements", () => {
   });
 
   test("complete a course → certificate → public verify page", async ({ page }) => {
-    test.setTimeout(90_000); // clicks through all 17 lessons
+    test.setTimeout(120_000); // clicks through all 24 lessons
+    const total = 24; // UX Research in Five Days
     await login(page);
     await goPro(page);
     // Pro unlocks paid courses: enrol and finish every class
-    await page.goto("/learn/react-architecture/1-1");
+    await page.goto("/learn/ux-research/1-1");
     await page.getByRole("button", { name: "Enroll to track progress" }).click();
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < total; i++) {
       await page.getByRole("button", { name: "Mark as complete" }).click();
-      await expect(page.getByText(`${i + 1} of 17 classes completed`)).toBeVisible();
-      if (i < 16) await page.getByRole("button", { name: "Next class" }).last().click();
+      await expect(page.getByText(`${i + 1} of ${total} classes completed`)).toBeVisible();
+      if (i < total - 1) await page.getByRole("button", { name: "Next class" }).last().click();
     }
-    await expect(page.getByRole("heading", { name: /You finished React Architecture at Scale!/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /You finished UX Research in Five Days!/ })).toBeVisible();
     await page.getByRole("link", { name: "Get your certificate" }).click();
     await expect(page).toHaveURL(/\/certificates\/BXN-/);
-    await expect(page.getByText("React Architecture at Scale", { exact: true })).toBeVisible();
+    await expect(page.getByText("UX Research in Five Days", { exact: true })).toBeVisible();
     const certId = page.url().split("/").pop() ?? "";
 
     await page.goto("/certificates");

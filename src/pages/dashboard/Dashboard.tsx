@@ -59,7 +59,9 @@ const DashboardView = ({ data }: { data: DashboardData }) => {
               <div className="relative overflow-hidden rounded-3xl border border-[rgba(111,183,255,.3)] bg-[linear-gradient(165deg,#0F2A4E,#0A1B33)] p-7 text-white shadow-[0_20px_48px_rgba(10,27,51,.3)]">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(420px_260px_at_88%_0%,rgba(27,111,208,.35),transparent_65%),radial-gradient(360px_240px_at_0%_100%,rgba(233,162,27,.14),transparent_65%)]" />
                 <div className="relative flex flex-col gap-4">
-                  <span className="text-[11.5px] font-extrabold tracking-[0.12em] text-[#8FD8E8]">CONTINUE LEARNING</span>
+                  <span className="text-[11.5px] font-extrabold tracking-[0.12em] text-[#8FD8E8]">
+                    {current.started ? "CONTINUE LEARNING" : "START LEARNING"}
+                  </span>
                   <div className="flex flex-wrap items-center gap-4.5">
                     <span
                       className="h-19 w-30 flex-none rounded-[14px] shadow-[0_10px_24px_rgba(0,0,0,.35)]"
@@ -81,7 +83,7 @@ const DashboardView = ({ data }: { data: DashboardData }) => {
                   </div>
                   <Link to={`/learn/${current.courseId}/${current.lessonId}`} className="btn btn-gold w-max px-6.5 py-3.5 text-[14.5px]">
                     <Icon name="play_arrow" size={19} />
-                    Resume Class {current.lessonNumber}
+                    {current.started ? "Resume" : "Start"} Class {current.lessonNumber}
                   </Link>
                 </div>
               </div>
@@ -177,7 +179,7 @@ const DashboardView = ({ data }: { data: DashboardData }) => {
               <Icon name="arrow_forward" size={19} className="text-soft" />
             </Link>
 
-            {/* Learning paths (F-008) */}
+            {/* Career roadmaps (F-008) */}
             <Link
               to="/paths"
               className="card flex items-center gap-3.5 p-5 text-ink transition-all hover:-translate-y-0.5 hover:text-ink hover:shadow-card-lg"
@@ -186,7 +188,7 @@ const DashboardView = ({ data }: { data: DashboardData }) => {
                 <Icon name="route" size={22} />
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="font-display text-[15px] font-extrabold">Learning paths</span>
+                <span className="font-display text-[15px] font-extrabold">Career roadmaps</span>
                 <span className="text-[12.5px] font-semibold text-soft">Step-by-step routes to a career</span>
               </span>
               <Icon name="arrow_forward" size={19} className="text-soft" />

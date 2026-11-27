@@ -8,7 +8,7 @@ const ROUTES: [path: string, heading: RegExp, account: Account][] = [
   ["/", /Learn skills that/, null],
   ["/courses", /Explore all/, null],
   ["/courses/java-generics", /Generics in Java/, null],
-  ["/notes", /Download/, null],
+  ["/notes", /Free handbooks/, null],
   ["/pricing", /Simple, honest/, null],
   ["/about", /Free where it counts/, null],
   ["/contact", /Get in/, null],
@@ -23,8 +23,10 @@ const ROUTES: [path: string, heading: RegExp, account: Account][] = [
   ["/verify", /Verify a/, null],
   ["/wishlist", /My wishlist/, null],
   ["/cart", /My cart/, null],
-  ["/paths", /Learning/, null],
+  ["/paths", /Career roadmaps/, null],
   ["/paths/backend-developer", /Backend Developer/, null],
+  // guests can watch free preview lessons
+  ["/learn/java-generics/1-1", /Why generics exist/, null],
   ["/verify/BXN-2026-SQ-08412", /Verify a/, null],
   // no valid amount → back to /support
   ["/thank-you", /Support Our Platform/, null],

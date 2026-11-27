@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/common/Icon";
 import type { FlatLesson } from "@/lib/lessons";
+import { plural } from "@/lib/utils";
 import type { CourseModule } from "@/types/course";
 import type { QuizScore } from "@/types/quiz";
 
 interface CurriculumSidebarProps {
   curriculum: CourseModule[];
   lessons: FlatLesson[];
+  /** course length, e.g. "6h" */
+  hours: string;
   currentId: string;
   done: ReadonlySet<string>;
   isLocked: (lesson: FlatLesson) => boolean;
@@ -36,7 +39,17 @@ const QuizLink = ({ courseId, module, score }: { courseId: string; module: numbe
 );
 
 /** "Course content" accordion: one module open at a time, lessons with done / current / locked state. */
-const CurriculumSidebar = ({ curriculum, lessons, currentId, done, isLocked, onSelect, showPreview, quizzes }: CurriculumSidebarProps) => {
+const CurriculumSidebar = ({
+  curriculum,
+  lessons,
+  hours,
+  currentId,
+  done,
+  isLocked,
+  onSelect,
+  showPreview,
+  quizzes,
+}: CurriculumSidebarProps) => {
   const currentModule = lessons.find((l) => l.id === currentId)?.moduleIndex ?? 0;
   const [openModule, setOpenModule] = useState(currentModule);
 
@@ -44,7 +57,9 @@ const CurriculumSidebar = ({ curriculum, lessons, currentId, done, isLocked, onS
     <aside className="card flex flex-col rounded-[20px]! min-[1081px]:sticky min-[1081px]:top-19 min-[1081px]:max-h-[calc(100vh-96px)] min-[1081px]:overflow-y-auto">
       <div className="sticky top-0 z-2 flex items-center justify-between rounded-t-[20px] border-b border-line bg-surface px-5 py-4.5">
         <span className="font-display text-[15px] font-extrabold text-ink">Course content</span>
-        <span className="text-xs font-bold text-soft">{lessons.length} classes · 6h</span>
+        <span className="text-xs font-bold text-soft">
+          {plural(lessons.length, "class", "es")} · {hours}
+        </span>
       </div>
       {curriculum.map((m, mi) => {
         const open = openModule === mi;

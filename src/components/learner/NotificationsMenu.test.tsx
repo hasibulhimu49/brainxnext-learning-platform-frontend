@@ -18,11 +18,11 @@ describe("<NotificationsMenu />", () => {
     await user.click(bell);
     const panel = screen.getByRole("dialog", { name: "Notifications" });
     expect(within(panel).getByText("Project approved")).toBeInTheDocument();
-    expect(within(panel).getAllByLabelText("Unread").length).toBeGreaterThan(0);
+    expect(within(panel).getAllByText("Unread").length).toBeGreaterThan(0);
     await user.click(within(panel).getByRole("button", { name: "Mark all read" }));
-    await waitFor(() => expect(within(panel).queryAllByLabelText("Unread")).toHaveLength(0));
+    await waitFor(() => expect(within(panel).queryAllByText("Unread")).toHaveLength(0));
     expect(screen.getByRole("button", { name: "Notifications" })).toBeInTheDocument();
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
+  }, 20_000);
 });

@@ -14,21 +14,22 @@ Target: **WCAG 2.2 AA** in both light and dark themes, on desktop and mobile.
   - Keep native `type`, `autoComplete` and `inputMode` (email, current-password, one-time-code, cc-number…).
 - **Images**: content images get meaningful `alt`; decorative backgrounds (hero photos, course covers) use `alt=""` or CSS backgrounds.
 - **Charts** (dashboard week chart, admin revenue) carry `role="img"` and an `aria-label` describing the data.
-- **Colour** never carries meaning alone — status pills also show text (`PAID`, `DRAFT`, `OVERDUE 2H`). Text tokens (`ink`, `muted`, `soft`) are tuned for contrast on `page`/`surface` in both themes; check any new colour with a contrast tool.
+- **Colour** never carries meaning alone — status pills also show text (`PAID`, `DRAFT`, `OVERDUE 2H`). Text tokens (`ink`, `muted`, `soft`) reach 4.5:1 on `page`, `surface`, `surface2` and `chip` in both themes; check any new colour with a contrast tool.
+- **Accent text vs fills.** `text-brand`, `text-teal`, `text-success`, `text-amber` and `text-danger` read theme-aware text colours (`--brand-text`, `--success-text`, … via Tailwind's `--text-color-*` keys in `src/index.css`): darker in light mode, lighter in dark mode (`text-brand` is `#6FB7FF` in dark). `bg-`/`border-` utilities keep the Figma fills; `bg-success` is a deeper green (`#2D8444`) so white text on it passes. On a fixed white chip use `text-brand-solid` (never switches theme). Don't hard-code `#1B6FD0` for text — use `text-brand` or `var(--brand-text)`.
 - **Keyboard**: everything clickable is reachable with Tab and works with Enter/Space; the mobile menu and OTP inputs support Backspace/paste. Never remove focus outlines without a replacement.
 - **Disabled-looking submit buttons** stay focusable and clickable (55% opacity) and use `aria-disabled`, so users can trigger the validation messages.
 
 ## Built-in support
 
-- **Focus ring.** `src/index.css` sets a global `:focus-visible` outline (2px `#1B6FD0`, 2px offset) in `@layer base`, so it only shows for keyboard focus and components with their own ring (shadcn inputs, `.field`) override it. Never add `outline-none` without a visible replacement.
+- **Focus ring.** `src/index.css` sets a global `:focus-visible` outline (2px `var(--brand-text)`, 2px offset) in `@layer base`, so it only shows for keyboard focus and components with their own ring (shadcn inputs, `.field`) override it. Never add `outline-none` without a visible replacement.
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` animations and transitions are cut to ~0, smooth scrolling is off and hover lifts (`.card-hover`, `hover:-translate-y-*`) are disabled. JS `scrollIntoView({ behavior: "smooth" })` calls should check the media query too.
-- **Skip link.** `PublicLayout`, `AuthLayout` and `AdminLayout` render `<a href="#main" class="skip-link">Skip to content</a>` first; the target is `id="main"` (the `<main>` landmark, or the content wrapper in `AdminLayout` because admin pages render their own `<main>`). Standalone pages that do not use a layout need their own.
+- **Skip link.** `PublicLayout`, `AuthLayout`, `AdminLayout`, the player (`Player`) and the standalone course editor (`AdminNewCourse`) render `<a href="#main" class="skip-link">Skip to content</a>` first; the target is `id="main"` (the `<main>` landmark, or the content wrapper in `AdminLayout` because admin pages render their own `<main>`). Standalone pages that do not use a layout need their own.
+- **Overlays.** The mobile menu (Navbar) and the Next AI chat panel use `useFocusTrap` (`src/components/common/useFocusTrap.ts`): Tab/Shift+Tab wrap inside, Escape closes and returns focus to the opener. The chat panel is `role="dialog"` + `aria-modal="true"`.
 - **Page titles.** Every page calls `usePageTitle("Name")` (`src/hooks/usePageTitle.ts`) → "Name · BrainXNext"; Home uses `usePageTitle()`.
 
 ## Known gaps
 
-- Mobile menu: Escape to close and focus trap (Navbar, Phase 4 follow-up).
-- `ScrollToTop` always scrolls smoothly to a #hash, even with reduced motion.
+None known. Fixed in F-009: low-contrast `soft` text, dark-mode brand/danger text, green/amber text and white-on-green buttons, footer grey on navy, missing `<h1>` on the certificate and course-editor pages, focus trap for the mobile menu and Next AI panel, the unread-notification dot (now real sr-only text), Next AI ping widening the page at 360px and the circle covering the last footer row, and `ScrollToTop` ignoring reduced motion for #hash links.
 
 ## Checking
 

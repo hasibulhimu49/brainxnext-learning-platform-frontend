@@ -18,51 +18,140 @@ import type {
 } from "@/types/admin";
 import type { OrderRecord, Promo } from "@/types/commerce";
 import { orders, submissions, tickets } from "./commerce";
-import { COURSES, CURRICULUM } from "./courses";
+import { COURSES, HANDBOOKS } from "./courses";
+import { curriculumOf } from "./curricula";
+import { formatTaka } from "@/lib/utils";
+import { timeAgoGB } from "@/lib/dates";
 import { listEnrollments } from "./learning";
 import { createCollection } from "./store";
 
 const g = (a: string, b: string) => `linear-gradient(135deg,${a},${b})`;
 
-export const OVERVIEW: AdminOverview = {
-  kpis: [
-    { label: "Total students", value: "8,430", icon: "group", color: "#1B6FD0", delta: "+12.4%", up: true },
-    { label: "Revenue (Aug)", value: "৳4.2L", icon: "payments", color: "#3FA457", delta: "+8.1%", up: true },
-    { label: "Pro subscribers", value: "1,240", icon: "workspace_premium", color: "#E9A21B", delta: "+21%", up: true },
-    { label: "Avg. completion", value: "64%", icon: "task_alt", color: "#0E97B0", delta: "-2.3%", up: false },
-  ],
-  revenue: [34, 41, 38, 52, 47, 58, 63, 71],
-  topCourses: [
-    { name: "Generics in Java", count: "8,430 enrolled", pct: 100 },
-    { name: "Python for Data Analysis", count: "5,240", pct: 62 },
-    { name: "Code Smells", count: "3,180", pct: 38 },
-    { name: "Modern JavaScript", count: "1,870", pct: 22, gold: true },
-  ],
-  activity: [
-    { who: "Rifat Hossain", what: "upgraded to Pro (yearly)", when: "8 min ago", icon: "workspace_premium", bg: g("#E9A21B", "#F2BC4B") },
-    {
-      who: "Sumaiya Akter",
-      what: "submitted the module 3 project in Generics in Java",
-      when: "24 min ago",
+/* Overview — derived from the same students and orders the Students and Payments sections show. */
+
+const counted = (o: OrderRecord) => o.status === "paid" || o.status === "refund_requested";
+
+/** "+12%" / "-3%"; a rise from nothing is "+100%". */
+const change = (current: number, previous: number) => {
+  const pct = previous ? Math.round(((current - previous) / previous) * 100) : current ? 100 : 0;
+  return { delta: `${pct >= 0 ? "+" : ""}${pct}%`, up: pct >= 0 };
+};
+
+const monthKey = (d: Date) => d.toISOString().slice(0, 7);
+
+/** ৳1,25,000 → "৳1.3L", ৳42,500 → "৳42.5K" */
+const shortTaka = (n: number) =>
+  n >= 100_000 ? `৳${(n / 100_000).toFixed(1)}L` : n >= 1000 ? `৳${(n / 1000).toFixed(1)}K` : `৳${n.toLocaleString("en-IN")}`;
+
+export const buildOverview = (now = new Date()): AdminOverview => {
+  const thisMonth = monthKey(now);
+  const lastMonth = monthKey(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1)));
+  const monthName = now.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+
+  const students = adminStudents.all();
+  const rows = students.map(studentRow);
+  const joinedBefore = (month: string) => students.filter((s) => s.joinedAt.slice(0, 7) < month).length;
+  const pro = students.filter((s) => s.plan === "pro");
+  const proBefore = pro.filter((s) => s.joinedAt.slice(0, 7) < thisMonth).length;
+  const learning = rows.filter((r) => r.courses > 0);
+  const avgCompletion = learning.length ? Math.round(learning.reduce((sum, r) => sum + r.progress, 0) / learning.length) : 0;
+
+  const paid = orders.all().filter(counted);
+  const revenueIn = (month: string) => paid.filter((o) => o.createdAt.startsWith(month)).reduce((sum, o) => sum + o.total, 0);
+  const revenueNow = revenueIn(thisMonth);
+
+  // last 8 weeks, oldest first, in ৳ thousand
+  const weekMs = 7 * 86_400_000;
+  const revenue = Array.from({ length: 8 }, (_, i) => {
+    const to = now.getTime() - (7 - i) * weekMs;
+    const from = to - weekMs;
+    const sum = paid.filter((o) => {
+      const t = new Date(o.createdAt).getTime();
+      return t > from && t <= to;
+    });
+    return Math.round(sum.reduce((s, o) => s + o.total, 0) / 100) / 10;
+  });
+
+  // enrollments per course across the student list
+  const enrolledCount = new Map<string, number>();
+  for (const s of students) for (const e of studentEnrollments(s)) enrolledCount.set(e.courseId, (enrolledCount.get(e.courseId) ?? 0) + 1);
+  const ranked = [...enrolledCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const top = ranked[0]?.[1] ?? 1;
+
+  const activity = [
+    ...paid.map((o) => ({
+      at: o.createdAt,
+      who: o.userName,
+      what:
+        o.kind === "plan"
+          ? `upgraded to Pro (${o.cycle ?? "monthly"})`
+          : o.kind === "donation"
+            ? `supported BrainXNext (${formatTaka(o.total)})`
+            : `bought ${o.itemTitle} (${formatTaka(o.total)} via ${o.method})`,
+      icon: o.kind === "plan" ? "workspace_premium" : "payments",
+      bg: o.kind === "plan" ? g("#E9A21B", "#F2BC4B") : g("#3FA457", "#5DBE74"),
+    })),
+    ...submissions.all().map((s) => ({
+      at: s.submittedAt,
+      who: s.userName,
+      what: `submitted “${s.title}” in ${s.courseTitle}`,
       icon: "assignment_turned_in",
       bg: g("#1B6FD0", "#3E92E8"),
-    },
-    {
-      who: "Mahin Khan",
-      what: "bought Modern JavaScript, Properly (৳4,900 via bKash)",
-      when: "1 h ago",
-      icon: "payments",
-      bg: g("#3FA457", "#5DBE74"),
-    },
-    {
-      who: "Tania Rahman",
-      what: "earned a certificate — SQL From Query to Model",
-      when: "3 h ago",
-      icon: "verified",
+    })),
+    ...adminReviews.all().map((r) => ({
+      at: r.at,
+      who: r.who,
+      what: `reviewed ${r.course} (${r.stars}★)`,
+      icon: "star",
       bg: g("#0E97B0", "#2FB8CF"),
-    },
-    { who: "412 students", what: "downloaded the Java Handbook this week", when: "today", icon: "download", bg: g("#7A4FD0", "#9B6FE8") },
-  ],
+    })),
+  ]
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, 5)
+    .map(({ at, ...item }) => ({ ...item, when: timeAgoGB(at, now.getTime()) }));
+
+  return {
+    kpis: [
+      {
+        label: "Total students",
+        value: students.length.toLocaleString("en-IN"),
+        icon: "group",
+        color: "#1B6FD0",
+        ...change(students.length, joinedBefore(thisMonth)),
+      },
+      {
+        label: `Revenue (${monthName})`,
+        value: shortTaka(revenueNow),
+        icon: "payments",
+        color: "#3FA457",
+        ...change(revenueNow, revenueIn(lastMonth)),
+      },
+      {
+        label: "Pro subscribers",
+        value: pro.length.toLocaleString("en-IN"),
+        icon: "workspace_premium",
+        color: "#E9A21B",
+        ...change(pro.length, proBefore),
+      },
+      {
+        label: "Avg. completion",
+        value: `${avgCompletion}%`,
+        icon: "task_alt",
+        color: "#0E97B0",
+        delta: String(learning.length),
+        up: true,
+        note: learning.length === 1 ? "learner with a course" : "learners with a course",
+      },
+    ],
+    revenue,
+    topCourses: ranked.map(([id, count], i) => ({
+      name: courseTitle(id),
+      count: i === 0 ? `${count} enrolled` : String(count),
+      pct: Math.round((count / top) * 100),
+      ...(COURSES.find((c) => c.id === id)?.free === false ? { gold: true } : {}),
+    })),
+    activity,
+  };
 };
 
 /* ================================================================== */
@@ -123,7 +212,7 @@ const seedCourses = (): StoredCourse[] =>
         pricing: c.free ? "free" : "paid",
         price: c.free ? "" : String(c.price),
         discount: discount ? String(discount) : "",
-        modules: CURRICULUM.map((m) => ({ title: m.title, lessons: m.lessons.map((l) => ({ title: l.title, dur: l.dur })) })),
+        modules: curriculumOf(c.id).map((m) => ({ title: m.title, lessons: m.lessons.map((l) => ({ title: l.title, dur: l.dur })) })),
       },
     };
   });
@@ -144,12 +233,22 @@ export const courseRow = (c: StoredCourse): AdminCourseRow => ({
   updatedAt: c.updatedAt,
 });
 
-/** Paid course orders count as revenue; refunded ones do not. */
-const courseRevenue = (id: string) =>
+/** What one order earned for course `id`: a course order's total, or a cart line's share of the cart total. */
+const revenueFor = (o: OrderRecord, id: string) => {
+  if (o.kind === "course") return o.itemId === id ? o.total : 0;
+  if (o.kind !== "cart") return 0;
+  const item = o.items?.find((i) => i.courseId === id);
+  if (!item) return 0;
+  // the order-level promo is split over the lines in proportion to their price
+  return o.subtotal > 0 ? Math.round((item.price / o.subtotal) * o.total) : 0;
+};
+
+/** Paid course and cart orders count as revenue; refunded ones do not. */
+export const courseRevenue = (id: string) =>
   orders
     .all()
-    .filter((o) => o.kind === "course" && o.itemId === id && (o.status === "paid" || o.status === "refund_requested"))
-    .reduce((sum, o) => sum + o.total, 0);
+    .filter(counted)
+    .reduce((sum, o) => sum + revenueFor(o, id), 0);
 
 export const courseDetail = (c: StoredCourse): AdminCourseDetail => ({
   ...courseRow(c),
@@ -203,7 +302,7 @@ interface StoredStudent {
   status: AdminStudentStatus;
   lastActiveAt: string;
   joinedAt: string;
-  /** courses an admin granted (provisional — the real enrolment would be created by the backend) */
+  /** courses an admin granted (provisional — the real enrollment would be created by the backend) */
   grants: { courseId: string; at: string }[];
   /** used when the learning store has nothing for this learner (only the demo student has real progress) */
   seedEnrollments: SeedEnrollment[];
@@ -449,13 +548,16 @@ const note = (
   fileSize: null,
 });
 
-const seedNotes = (): AdminNote[] => [
-  note(1, "PDF", "Java OOP Complete Notes", "Java", 42, "2026-11-25T06:00:00.000Z", "published"),
-  note(2, "PDF", "Spring Security Guide", "Spring Boot", 31, "2026-11-22T06:00:00.000Z", "published"),
-  note(3, "DOC", "PostgreSQL Query Cheatsheet", "Database", 18, "2026-11-20T06:00:00.000Z", "draft"),
-  note(4, "PDF", "JavaScript ES2026 Notes", "JavaScript", 55, "2026-11-18T06:00:00.000Z", "published"),
-  note(5, "PDF", "Docker for Developers", "DevOps", 27, "2026-11-10T06:00:00.000Z", "published"),
-];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** One note per public handbook (the /notes page), so both lists show the same files. "62 pages · updated Aug 2026" → 62, 2026-08-01. */
+const seedNotes = (): AdminNote[] =>
+  HANDBOOKS.map((h, i) => {
+    const pages = Number(/(\d+) pages/.exec(h.meta)?.[1] ?? 0);
+    const [, month = "Jan", year = "2026"] = /updated (\w+) (\d{4})/.exec(h.meta) ?? [];
+    const at = new Date(Date.UTC(Number(year), Math.max(0, MONTHS.indexOf(month)), 1, 6)).toISOString();
+    return note(i + 1, "PDF", `${h.name} Handbook`, h.name, pages, at, "published");
+  });
 
 export const adminNotes = createCollection<AdminNote>("bxn-mock-admin-notes", seedNotes);
 

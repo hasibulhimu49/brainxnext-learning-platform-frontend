@@ -7,7 +7,6 @@ export const queryKeys = {
     detail: (id: string) => ["courses", id] as const,
   },
   handbooks: ["handbooks"] as const,
-  noteHighlights: ["notes", "highlights"] as const,
   /** everything under "me" belongs to the signed-in user */
   me: {
     all: ["me"] as const,

@@ -64,11 +64,11 @@ const Support = () => {
 
             {handbookName ? (
               <HandbookDownload name={handbookName} className={skipCls}>
-                I want to continue without supporting this platform
+                No thanks, just download
               </HandbookDownload>
             ) : (
               <Link to="/notes" className={skipCls}>
-                I want to continue without supporting this platform
+                No thanks, back to handbooks
               </Link>
             )}
           </>

@@ -1,6 +1,6 @@
 # F-002 — Final polish: missing screens and broken flows
 
-**Status:** In progress — Phase 1 (Foundation) done 2026-11-25
+**Status:** Done — phases 1–4 shipped 2026-11-25
 **Owner:** Mohammad Hasibul Hasan
 **Design:** existing Figma exports; every new screen reuses their components and tokens (`docs/project/ui-guidelines.md`)
 **Backend API docs:** not available. New endpoints in the mock are provisional placeholders (see CLAUDE.md §3)

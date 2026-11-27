@@ -3,7 +3,8 @@ import type { AdminReview } from "@/types/admin";
 import type { CourseReview, MyReviewState } from "@/types/course";
 import { API_ERROR_CODES as CODES } from "../../envelope";
 import { adminReviews } from "../db/admin";
-import { progressOf, TOTAL_LESSONS } from "../db/learning";
+import { totalLessonsOf } from "../db/curricula";
+import { progressOf } from "../db/learning";
 import { newId } from "../db/store";
 import { bodyOf, fail, ok, type MockRequest, type MockRoute } from "../http";
 import { findCourse } from "../db/courses";
@@ -33,7 +34,8 @@ const findMine = (email: string, name: string, courseId: string) =>
 
 const stateFor = (email: string, name: string, courseId: string): MyReviewState => {
   const p = progressOf(email, courseId);
-  const progressPct = Math.round((p.completed.length / TOTAL_LESSONS) * 100);
+  const total = totalLessonsOf(courseId);
+  const progressPct = total ? Math.round((p.completed.length / total) * 100) : 0;
   const mine = findMine(email, name, courseId);
   const reason = !p.enrolled ? "not_enrolled" : progressPct < REVIEW_MIN_PCT && !mine ? "too_early" : null;
   return { review: mine ? toPublic(mine) : null, canReview: reason === null, reason, progressPct, minPct: REVIEW_MIN_PCT };

@@ -3,7 +3,8 @@ import { API_ERROR_CODES as CODES } from "../../envelope";
 import { isPro } from "../db/billing";
 import { buildDashboard } from "../db/dashboard";
 import { syncCertificates } from "../db/entitlement";
-import { LESSON_IDS, enroll, findEnrollment, listEnrollments, progressOf, updateProgress } from "../db/learning";
+import { lessonIdsOf } from "../db/curricula";
+import { enroll, findEnrollment, listEnrollments, progressOf, updateProgress } from "../db/learning";
 import { findUser, toProfile, updateUser } from "../db/users";
 import { bodyOf, fail, ok, str, type MockRoute } from "../http";
 import { findCourse } from "../db/courses";
@@ -110,7 +111,7 @@ export const learnerRoutes: MockRoute[] = [
       if (!findEnrollment(user.email, course.id)) return fail(403, CODES.notEnrolled, "Enrol in this course to save your progress.");
       const b = bodyOf(req);
       const lessonId = str(b.lessonId);
-      if (!LESSON_IDS.includes(lessonId)) return invalid([{ path: ["lessonId"], message: "Unknown lesson" }]);
+      if (!lessonIdsOf(course.id).includes(lessonId)) return invalid([{ path: ["lessonId"], message: "Unknown lesson" }]);
       if (b.completed !== undefined && typeof b.completed !== "boolean") {
         return invalid([{ path: ["completed"], message: "Expected true or false" }]);
       }

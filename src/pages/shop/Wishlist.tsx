@@ -56,7 +56,7 @@ const WishlistView = ({ saved }: { saved: Course[] }) => {
       )}
       <div className="grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-3 min-[1240px]:grid-cols-4">
         {saved.map((c) => (
-          <CourseCard key={c.id} course={c} />
+          <CourseCard key={c.id} course={c} owned={owned.has(c.id)} />
         ))}
       </div>
     </div>

@@ -1,8 +1,11 @@
+import { COURSES } from "./courses";
+import { curriculumOf } from "./curricula";
 import { createCollection } from "./store";
 
 /**
- * Module quiz bank (F-007). One quiz per curriculum module — the mock shares one curriculum
- * (Generics in Java) across courses, so the same four quizzes serve every course for now.
+ * Module quiz bank (F-007). One quiz per curriculum module. Generics in Java has hand-written
+ * questions (QUIZ_BANK); every other course gets a simple generated quiz per module, built from
+ * its own curriculum (see quizFor). PROVISIONAL until real quizzes come from the backend.
  */
 
 export interface BankQuestion {
@@ -158,6 +161,92 @@ export const QUIZ_BANK: BankQuestion[][] = [
     },
   ],
 ];
+
+/** "Class 5 — Upper bounds with extends" → "Upper bounds with extends" */
+const topicOf = (title: string) => title.replace(/^Class \d+ — /, "").replace(/^Practice — /, "");
+
+/** Put the right answer at `at` among three distinct distractors. */
+const withAnswerAt = (answer: string, distractors: string[], at: number) => {
+  const options = [...new Set(distractors.filter((d) => d !== answer))].slice(0, 3);
+  const index = Math.min(at, options.length);
+  options.splice(index, 0, answer);
+  return { options, answer: index };
+};
+
+/**
+ * A four-question practice quiz for one module of a course without a hand-written bank: which
+ * topics belong to this module, how it opens, and two study-habit questions about its topics.
+ */
+const generatedQuiz = (courseId: string, module: number): BankQuestion[] | undefined => {
+  const curriculum = curriculumOf(courseId);
+  const m = curriculum[module];
+  if (!m) return undefined;
+  const topics = [...new Set(m.lessons.map((l) => topicOf(l.title)))];
+  const elsewhere = [
+    ...new Set(
+      curriculum
+        .filter((_, i) => i !== module)
+        .flatMap((x) => x.lessons.map((l) => topicOf(l.title)))
+        .filter((t) => !topics.includes(t))
+    ),
+  ];
+  // fall back to other courses' topics when the course is too small to have enough distractors
+  const others = [
+    ...elsewhere,
+    ...COURSES.filter((c) => c.id !== courseId).flatMap((c) => curriculumOf(c.id).flatMap((x) => x.lessons.map((l) => topicOf(l.title)))),
+  ];
+  const pick = (offset: number) => [0, 1, 2, 3, 4, 5].map((i) => others[(offset + i * 3) % Math.max(1, others.length)] ?? `Topic ${i + 1}`);
+  const first = topics[0] ?? m.title;
+  const second = topics[1] ?? first;
+  const id = (n: number) => `${courseId}-m${module + 1}-q${n}`;
+
+  const q1 = withAnswerAt(second, pick(module), (module + 1) % 4);
+  const q2 = withAnswerAt(first, pick(module + 5), (module + 2) % 4);
+  const q3 = withAnswerAt(
+    `Rebuild the “${first}” example yourself, without the video`,
+    ["Watch the class again at 2× speed", "Skip straight to the next module", "Copy the finished code from the resources"],
+    (module + 3) % 4
+  );
+  const q4 = withAnswerAt(
+    String(m.lessons.length),
+    [m.lessons.length + 2, m.lessons.length - 1, m.lessons.length + 1, m.lessons.length + 3].filter((n) => n > 0).map(String),
+    module % 4
+  );
+
+  return [
+    {
+      id: id(1),
+      prompt: `Which of these topics is covered in “${m.title}”?`,
+      ...q1,
+      explanation: `“${second}” is one of the classes in this module — the other options belong elsewhere.`,
+    },
+    {
+      id: id(2),
+      prompt: `Which class opens the “${m.title}” module?`,
+      ...q2,
+      explanation: `The module starts with “${first}”, which the rest of the module builds on.`,
+    },
+    {
+      id: id(3),
+      prompt: `What is the best way to check you really understood “${first}”?`,
+      ...q3,
+      explanation: "Rebuilding an example from memory shows what you can do on your own — re-watching only feels like learning.",
+    },
+    {
+      id: id(4),
+      prompt: `How many classes does “${m.title}” have?`,
+      ...q4,
+      explanation: `This module has ${m.lessons.length} classes — the sidebar shows your progress through each one.`,
+    },
+  ];
+};
+
+/** The question bank for a module of a course, or undefined when the module doesn't exist. */
+export const quizFor = (courseId: string, module: number): BankQuestion[] | undefined => {
+  if (!Number.isInteger(module) || module < 0) return undefined;
+  if (courseId === "java-generics") return QUIZ_BANK[module];
+  return generatedQuiz(courseId, module);
+};
 
 export interface StoredQuizScore {
   email: string;

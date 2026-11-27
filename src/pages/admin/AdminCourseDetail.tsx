@@ -110,9 +110,9 @@ const CourseView = ({ course }: { course: Detail }) => {
           ))}
         </AdminCard>
 
-        <AdminCard title="Recent enrolments">
+        <AdminCard title="Recent enrollments">
           {course.recentEnrollments.length === 0 ? (
-            <EmptyState icon="group_add" title="No enrolments yet">
+            <EmptyState icon="group_add" title="No enrollments yet">
               Learners who join this course show up here.
             </EmptyState>
           ) : (

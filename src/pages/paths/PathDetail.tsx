@@ -92,7 +92,7 @@ const PathView = ({ path }: { path: LearningPath }) => {
         >
           <Icon name={path.icon} size={32} className="text-white" />
         </span>
-        <span className="text-[12px] font-extrabold tracking-[0.12em] text-[#8FD8E8]">LEARNING PATH · {path.level.toUpperCase()}</span>
+        <span className="text-[12px] font-extrabold tracking-[0.12em] text-[#8FD8E8]">CAREER ROADMAP · {path.level.toUpperCase()}</span>
         <h1 className="m-0 font-display text-[clamp(30px,4.4vw,46px)] font-extrabold tracking-[-0.02em] text-white">{path.title}</h1>
         <p className="m-0 text-[15.5px] leading-relaxed text-[#C9DAEC]">{path.description}</p>
         <span className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-[13.5px] font-bold text-[#C9DAEC]">
@@ -107,7 +107,7 @@ const PathView = ({ path }: { path: LearningPath }) => {
           <div className="flex flex-col gap-4">
             <Link to="/paths" className="inline-flex w-max items-center gap-1 text-[13px] font-bold text-soft hover:text-brand">
               <Icon name="arrow_back" size={16} />
-              All paths
+              All roadmaps
             </Link>
             <ol className="m-0 list-none p-0">
               {steps.map((s, i) => (
@@ -133,18 +133,20 @@ const PathView = ({ path }: { path: LearningPath }) => {
             </div>
 
             {next && nextTo ? (
-              <Link to={nextTo} className="btn btn-primary w-full rounded-[13px] px-5 py-3.5 text-[14.5px]">
+              <Link to={nextTo} className="btn btn-primary w-full rounded-[13px] px-5 py-3.5 text-center text-[14.5px] whitespace-normal">
                 <Icon name="play_arrow" size={18} />
-                {done === 0 && next.status === "not_started" ? "Start the path" : "Continue"}: {next.course.title}
+                {done === 0 && next.status === "not_started" ? "Start the roadmap" : "Continue"}: {next.course.title}
               </Link>
             ) : (
               <p className="m-0 rounded-xl bg-success/10 px-4 py-3 text-center text-[13.5px] font-extrabold text-success">
-                Path complete — well done! 🎉
+                Roadmap complete — well done! 🎉
               </p>
             )}
 
             {isPro ? (
-              <p className="m-0 text-center text-[12.5px] font-bold text-muted">Every course in this path is included in your Pro plan.</p>
+              <p className="m-0 text-center text-[12.5px] font-bold text-muted">
+                Every course in this roadmap is included in your Pro plan.
+              </p>
             ) : toBuy.length > 0 ? (
               <button
                 type="button"
@@ -154,7 +156,7 @@ const PathView = ({ path }: { path: LearningPath }) => {
                     action: { label: "View cart", onClick: () => void navigate("/cart") },
                   });
                 }}
-                className="btn btn-outline w-full rounded-[13px] px-5 py-3.25 text-[13.5px]"
+                className="btn btn-outline w-full rounded-[13px] px-5 py-3.25 text-center text-[13.5px] whitespace-normal"
               >
                 <Icon name="add_shopping_cart" size={17} />
                 Add {plural(toBuy.length, "paid course")} to cart · {formatTaka(toBuyTotal)}
@@ -179,11 +181,11 @@ const PathView = ({ path }: { path: LearningPath }) => {
   );
 };
 
-/** /paths/:pathId — one learning path (F-008). */
+/** /paths/:pathId — one career roadmap (F-008). */
 const PathDetail = () => {
   const { pathId = "" } = useParams();
   const path = usePath(pathId);
-  usePageTitle(path.data ? `${path.data.title} path` : "Learning path");
+  usePageTitle(path.data ? `${path.data.title} roadmap` : "Career roadmap");
   if (isApiError(path.error) && path.error.code === API_ERROR_CODES.notFound) return <Navigate to="/paths" replace />;
   return <QueryStatus query={path}>{(p) => <PathView path={p} />}</QueryStatus>;
 };

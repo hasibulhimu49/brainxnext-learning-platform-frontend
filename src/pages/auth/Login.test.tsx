@@ -25,7 +25,7 @@ describe("<Login />", () => {
   it("shows the server error for a wrong password", async () => {
     renderWithProviders(<Login />, { route: "/login" });
     await fill("hasibulx26@gmail.com", "wrong-password");
-    expect(await screen.findByRole("alert")).toHaveTextContent("Wrong password. Try again or reset it below.");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Wrong password. Try again, or use “Forgot password?” above.");
     expect(useAuthStore.getState().token).toBeNull();
   });
 

@@ -1,15 +1,18 @@
 import type { ReactNode } from "react";
-import aboutImg from "@/assets/images/about-team.jpg";
+import aboutImg from "@/assets/images/about-team.webp";
 import HeroBand from "@/components/common/HeroBand";
 import Icon from "@/components/common/Icon";
 import CtaBanner from "@/components/marketing/CtaBanner";
+import useCatalogStats, { type CatalogStats } from "@/components/marketing/useCatalogStats";
 import usePageTitle from "@/hooks/usePageTitle";
+import { plural } from "@/lib/utils";
 
-const STATS = [
-  { value: "31k", color: "#1B6FD0", label: "YouTube subscribers" },
-  { value: "8,400+", color: "#0E97B0", label: "Active learners" },
-  { value: "48", color: "#E9A21B", label: "Courses, 12 free" },
-  { value: "96%", color: "#3FA457", label: "Path finish rate" },
+/** The course figure comes from the catalog so it always matches /courses. */
+const aboutStats = (stats: CatalogStats | null) => [
+  { key: "youtube", value: "31k", color: "#1B6FD0", label: "YouTube subscribers" },
+  { key: "learners", value: "8,400+", color: "#0E97B0", label: "Active learners" },
+  { key: "courses", value: stats ? String(stats.total) : "–", color: "#E9A21B", label: stats ? `Courses, ${stats.free} free` : "Courses" },
+  { key: "finish", value: "96%", color: "#3FA457", label: "Roadmap finish rate" },
 ];
 
 const VALUES = [
@@ -42,7 +45,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#1B6FD0,#0E97B0)",
     role: "Founder · Java & Backend",
     bio: "Started the channel with Java classes in Bangla. Records the core Java track and reviews backend submissions.",
-    courses: "6 courses",
     rating: "4.9",
   },
   {
@@ -50,7 +52,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#1B6FD0,#3E92E8)",
     role: "Data Engineer · Grameenphone",
     bio: "Builds data pipelines for 80M subscribers by day. Teaches the Python and SQL tracks with real, messy datasets.",
-    courses: "4 courses",
     rating: "4.9",
   },
   {
@@ -58,7 +59,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#0E97B0,#2FB8CF)",
     role: "Staff Frontend Eng · Shopify",
     bio: "Ten years of JavaScript in production. Teaches the JS and React tracks and reviews frontend architecture work.",
-    courses: "5 courses",
     rating: "4.8",
   },
   {
@@ -66,7 +66,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#E9A21B,#F2BC4B)",
     role: "Product Designer · Figma",
     bio: "Designs design tools for designers. Teaches design systems and UX research with portfolio-grade briefs.",
-    courses: "3 courses",
     rating: "4.9",
   },
   {
@@ -75,7 +74,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#7A4FD0,#9B6FE8)",
     role: "ML Lead · bKash",
     bio: "PhD in ML, ships fraud-detection models daily. Teaches the AI track and the LLM engineering course.",
-    courses: "4 courses",
     rating: "4.8",
   },
   {
@@ -83,7 +81,6 @@ const MENTORS = [
     grad: "linear-gradient(135deg,#D0491B,#E9744B)",
     role: "Product Analyst · Pathao",
     bio: "Turns ride-share data into product decisions. Teaches analytics and the business track's metrics courses.",
-    courses: "3 courses",
     rating: "4.7",
   },
 ];
@@ -97,6 +94,7 @@ const Eyebrow = ({ icon, children }: { icon: string; children: ReactNode }) => (
 
 const About = () => {
   usePageTitle("About");
+  const stats = useCatalogStats();
   return (
     <>
       <HeroBand className="pt-18 pb-16">
@@ -117,8 +115,8 @@ const About = () => {
 
       <section className="bg-page px-4.5 sm:px-6">
         <div className="relative mx-auto -mt-9 grid max-w-275 grid-cols-2 gap-4 min-[1001px]:grid-cols-4">
-          {STATS.map((s) => (
-            <div key={s.label} className="rounded-[20px] border border-line bg-surface p-6 text-center shadow-card-lg">
+          {aboutStats(stats).map((s) => (
+            <div key={s.key} className="rounded-[20px] border border-line bg-surface p-6 text-center shadow-card-lg">
               <div className="font-display text-[28px] leading-none font-extrabold" style={{ color: s.color }}>
                 {s.value}
               </div>
@@ -218,7 +216,7 @@ const About = () => {
                 </div>
                 <p className="m-0 text-[13.5px] leading-relaxed font-medium text-muted">{m.bio}</p>
                 <div className="flex items-center justify-between border-t border-line pt-3.25">
-                  <span className="text-xs font-extrabold text-brand">{m.courses}</span>
+                  <span className="text-xs font-extrabold text-brand">{stats ? plural(stats.byMentor[m.name] ?? 0, "course") : " "}</span>
                   <span className="inline-flex items-center gap-1.25 text-xs font-bold text-soft">
                     <Icon name="star" size={15} className="text-amber" />
                     {m.rating}

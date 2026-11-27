@@ -1,5 +1,6 @@
 import { isPro } from "./billing";
 import { COURSES } from "./courses";
+import { totalLessonsOf } from "./curricula";
 import { certificatesOf, findEnrollment, issueCertificate, listEnrollments } from "./learning";
 
 /**
@@ -18,7 +19,12 @@ export const syncCertificates = (user: { email: string; name: string }) => {
     if (!e.completedAt || !hasCourseExtras(user.email, e.courseId)) continue;
     const course = COURSES.find((c) => c.id === e.courseId);
     if (course)
-      issueCertificate(user.email, user.name, { id: course.id, title: course.title, mentor: course.mentor, lessons: course.lessons });
+      issueCertificate(user.email, user.name, {
+        id: course.id,
+        title: course.title,
+        mentor: course.mentor,
+        lessons: totalLessonsOf(course.id),
+      });
   }
   return certificatesOf(user.email);
 };

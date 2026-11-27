@@ -14,4 +14,4 @@ Guided sequences of catalog courses (Backend Developer, Data Analyst, AI Enginee
 ## Pieces
 
 Mock `db/paths.ts`, `routes/paths.ts` (`GET /paths`, `GET /paths/:id`, provisional); `types/path.ts`, `services/pathService.ts`,
-`queries/paths.ts`, pages `Paths.tsx` and `PathDetail.tsx`. Linked from the catalog banner, footer (LEARN) and dashboard.
+`queries/paths.ts`, pages `Paths.tsx` and `PathDetail.tsx`. Linked from the navbar ("Roadmaps"), catalog banner, footer (LEARN) and dashboard. Shown as **"Career roadmaps"** since F-009.

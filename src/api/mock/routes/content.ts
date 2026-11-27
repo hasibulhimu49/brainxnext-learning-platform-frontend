@@ -1,6 +1,7 @@
 import { contactSchema } from "@/schemas/account";
 import { API_ERROR_CODES as CODES } from "../../envelope";
-import { HANDBOOKS, NOTE_HIGHLIGHTS } from "../db/courses";
+import { adminNotes } from "../db/admin";
+import { HANDBOOKS } from "../db/courses";
 import { fail, ok, type MockRoute } from "../http";
 import { invalid } from "./shared";
 import { tickets } from "../db/commerce";
@@ -9,8 +10,20 @@ import { newId } from "../db/store";
 
 /** Public content: handbooks, notes, certificate lookup and the contact form. */
 export const contentRoutes: MockRoute[] = [
-  { method: "GET", path: "/handbooks", handler: () => ok(HANDBOOKS) },
-  { method: "GET", path: "/notes/highlights", handler: () => ok(NOTE_HIGHLIGHTS) },
+  {
+    method: "GET",
+    path: "/handbooks",
+    // the same records Admin → Notes manages: a handbook shows on /notes while its note is published
+    handler: () => {
+      const published = new Set(
+        adminNotes
+          .all()
+          .filter((n) => n.status === "published")
+          .map((n) => n.category)
+      );
+      return ok(HANDBOOKS.filter((h) => published.has(h.name)));
+    },
+  },
   {
     method: "GET",
     path: "/certificates/:id",

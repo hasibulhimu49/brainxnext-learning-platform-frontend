@@ -9,8 +9,6 @@ export const useCourse = (id: string) => useQuery({ queryKey: queryKeys.courses.
 
 export const useHandbooks = () => useQuery({ queryKey: queryKeys.handbooks, queryFn: courseService.handbooks });
 
-export const useNoteHighlights = () => useQuery({ queryKey: queryKeys.noteHighlights, queryFn: courseService.noteHighlights });
-
 /** Display name for a handbook slug ("javascript" → "JavaScript"); the slug itself until the list loads. */
 export const useHandbookName = (slug: string | null) => {
   const { data } = useHandbooks();

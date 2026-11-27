@@ -30,13 +30,13 @@ const CoursePreviewCard = ({
   discount,
 }: CoursePreviewCardProps) => {
   const badge = isPaid ? (discount ? `${discount}% OFF` : level.toUpperCase()) : "FREE";
-  const badgeCls = isPaid ? (discount ? "bg-[#EC3013] text-white" : "bg-white/20 text-white") : "bg-white text-brand";
+  const badgeCls = isPaid ? (discount ? "bg-[#EC3013] text-white" : "bg-white/20 text-white") : "bg-white text-brand-solid";
   return (
     <div className="card overflow-hidden shadow-card-lg">
       <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
         <span className="font-display text-[13px] font-extrabold tracking-[0.08em] text-soft">CARD PREVIEW</span>
         <span
-          className={`pill px-2.5 py-1 text-[10.5px] ${status === "published" ? "bg-success/14 text-success" : "bg-amber/16 text-[#B57708]"}`}
+          className={`pill px-2.5 py-1 text-[10.5px] ${status === "published" ? "bg-success/14 text-success" : "bg-amber/16 text-amber"}`}
         >
           {status === "published" ? "PUBLISHED" : "DRAFT"}
         </span>

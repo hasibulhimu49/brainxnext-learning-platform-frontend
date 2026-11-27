@@ -1,5 +1,7 @@
 # F-001 — Implementation plan
 
+> **Note (F-009):** files were reorganised by area in F-009 (e.g. `pages/marketing/Checkout` → `pages/checkout/`, `dashboard/*` → `learner/`). Paths below are as they were when this plan was written; see `CLAUDE.md` §9 for the current layout.
+
 **Status:** Approved (by Mohammad Hasibul Hasan, 2026-11-24) — implemented 2026-11-25
 
 > Do not start coding until this plan is approved.

@@ -17,7 +17,8 @@ export const authRoutes: MockRoute[] = [
       if (!parsed.success) return invalid(parsed.error.issues);
       const user = findUser(parsed.data.email);
       if (!user) return fail(404, CODES.userNotFound, "No account found with that email. Create a free account first.");
-      if (user.password !== parsed.data.password) return fail(401, CODES.wrongPassword, "Wrong password. Try again or reset it below.");
+      if (user.password !== parsed.data.password)
+        return fail(401, CODES.wrongPassword, "Wrong password. Try again, or use “Forgot password?” above.");
       if (!user.verified) return fail(403, CODES.emailNotVerified, "Please verify your email before logging in.");
       return ok({ token: issueToken(user.email), user: toSessionUser(user) });
     },

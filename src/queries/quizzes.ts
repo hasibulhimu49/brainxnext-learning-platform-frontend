@@ -3,8 +3,14 @@ import { quizService } from "@/services/quizService";
 import { useIsSignedIn } from "@/stores/authStore";
 import { queryKeys } from "./keys";
 
-export const useQuiz = (courseId: string, module: number) =>
-  useQuery({ queryKey: queryKeys.quiz(courseId, module), queryFn: () => quizService.quiz(courseId, module), retry: false });
+/** One module quiz; pass `enabled: false` for an invalid module index so nothing is requested. */
+export const useQuiz = (courseId: string, module: number, enabled = true) =>
+  useQuery({
+    queryKey: queryKeys.quiz(courseId, module),
+    queryFn: () => quizService.quiz(courseId, module),
+    enabled: enabled && !!courseId && Number.isInteger(module) && module >= 0,
+    retry: false,
+  });
 
 /** Best score per module for the curriculum sidebar. */
 export const useQuizScores = (courseId: string) =>

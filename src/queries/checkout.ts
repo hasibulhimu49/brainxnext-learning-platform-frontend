@@ -6,7 +6,10 @@ import type { BillingCycle, OrderRecord } from "@/types/commerce";
 import { queryKeys } from "./keys";
 import { invalidateLearning } from "./learning";
 
-/** A paid order enrols the buyer (course) or starts Pro (plan); either way orders and notifications change. */
+/**
+ * A paid order enrols the buyer (course) or starts Pro (plan); either way orders and notifications change.
+ * Pro also unlocks certificates for finished courses and changes what the dashboard and enrolments offer.
+ */
 export const invalidateAfterOrder = (qc: QueryClient, order: OrderRecord) => {
   qc.setQueryData(queryKeys.me.order(order.id), order);
   return Promise.all([
@@ -14,7 +17,11 @@ export const invalidateAfterOrder = (qc: QueryClient, order: OrderRecord) => {
     qc.invalidateQueries({ queryKey: queryKeys.me.notifications }),
     order.kind === "course" ? invalidateLearning(qc, order.itemId) : null,
     ...(order.kind === "cart" ? (order.items ?? []).map((i) => invalidateLearning(qc, i.courseId)) : []),
-    order.kind === "plan" ? qc.invalidateQueries({ queryKey: queryKeys.me.subscription }) : null,
+    ...(order.kind === "plan"
+      ? [queryKeys.me.subscription, queryKeys.me.certificates, queryKeys.me.dashboard, queryKeys.me.enrollments].map((queryKey) =>
+          qc.invalidateQueries({ queryKey })
+        )
+      : []),
   ]);
 };
 

@@ -12,6 +12,8 @@ export interface EnrolledCourse extends CoverSource {
   title: string;
   icon: IconName;
   pct: number;
+  /** at least one lesson completed */
+  started: boolean;
   meta: string;
 }
 
@@ -43,6 +45,8 @@ export interface ContinueLearning extends CoverSource {
   lesson: string;
   lessonNumber: number;
   pct: number;
+  /** at least one lesson completed ("Resume" vs "Start") */
+  started: boolean;
 }
 
 /** Built from the signed-in user's enrolments; a new user gets empty lists and `continueLearning: null`. */

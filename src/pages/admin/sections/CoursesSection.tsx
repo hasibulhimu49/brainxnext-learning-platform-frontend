@@ -16,6 +16,7 @@ import { SECTION_META } from "@/constants/admin";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useAdminCourses } from "@/queries/admin";
 import type { AdminCourseRow, AdminCourseStatus } from "@/types/admin";
+import { plural } from "@/lib/utils";
 
 const meta = SECTION_META.courses;
 type StatusFilter = "all" | AdminCourseStatus;
@@ -25,7 +26,7 @@ const COLUMNS: Column<AdminCourseRow>[] = [
     key: "title",
     header: "Course",
     sort: (c) => c.title,
-    render: (c) => <Name title={c.title} sub={`${c.track} • ${c.modules} modules`} />,
+    render: (c) => <Name title={c.title} sub={`${c.track} • ${plural(c.modules, "module")}`} />,
   },
   { key: "students", header: "Students", sort: (c) => c.students, render: (c) => c.students.toLocaleString("en-IN") },
   {
@@ -80,7 +81,7 @@ const CoursesSection = () => {
             Export
           </HeaderButton>
           <HeaderButton primary to="/admin/courses/new">
-            + Create course
+            + New course
           </HeaderButton>
         </>
       }
@@ -120,7 +121,7 @@ const CoursesSection = () => {
                       title="No courses yet"
                       action={
                         <HeaderButton primary to="/admin/courses/new">
-                          + Create course
+                          + New course
                         </HeaderButton>
                       }
                     >

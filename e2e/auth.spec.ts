@@ -77,7 +77,7 @@ test.describe("authentication", () => {
     await page.getByLabel("Confirm new password").fill("brandnewpass1");
     await page.getByRole("button", { name: "Reset password" }).click();
     await expect(page.getByRole("heading", { name: "Password updated!" })).toBeVisible();
-    await page.getByRole("link", { name: "Log in" }).click();
+    await page.getByRole("link", { name: "Log in", exact: true }).click();
     await submitLogin(page, { email: STUDENT.email, password: "brandnewpass1" });
     await expect(page).toHaveURL(/\/dashboard$/);
   });

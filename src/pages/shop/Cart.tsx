@@ -37,7 +37,7 @@ const CartRow = ({ course }: { course: Course }) => {
           {course.title}
         </Link>
         <span className="text-[12.5px] font-semibold text-soft">
-          {course.mentor} · {course.lessons} lessons · {course.hours}
+          {course.mentor} · {plural(course.lessons, "lesson")} · {course.hours}
         </span>
         <span className="mt-1.5 flex flex-wrap items-end gap-x-4 gap-y-1.5 text-[12.5px] font-bold">
           <button type="button" onClick={saveForLater} className="border-0 bg-transparent p-0 text-brand hover:underline">
@@ -186,15 +186,19 @@ const CartSummary = ({ items, subtotal, isPro }: { items: Course[]; subtotal: nu
 };
 
 const CartView = () => {
-  const { items, unavailable, ready, isPro, subtotal } = useCart();
+  const { items, unavailable, alreadyOwned, ready, isPro, subtotal } = useCart();
   const removeMany = useShopStore((s) => s.removeManyFromCart);
 
   // owned, free or retired courses can't be bought — drop them and say so
   useEffect(() => {
     if (!ready || unavailable.length === 0) return;
     removeMany(unavailable);
-    toast(`Removed ${plural(unavailable.length, "course")} you already have access to`);
-  }, [ready, unavailable, removeMany]);
+    toast(
+      alreadyOwned
+        ? `Removed ${plural(unavailable.length, "course")} you already have access to`
+        : `Removed ${plural(unavailable.length, "course")} that can't be bought`
+    );
+  }, [ready, unavailable, alreadyOwned, removeMany]);
 
   if (!ready) return null;
   if (items.length === 0) {

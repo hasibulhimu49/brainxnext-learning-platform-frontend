@@ -26,34 +26,54 @@ The client always checks `success` before reading `data`. A failure, a non-envel
 
 ## Mock layout
 
-`src/api/mock/routes/` — one module per area so features can be worked on in parallel, combined in `index.ts`:
+`src/api/mock/routes/` — one module per area so features can be worked on in parallel, combined in `index.ts`. `src/api/mock/http.ts` has `ok` / `fail` and the request/route types; `adapter.ts` matches routes and adds latency (0 ms in tests).
 
 | Module | Endpoints |
 | --- | --- |
 | `auth.ts` | `/auth/*` |
-| `catalog.ts` | `/courses`, `/courses/:id` |
-| `learner.ts` | `/me/*`, `/courses/:id/enroll` |
+| `catalog.ts` | `/courses`, `/courses/:id` (with the course's own curriculum and visible reviews) |
+| `learner.ts` | `/me/dashboard`, `/me/profile`, `/me/password`, `/me/enrollments`, `/me/progress/:courseId`, `/courses/:id/enroll`; spreads in `billing.ts` (`/me/subscription`, `/me/orders`), `achievements.ts` (`/me/certificates`, `/me/submissions`, `/me/notifications`) and `account.ts` (`/me/preferences`, `/me/email`, `DELETE /me`) |
 | `checkout.ts` | `/checkout/*` |
-| `content.ts` | `/handbooks`, `/notes/highlights`, `/certificates/:id`, `/contact` |
+| `content.ts` | `/handbooks`, `/certificates/:id`, `/contact` |
+| `reviews.ts` | `/me/reviews/:courseId` |
+| `quizzes.ts` | `/courses/:courseId/quizzes/:module`, `/me/quizzes/*` |
+| `paths.ts` | `/paths`, `/paths/:id` |
+| `assistant.ts` | `/assistant/chat` |
 | `admin.ts` | `/admin/*` |
 | `shared.ts` | `invalid`, `unauthorized`, `forbidden`, `requireUser`, `requireAdmin` |
 
-Mock data lives in `src/api/mock/db/` (`users.ts` + reset tokens, `learning.ts` enrolments/progress in localStorage `bxn-mock-learning`, `dashboard.ts`, `courses.ts`, `admin.ts`). Tests reset them in `src/test/setup.ts`.
+Mock data lives in `src/api/mock/db/`, persisted in localStorage under `bxn-mock-*` keys (`store.ts` → `createCollection`):
+
+| File | Holds |
+| --- | --- |
+| `users.ts` | accounts, reset tokens, preferences, read notifications |
+| `courses.ts` | `COURSES`, `HANDBOOKS`, `findCourse` |
+| `curricula.ts` | per-course description, outcomes and module / lesson outline (`curriculumOf`, `lessonsOf`, `totalLessonsOf`) |
+| `learning.ts` | enrolments, progress, certificates |
+| `entitlement.ts` | Pro / bought-course rules, certificate issuing |
+| `billing.ts` | subscriptions |
+| `commerce.ts` | orders, promos, submissions, support tickets |
+| `dashboard.ts` | builds `/me/dashboard` |
+| `quizzes.ts` | quiz questions per course module + best scores |
+| `paths.ts` | career roadmaps |
+| `admin.ts` | admin courses, students, reviews, notes (seeded from `HANDBOOKS`), payment events |
+
+Tests reset them in `src/test/setup.ts`.
 
 ## Rules
 
 - Never import `axios` or call `fetch` outside `src/api` / `src/services` (ESLint error).
-- Branch on `error.code` (see `API_ERROR_CODES`), never on message text.
+- Branch on `error.code` (see `API_ERROR_CODES`), never on message text. Every code the mock returns is in `API_ERROR_CODES`.
 - Show `errorMessage(error)` to users; it falls back to a generic message for non-API errors.
 - `401` clears the session automatically and marks it expired (interceptor in `client.ts`).
 
 ## Error codes
 
-`NETWORK_ERROR`, `INVALID_ENVELOPE`, `INVALID_RESPONSE`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `USER_NOT_FOUND`, `WRONG_PASSWORD`, `EMAIL_TAKEN`, `INVALID_CODE`, `INVALID_PROMO`, `EMAIL_NOT_VERIFIED`, `NO_PENDING_SIGNUP`, `INVALID_RESET_TOKEN`, `PAYMENT_REQUIRED`, `ALREADY_ENROLLED`, `NOT_ENROLLED`.
+`API_ERROR_CODES` in `src/api/envelope.ts`. Client-side: `NETWORK_ERROR`, `INVALID_ENVELOPE`, `INVALID_RESPONSE`. Server (provisional): `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `USER_NOT_FOUND`, `WRONG_PASSWORD`, `EMAIL_TAKEN`, `INVALID_CODE`, `INVALID_PROMO`, `EMAIL_NOT_VERIFIED`, `NO_PENDING_SIGNUP`, `INVALID_RESET_TOKEN`, `PAYMENT_REQUIRED`, `ALREADY_ENROLLED`, `NOT_ENROLLED`, `PAYMENT_DECLINED`, `ORDER_NOT_PENDING`, `ALREADY_SUBSCRIBED`, `UPGRADE_REQUIRED`, `REFUND_NOT_ALLOWED`, `REVIEW_TOO_EARLY`, `NO_REFUND_REQUEST`, `PROMO_EXISTS`, `INTERNAL_ERROR` (the server or the mock failed unexpectedly).
 
 ## Current endpoints (mock)
 
-`POST /auth/login|register|verify-otp|resend-otp|forgot-password|reset-password` · `GET /courses`, `GET /courses/:id`, `GET /handbooks`, `GET /notes/highlights` · `GET /me/dashboard`, `GET|PATCH /me/profile`, `POST /me/password` · `GET /certificates/:id` · `POST /checkout/promo`, `POST /checkout/orders` · `POST /contact` · `GET /admin/overview` + the admin endpoints listed under "Admin (Phase 3)".
+All provisional. Auth: `POST /auth/login|register|verify-otp|resend-otp|forgot-password|reset-password`. Public: `GET /courses`, `GET /courses/:id`, `GET /handbooks`, `GET /certificates/:id`, `GET /paths`, `GET /paths/:id`, `POST /contact`, `POST /assistant/chat`. The rest are in the tables below.
 
 ### Provisional (added by F-002 Phase 1 — no backend docs yet)
 
@@ -87,7 +107,7 @@ Every endpoint below requires an admin token: no session → `401 UNAUTHORIZED`,
 | `GET /admin/notes` · `POST /admin/notes` | `{ name, category, type, pages, status }` | `{ stats, rows, categories }` · `201 AdminNote` (v1) |
 | `POST /admin/notes/:id/versions` | `{ fileName, fileSize }` (PDF ≤ 50 MB; metadata only) | `AdminNote` with `version + 1` and a new `updatedAt` |
 | `GET /admin/payments` · `GET /admin/payments/:id` | — | `{ stats, rows: OrderRecord[] }` · `{ order, timeline }` |
-| `POST /admin/payments/:id/refund` | `{ reason }` | full refund → `status: refunded`; not paid → `409 NOT_REFUNDABLE`; short reason → `422` |
+| `POST /admin/payments/:id/refund` | `{ reason }` | full refund → `status: refunded`; not paid → `409 REFUND_NOT_ALLOWED`; short reason → `422` |
 | `POST /admin/payments/:id/refund/reject` | `{ reason }` | `refund_requested` → `paid`; no request → `409 NO_REFUND_REQUEST` |
 | `GET /admin/submissions` · `GET /admin/submissions/:id` | — | `Submission[]` · `Submission` |
 | `POST /admin/submissions/:id/review` | `{ decision: approved \| changes_requested, feedback }` (≥ 20 chars) | `Submission` with `status`, `feedback`, `reviewer` (signed-in admin's name), `reviewedAt` |
@@ -96,7 +116,7 @@ Every endpoint below requires an admin token: no session → `401 UNAUTHORIZED`,
 | `GET /admin/tickets` · `GET /admin/tickets/:id` | — | `Ticket[]` · `Ticket` |
 | `POST /admin/tickets/:id/replies` · `PATCH /admin/tickets/:id` | `{ message }` · `{ status: open \| closed }` | `Ticket` (a reply appends to `replies` and sets `status: replied`) |
 
-New error codes (admin only, not in `API_ERROR_CODES`): `NOT_REFUNDABLE`, `NO_REFUND_REQUEST`, `PROMO_EXISTS`. Admin mock data: `src/api/mock/db/admin.ts` (localStorage `bxn-mock-admin-*`; `resetMockAdmin()` for tests).
+Admin mock data: `src/api/mock/db/admin.ts` (localStorage `bxn-mock-admin-*`; `resetMockAdmin()` for tests).
 
 ### Learner and money (Phase 2) — provisional, no backend docs yet
 
@@ -105,7 +125,7 @@ All `/me/*` endpoints need a user token (no session → `401`). Orders use the s
 | Endpoint | Request | Response / errors |
 | --- | --- | --- |
 | `POST /checkout/promo` | `{ code }` | `PromoResult`; validated with `findValidPromo` (active, not expired, under limit) else `400 INVALID_PROMO` |
-| `POST /checkout/orders` | `{ kind: "course", courseId, payment, promoCode? }` · `{ kind: "plan", plan: "pro", cycle, payment, promoCode? }` · `{ kind: "donation", amount, payment: { method } }` · `{ kind: "cart", courseIds, payment, promoCode? }` (F-004: one order with `items[]`, promo on the subtotal, paying enrols every course; empty/free → `400`, any owned → `409 ALREADY_ENROLLED`, Pro → `409 ALREADY_SUBSCRIBED`) | `201 OrderRecord` written to `orders`. Card → `paid` (fulfilled: enrol / start Pro, promo `used + 1`); bKash/Nagad → `pending`. Donations need no session and are paid at once. Owned course → `409 ALREADY_ENROLLED`; already Pro → `409 ALREADY_SUBSCRIBED`; Teams / free course → `400` |
+| `POST /checkout/orders` | `{ kind: "course", courseId, payment, promoCode? }` · `{ kind: "plan", plan: "pro", cycle, payment, promoCode? }` · `{ kind: "donation", amount, payment: { method } }` · `{ kind: "cart", courseIds, payment, promoCode? }` (F-004: one order with `items[]`, promo on the subtotal, paying enrols every course; empty/free → `400`, any owned → `409 ALREADY_ENROLLED`, Pro → `409 ALREADY_SUBSCRIBED`) | `201 OrderRecord` written to `orders`. Card → `paid` (fulfilled: enrol / start Pro, promo `used + 1`); bKash/Nagad → `pending`. Donations need no session and are paid at once. Owned course → `409 ALREADY_ENROLLED`; Pro member buying a plan, a course or a cart → `409 ALREADY_SUBSCRIBED`; Teams / free course → `400` |
 | `POST /checkout/orders/:id/confirm` | `{ simulateFailure? }` (demo) | `paid` order (fulfilled); wallet ending `0000` or `simulateFailure` → status `failed` + `402 PAYMENT_DECLINED`; not pending → `409 ORDER_NOT_PENDING` |
 | `POST /checkout/orders/:id/cancel` | — | order with status `failed` |
 | `GET /me/orders` · `GET /me/orders/:id` | — | own orders, newest first · one order (others' → `404`) |
@@ -144,7 +164,7 @@ While the mock API is on, `OPEN_ADMIN` (`src/api/config.ts`, env `VITE_OPEN_ADMI
 | --- | --- |
 | `GET /me/reviews/:courseId` | `MyReviewState { review, canReview, reason, progressPct, minPct }` |
 | `PUT /me/reviews/:courseId` | `{ stars 1–5, text 20–1000 }` → `MyReviewState`; not enrolled → `403 NOT_ENROLLED`, under 30% → `403 REVIEW_TOO_EARLY` |
-| `GET /courses/:id/quizzes/:module` | `Quiz` without answers (enrolled only) |
+| `GET /courses/:id/quizzes/:module` | `Quiz` without answers (0-based module, enrolled only; each course has its own quizzes); unknown → `404`, not enrolled → `403 NOT_ENROLLED` |
 | `POST /me/quizzes/:courseId/:module` | `{ answers: number[] }` → `QuizResult` with explanations; best score kept |
 | `GET /me/quizzes/:courseId` | `QuizScore[]` |
-| `GET /paths`, `GET /paths/:id` | `LearningPath` (public) |
+| `GET /paths`, `GET /paths/:id` | `LearningPath` (public, shown as "Career roadmaps") |

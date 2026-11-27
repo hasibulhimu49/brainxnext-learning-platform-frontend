@@ -64,6 +64,11 @@ export const API_ERROR_CODES = {
   refundNotAllowed: "REFUND_NOT_ALLOWED",
   // F-006 (provisional)
   reviewTooEarly: "REVIEW_TOO_EARLY",
+  // admin (provisional)
+  noRefundRequest: "NO_REFUND_REQUEST",
+  promoExists: "PROMO_EXISTS",
+  /** the server (or the mock) failed unexpectedly */
+  internal: "INTERNAL_ERROR",
 } as const;
 
 export class ApiError extends Error {

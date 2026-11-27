@@ -4,6 +4,8 @@ The app is a static single-page app: `npm run build` produces `dist/` (HTML, has
 
 ## Build
 
+Node.js 20.19 or newer (`engines` in `package.json`).
+
 ```bash
 npm ci
 npm run typecheck && npm run lint && npm test   # must pass before deploying
@@ -18,7 +20,8 @@ Vite inlines `VITE_*` variables **at build time** — rebuild after changing the
 | Variable | Production value |
 | --- | --- |
 | `VITE_API_BASE_URL` | the real API base, e.g. `https://api.brainxnext.com/api/v1` |
-| `VITE_USE_MOCK_API` | `false` — never ship the mock API to production |
+| `VITE_USE_MOCK_API` | `false` — never ship the mock API to production (the build then leaves the mock chunk out) |
+| `VITE_OPEN_ADMIN` | `false` — the admin demo mode is already off when the mock is off; set it anyway so the intent is explicit |
 
 Never put secrets in `VITE_*` variables; everything in them is visible in the browser bundle. Keep real values in the host's environment settings, not in committed `.env` files.
 
@@ -34,8 +37,8 @@ Never put secrets in `VITE_*` variables; everything in them is visible in the br
 | Environment | Branch | API |
 | --- | --- | --- |
 | Local | any | mock API (default) or local backend |
-| Staging | `develop` (proposed) | staging API, `VITE_USE_MOCK_API=false` |
-| Production | `main` | production API, `VITE_USE_MOCK_API=false` |
+| Staging | `develop` (proposed) | staging API, `VITE_USE_MOCK_API=false`, `VITE_OPEN_ADMIN=false` |
+| Production | `main` | production API, `VITE_USE_MOCK_API=false`, `VITE_OPEN_ADMIN=false` |
 
 ## CI (to set up)
 

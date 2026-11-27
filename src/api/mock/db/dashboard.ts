@@ -4,27 +4,36 @@ import type { Course } from "@/types/course";
 import type { DashboardData, EnrolledCourse, Recommendation } from "@/types/dashboard";
 import type { Enrollment } from "@/types/learning";
 import { COURSES } from "./courses";
-import { LESSONS, certificatesOf, getLearner, listEnrollments, progressOf } from "./learning";
+import { lessonsOf } from "./curricula";
+import { certificatesOf, getLearner, listEnrollments, progressOf } from "./learning";
 
 const monthYear = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
-const secondsOf = (ids: Iterable<string>) => {
+const secondsOf = (courseId: string, ids: Iterable<string>) => {
   const set = new Set(ids);
-  return LESSONS.filter((l) => set.has(l.id)).reduce((sum, l) => sum + durationSeconds(l.lesson.dur), 0);
+  return lessonsOf(courseId)
+    .filter((l) => set.has(l.id))
+    .reduce((sum, l) => sum + durationSeconds(l.lesson.dur), 0);
 };
 
 /** The lesson to resume: the last one opened unless it's done, then the first one not done yet. */
 const resumeLesson = (email: string, courseId: string) => {
   const { completed, lastLessonId } = progressOf(email, courseId);
   const done = new Set(completed);
-  return LESSONS.find((l) => l.id === lastLessonId && !done.has(l.id)) ?? LESSONS.find((l) => !done.has(l.id)) ?? LESSONS[0] ?? null;
+  const lessons = lessonsOf(courseId);
+  return lessons.find((l) => l.id === lastLessonId && !done.has(l.id)) ?? lessons.find((l) => !done.has(l.id)) ?? lessons[0] ?? null;
 };
 
 const metaFor = (email: string, e: Enrollment) => {
   if (e.completedAt) return `Completed ${monthYear(e.completedAt)}`;
   if (e.completedLessons === 0) return "Not started yet";
   const done = new Set(progressOf(email, e.courseId).completed);
-  const left = secondsOf(LESSONS.filter((l) => !done.has(l.id)).map((l) => l.id));
+  const left = secondsOf(
+    e.courseId,
+    lessonsOf(e.courseId)
+      .filter((l) => !done.has(l.id))
+      .map((l) => l.id)
+  );
   const next = resumeLesson(email, e.courseId);
   return `Class ${next?.number ?? 1} of ${e.totalLessons} · ${formatDuration(left)} left`;
 };
@@ -46,7 +55,7 @@ export const buildDashboard = (email: string): DashboardData => {
   const inProgress = enrollments.filter((e) => !e.completedAt);
   const completed = enrollments.filter((e) => e.completedAt);
   const certificates = certificatesOf(email);
-  const learnedSeconds = enrollments.reduce((sum, e) => sum + secondsOf(progressOf(email, e.courseId).completed), 0);
+  const learnedSeconds = enrollments.reduce((sum, e) => sum + secondsOf(e.courseId, progressOf(email, e.courseId).completed), 0);
 
   const current = inProgress[0];
   const currentLesson = current ? resumeLesson(email, current.courseId) : null;
@@ -54,7 +63,16 @@ export const buildDashboard = (email: string): DashboardData => {
 
   const myCourses: EnrolledCourse[] = enrollments.map((e) => {
     const c = courseOf(e.courseId);
-    return { courseId: c.id, title: c.title, icon: c.icon, img: c.img, grad: c.grad, pct: e.pct, meta: metaFor(email, e) };
+    return {
+      courseId: c.id,
+      title: c.title,
+      icon: c.icon,
+      img: c.img,
+      grad: c.grad,
+      pct: e.pct,
+      started: e.completedLessons > 0,
+      meta: metaFor(email, e),
+    };
   });
 
   const enrolledIds = new Set(enrollments.map((e) => e.courseId));
@@ -95,6 +113,7 @@ export const buildDashboard = (email: string): DashboardData => {
             lesson: `${currentLesson.lesson.title.replace(" — ", " · ")} · ${currentLesson.lesson.dur}`,
             lessonNumber: currentLesson.number,
             pct: current.pct,
+            started: current.completedLessons > 0,
           }
         : null,
     myCourses,

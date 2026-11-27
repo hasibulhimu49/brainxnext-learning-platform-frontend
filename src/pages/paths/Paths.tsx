@@ -44,18 +44,18 @@ const PathCard = ({ path }: { path: LearningPath }) => {
   );
 };
 
-/** /paths — learning paths (F-008). */
+/** /paths — career roadmaps (F-008; the URL keeps the old "paths" name). */
 const Paths = () => {
-  usePageTitle("Learning paths");
+  usePageTitle("Career roadmaps");
   const paths = usePaths();
   return (
     <>
       <HeroBand>
         <h1 className="m-0 font-display text-[clamp(30px,4.4vw,46px)] font-extrabold tracking-[-0.02em] text-white">
-          Learning <span className="text-grad-hero">paths</span>
+          Career <span className="text-grad-hero">roadmaps</span>
         </h1>
         <p className="m-0 text-[15.5px] leading-relaxed text-[#C9DAEC]">
-          Not sure where to start? Follow a path: the right courses in the right order, free ones first.
+          Not sure where to start? Follow a roadmap: the right courses in the right order, free ones first. Open to everyone.
         </p>
       </HeroBand>
       <section className="bg-page px-4.5 py-14 sm:px-6">

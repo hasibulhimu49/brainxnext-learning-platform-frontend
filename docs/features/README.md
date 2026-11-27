@@ -29,11 +29,12 @@ docs/features/F-011-voucher-coupon/
 
 | ID  | Feature | Status |
 | --- | ------- | ------ |
-| [F-001](F-001-bdt-currency/feature.md) | Prices in Bangladeshi Taka (৳) | Done |
+| [F-001](F-001-bdt-currency/feature.md) | Prices in Bangladeshi Taka (৳) | Done — 2026-11-25 |
 | [F-002](F-002-final-polish/feature.md) | Final polish: missing screens and broken flows | Done (phases 1–4) — 2026-11-25 |
 | [F-003](F-003-mobile-responsive/feature.md) | Mobile responsiveness pass | Done — 2026-11-25 |
 | [F-004](F-004-wishlist-cart/feature.md) | Wishlist and cart | Done — 2026-11-26 |
 | [F-005](F-005-next-ai-chat/feature.md) | Next AI chat (demo answers) | Done — 2026-11-26 |
 | [F-006](F-006-course-reviews/feature.md) | Course reviews | Done — 2026-11-26 |
 | [F-007](F-007-module-quizzes/feature.md) | Module quizzes | Done — 2026-11-26 |
-| [F-008](F-008-learning-paths/feature.md) | Learning paths | Done — 2026-11-26 |
+| [F-008](F-008-learning-paths/feature.md) | Learning paths (shown as "Career roadmaps") | Done — 2026-11-26 |
+| [F-009](F-009-final-audit/feature.md) | Final audit: structure, bugs, copy, accessibility, performance, docs | Done — 2026-11-27 |

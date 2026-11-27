@@ -1,9 +1,24 @@
-import axios, { type AxiosRequestConfig } from "axios";
+import axios, { type AxiosAdapter, type AxiosRequestConfig } from "axios";
 import type { z } from "zod";
 import { useAuthStore } from "@/stores/authStore";
 import { API_BASE_URL, USE_MOCK_API } from "./config";
 import { API_ERROR_CODES, ApiError, parseEnvelope, unwrap } from "./envelope";
-import { mockAdapter } from "./mock/adapter";
+
+/**
+ * The mock API (and its whole demo database) is loaded on demand, so it is a separate chunk and
+ * builds with VITE_USE_MOCK_API=false never download it. Requests sent before it has loaded simply
+ * wait for the import. The import starts as soon as this module loads (in parallel with the first
+ * render) and the promise is shared by every request.
+ * The condition repeats USE_MOCK_API inline on purpose: Rollup only drops the import (and the mock
+ * chunk) from VITE_USE_MOCK_API=false builds when the env check sits right here.
+ */
+const mockAdapterPromise: Promise<AxiosAdapter> | null =
+  import.meta.env.VITE_USE_MOCK_API !== "false" ? import("./mock/adapter").then((m) => m.mockAdapter) : null;
+const lazyMockAdapter: AxiosAdapter = async (config) => {
+  if (!mockAdapterPromise) throw new Error("Mock API is disabled");
+  const adapter = await mockAdapterPromise;
+  return adapter(config);
+};
 
 /**
  * The single Axios instance for the app. Only src/api and src/services may use it —
@@ -13,7 +28,7 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15_000,
   headers: { Accept: "application/json" },
-  ...(USE_MOCK_API ? { adapter: mockAdapter } : {}),
+  ...(USE_MOCK_API ? { adapter: lazyMockAdapter } : {}),
 });
 
 apiClient.interceptors.request.use((config) => {

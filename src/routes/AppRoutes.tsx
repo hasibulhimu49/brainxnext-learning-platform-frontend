@@ -73,7 +73,7 @@ const NotFound = lazy(() => import("@/pages/errors/NotFound"));
 const guest = (page: ReactNode) => <GuestOnly>{page}</GuestOnly>;
 
 const AppRoutes = () => (
-  <Suspense fallback={<LoadingState className="min-h-[60vh]" />}>
+  <Suspense fallback={<LoadingState className="min-h-screen" />}>
     <Routes>
       {/* Marketing — public navbar */}
       <Route element={<PublicLayout footer="full" />}>
@@ -99,6 +99,9 @@ const AppRoutes = () => (
       </Route>
 
       {/* Signed-in area — guests are sent to /login?next=… */}
+      {/* public so guests can watch free preview lessons; the player gates every other lesson itself */}
+      <Route path="learn/:courseId/:lessonId?" element={<Player />} />
+
       <Route element={<RequireAuth />}>
         <Route element={<PublicLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
@@ -113,7 +116,6 @@ const AppRoutes = () => (
         <Route path="learn" element={<LearnIndex />} />
         <Route path="learn/:courseId/project" element={<ProjectSubmission />} />
         <Route path="learn/:courseId/quiz/:module" element={<ModuleQuiz />} />
-        <Route path="learn/:courseId/:lessonId?" element={<Player />} />
         <Route path="certificates/:certId" element={<Certificate />} />
         <Route path="certificate" element={<Navigate to="/certificates" replace />} />
         <Route path="orders/:orderId" element={<OrderReceipt />} />

@@ -14,7 +14,7 @@
   --surface2: #f2f7fd;
   --text: #13293f;
   --muted: #4a6480;
-  --soft: #8aa0b8;
+  --soft: #5a7189; /* Figma #8AA0B8, darkened for 4.5:1 on page/surface/surface2/chip */
   --line: #e3eaf4;
   --navbg: rgba(255, 255, 255, 0.85);
   --chipbg: #edf5ff;
@@ -24,6 +24,12 @@
   --orb1: rgba(27, 111, 208, 0.14);
   --orb2: rgba(14, 151, 176, 0.13);
   --orb3: rgba(233, 162, 27, 0.11);
+  /* text-safe accent colours (>= 4.5:1 on page/surface/surface2/chip and on their own ~15% tints); fills keep the Figma colours */
+  --brand-text: #1b6fd0;
+  --teal-text: #0b7184;
+  --success-text: #2c733d;
+  --amber-text: #8c6110;
+  --danger-text: #bb2926;
   color-scheme: light;
 }
 
@@ -34,7 +40,7 @@
   --surface2: #0c1d35;
   --text: #eaf2fc;
   --muted: #a9bfd8;
-  --soft: #7e96b3;
+  --soft: #8aa1bc; /* Figma #7E96B3, lightened for 4.5:1 on chip */
   --line: rgba(255, 255, 255, 0.12);
   --navbg: rgba(10, 27, 51, 0.85);
   --chipbg: rgba(27, 111, 208, 0.18);
@@ -44,6 +50,11 @@
   --orb1: rgba(27, 111, 208, 0.28);
   --orb2: rgba(14, 151, 176, 0.22);
   --orb3: rgba(233, 162, 27, 0.14);
+  --brand-text: #6fb7ff;
+  --teal-text: #35a8bd;
+  --success-text: #52ad68;
+  --amber-text: #e9a21b;
+  --danger-text: #f07a76;
   color-scheme: dark;
 }
 
@@ -74,7 +85,7 @@
   --color-secondary: var(--surface2);
   --color-secondary-foreground: var(--text);
   --color-accent: var(--chipbg);
-  --color-accent-foreground: #1b6fd0;
+  --color-accent-foreground: var(--brand-text);
   --color-muted-foreground: var(--soft);
   --color-destructive: #d9302c;
   --color-border: var(--line);
@@ -96,6 +107,18 @@
   --color-danger: #d9302c;
   --color-purple: #7a4fd0;
   --color-orange: #d0491b;
+  /* brand blue that never follows the theme: text on fixed white chips (`bg-white text-brand-solid`) */
+  --color-brand-solid: #1b6fd0;
+
+  /* Text colours. `text-brand|teal|success|amber|danger` read these (Tailwind's --text-color-* namespace
+     wins over --color-* for text utilities), so text stays AA in both themes while bg-/border- fills keep
+     the brand colours. Success fills sit under white text, so bg-success is a slightly deeper green (4.67:1). */
+  --text-color-brand: var(--brand-text);
+  --text-color-teal: var(--teal-text);
+  --text-color-success: var(--success-text);
+  --text-color-amber: var(--amber-text);
+  --text-color-danger: var(--danger-text);
+  --background-color-success: #2d8444;
 
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", "Plus Jakarta Sans", sans-serif;
@@ -313,12 +336,12 @@
   }
   .btn-outline:hover {
     border-color: #1b6fd0;
-    color: #1b6fd0;
+    color: var(--brand-text);
   }
   .btn-danger {
     border: 1.5px solid rgba(217, 48, 44, 0.5);
     background: transparent;
-    color: #d9302c;
+    color: var(--danger-text);
   }
   .btn-danger:hover {
     background: rgba(217, 48, 44, 0.08);
@@ -341,7 +364,7 @@
   }
   .icon-btn:hover {
     border-color: #1b6fd0;
-    color: #1b6fd0;
+    color: var(--brand-text);
   }
 
   /* cards */
@@ -368,7 +391,7 @@
     padding: 8px 16px;
     border-radius: 999px;
     background: var(--chipbg);
-    color: #1b6fd0;
+    color: var(--brand-text);
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.1em;
@@ -453,7 +476,7 @@
   }
   .filter-chip:hover {
     border-color: #1b6fd0;
-    color: #1b6fd0;
+    color: var(--brand-text);
   }
   .filter-chip[data-active="true"] {
     border-color: transparent;
@@ -463,7 +486,7 @@
   .filter-chip-soft[data-active="true"] {
     border-color: #1b6fd0;
     background: var(--chipbg);
-    color: #1b6fd0;
+    color: var(--brand-text);
   }
 
   .inline-code {
@@ -472,7 +495,7 @@
     padding: 2px 7px;
     border-radius: 6px;
     font-size: 13px;
-    color: #1b6fd0;
+    color: var(--brand-text);
   }
 }
 
@@ -482,7 +505,7 @@
 @layer base {
   /* keyboard focus ring (not shown on mouse click); components with their own ring override it */
   :focus-visible {
-    outline: 2px solid #1b6fd0;
+    outline: 2px solid var(--brand-text);
     outline-offset: 2px;
   }
   :where(a:not([class])):focus-visible {

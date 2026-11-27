@@ -8,30 +8,27 @@ import BuyCard from "@/components/course/BuyCard";
 import CourseReviews from "@/components/course/CourseReviews";
 import { YouTubeSubscribe } from "@/components/common/SocialIcons";
 import usePageTitle from "@/hooks/usePageTitle";
-import { flattenLessons } from "@/lib/lessons";
-import { courseCover, formatTaka } from "@/lib/utils";
-import { useIsPro } from "@/queries/account";
+import { flattenLessons, lessonId } from "@/lib/lessons";
+import { courseCover, formatTaka, plural } from "@/lib/utils";
+import { useSubscription } from "@/queries/account";
 import { useCourse, useCourses } from "@/queries/courses";
 import { useEnroll, useIsEnrolled } from "@/queries/learning";
 import { loginPath } from "@/routes/redirects";
 import { useIsSignedIn } from "@/stores/authStore";
 import type { Course, CourseDetail as CourseDetailData } from "@/types/course";
 
-const HERO_FACTS: { icon: string; color: string; text?: string; key?: "hours" | "lang" }[] = [
-  { icon: "star", color: "#F7C948", text: "4.9 (1,240 ratings)" },
-  { icon: "group", color: "#6FB7FF", text: "8,430 learners" },
-  { icon: "schedule", color: "#4FD0E0", key: "hours" },
-  { icon: "translate", color: "#7ED694", key: "lang" },
-  { icon: "update", color: "#E9A21B", text: "Updated Aug 2026" },
-];
-
-const REQUIREMENTS = [
-  "Core Java basics — classes, objects, methods",
-  "Any IDE (IntelliJ or VS Code)",
-  "No prior generics knowledge needed",
-];
-
-type Fact = (typeof HERO_FACTS)[number];
+/** Hero facts: rating from the visible reviews ("New course" without any), size, length, language. */
+const heroFacts = (course: CourseDetailData) => {
+  const { reviews } = course;
+  const average = reviews.length ? reviews.reduce((sum, r) => sum + r.stars, 0) / reviews.length : 0;
+  return [
+    { icon: "star", color: "#F7C948", text: reviews.length ? `${average.toFixed(1)} (${plural(reviews.length, "review")})` : "New course" },
+    { icon: "smart_display", color: "#6FB7FF", text: plural(course.totalLessons, "class", "es") },
+    { icon: "schedule", color: "#4FD0E0", text: `${course.hours} total` },
+    { icon: "translate", color: "#7ED694", text: course.lang || "English" },
+    { icon: "update", color: "#E9A21B", text: "Updated Aug 2026" },
+  ];
+};
 
 const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; allCourses: Course[] }) => {
   const navigate = useNavigate();
@@ -39,18 +36,19 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
   const signedIn = useIsSignedIn();
   const enrolled = useIsEnrolled(course.id) ?? false;
   const enroll = useEnroll();
-  // Pro unlocks every paid course: enrol instead of buying
-  const isPro = useIsPro() ?? false;
-  const viaPro = !course.free && isPro;
+  // Pro unlocks every paid course: enrol instead of buying — so wait for the plan before sending anyone to checkout
+  const subscription = useSubscription();
+  const viaPro = !course.free && subscription.data?.plan === "pro";
+  const planLoading = signedIn && !course.free && subscription.isPending;
   usePageTitle(course.title);
   const previewLesson = flattenLessons(course.curriculum).find((l) => l.lesson.preview);
 
   const [titleMain = course.title, titleSub] = course.title.split(" — ");
   const related = allCourses.filter((c) => c.cat === course.cat && c.id !== course.id).slice(0, 3);
-  const factText = (f: Fact) => f.text ?? (f.key === "hours" ? `${course.hours} total` : course.lang || "English");
 
   const handleEnroll = () => {
     if (enrolled) return navigate(`/learn/${course.id}`);
+    if (planLoading) return;
     if (!course.free && !viaPro) return navigate(`/checkout/${course.id}`);
     if (!signedIn) return navigate(loginPath(`/courses/${course.id}`));
     enroll.mutate(course.id, { onSuccess: () => toast.success("You're enrolled — enjoy the course!") });
@@ -95,10 +93,10 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
               </h1>
               <p className="m-0 max-w-[60ch] text-[16.5px] leading-relaxed font-medium text-[#C3D8EF]">{course.description}</p>
               <div className="flex flex-wrap gap-4.5 text-[13.5px] font-bold text-[#C9DAEC]">
-                {HERO_FACTS.map((f) => (
+                {heroFacts(course).map((f) => (
                   <span key={f.icon} className="inline-flex items-center gap-1.75">
                     <Icon name={f.icon} size={17} style={{ color: f.color }} />
-                    {factText(f)}
+                    {f.text}
                   </span>
                 ))}
               </div>
@@ -108,7 +106,9 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
                 </span>
                 <span className="flex flex-col">
                   <span className="text-sm font-extrabold">{course.mentor}</span>
-                  <span className="text-xs font-semibold text-[#8AA0B8]">Course instructor · 31k subscribers</span>
+                  <span className="text-xs font-semibold text-[#8AA0B8]">
+                    {course.mentor === "BrainXNext" ? "Course instructor · 31k subscribers" : "Course instructor"}
+                  </span>
                 </span>
                 {/* BrainXNext's own courses come from its YouTube channel */}
                 {course.mentor === "BrainXNext" && <YouTubeSubscribe className="ml-1" />}
@@ -119,7 +119,7 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
               course={course}
               enrolled={enrolled}
               includedInPro={viaPro}
-              pending={enroll.isPending}
+              pending={enroll.isPending || planLoading}
               error={enroll.isError ? errorMessage(enroll.error) : undefined}
               onPrimary={handleEnroll}
               onPreview={() => navigate(`/learn/${course.id}/${previewLesson?.id ?? ""}`)}
@@ -148,7 +148,7 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
               <div className="mb-4 flex flex-wrap items-baseline justify-between gap-4">
                 <h2 className="m-0 font-display text-[21px] font-extrabold tracking-[-0.01em] text-ink">Course content</h2>
                 <span className="text-[13px] font-bold text-soft">
-                  {course.curriculum.length} modules · {course.totalLessons} classes · 6h total
+                  {plural(course.curriculum.length, "module")} · {plural(course.totalLessons, "class", "es")} · {course.hours} total
                 </span>
               </div>
               <div className="flex flex-col gap-3">
@@ -176,30 +176,46 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
                       </button>
                       {open && (
                         <div className="flex flex-col border-t border-line">
-                          {m.lessons.map((l) => (
-                            <div
-                              key={l.title}
-                              className="flex items-center justify-between gap-3.5 border-b border-line px-5.5 py-3.25 transition-colors last:border-b-0 hover:bg-surface2"
-                            >
-                              <span className="flex min-w-0 items-center gap-2.75 text-sm font-semibold text-muted">
-                                <Icon
-                                  name={l.preview ? "play_circle" : "lock"}
-                                  size={18}
-                                  className={l.preview ? "text-brand" : "text-soft"}
-                                />
-                                {l.title}
-                              </span>
-                              <span className="flex flex-none items-center gap-3">
-                                <span
-                                  className={`pill px-2.25 py-0.75 ${l.preview ? "bg-chip text-brand" : "invisible"}`}
-                                  aria-hidden={!l.preview}
-                                >
-                                  {l.preview ? "PREVIEW" : "ENROLL"}
+                          {m.lessons.map((l, j) => {
+                            const rowCls =
+                              "flex items-center justify-between gap-3.5 border-b border-line px-5.5 py-3.25 transition-colors last:border-b-0 hover:bg-surface2";
+                            const row = (
+                              <>
+                                <span className="flex min-w-0 items-center gap-2.75 text-sm font-semibold text-muted">
+                                  <Icon
+                                    name={l.preview ? "play_circle" : "lock"}
+                                    size={18}
+                                    className={l.preview ? "text-brand" : "text-soft"}
+                                  />
+                                  {l.title}
                                 </span>
-                                <span className="text-[12.5px] font-bold text-soft">{l.dur}</span>
-                              </span>
-                            </div>
-                          ))}
+                                <span className="flex flex-none items-center gap-3">
+                                  <span
+                                    className={`pill px-2.25 py-0.75 ${l.preview ? "bg-chip text-brand" : "invisible"}`}
+                                    aria-hidden={!l.preview}
+                                  >
+                                    {l.preview ? "PREVIEW" : "ENROLL"}
+                                  </span>
+                                  <span className="text-[12.5px] font-bold text-soft">{l.dur}</span>
+                                </span>
+                              </>
+                            );
+                            // free preview classes open in the player — for guests too
+                            return l.preview ? (
+                              <Link
+                                key={l.title}
+                                to={`/learn/${course.id}/${lessonId(i, j)}`}
+                                aria-label={`Preview ${l.title}`}
+                                className={`${rowCls} text-ink hover:text-ink`}
+                              >
+                                {row}
+                              </Link>
+                            ) : (
+                              <div key={l.title} className={rowCls}>
+                                {row}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -215,7 +231,7 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
             <div className="card p-6.5">
               <h3 className="mt-0 mb-3.5 font-display text-[17px] font-extrabold text-ink">Requirements</h3>
               <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[13.5px] leading-normal font-semibold text-muted">
-                {REQUIREMENTS.map((r) => (
+                {course.requirements.map((r) => (
                   <li key={r} className="flex gap-2.25">
                     <Icon name="arrow_right" size={17} className="text-brand" />
                     {r}
@@ -241,7 +257,7 @@ const CourseDetailView = ({ course, allCourses }: { course: CourseDetailData; al
                     <span className="flex min-w-0 flex-col">
                       <span className="text-[13.5px] font-extrabold">{c.title}</span>
                       <span className="text-xs font-semibold text-soft">
-                        {c.lessons} lessons · {c.free ? "Free" : formatTaka(c.price)}
+                        {plural(c.lessons, "lesson")} · {c.free ? "Free" : formatTaka(c.price)}
                       </span>
                     </span>
                   </Link>

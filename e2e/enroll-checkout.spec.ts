@@ -21,7 +21,7 @@ test.describe("finding, enrolling and buying a course", () => {
 
     await page.getByRole("button", { name: "Mark as complete" }).click();
     await expect(page.getByRole("button", { name: "Completed" })).toBeVisible();
-    await expect(page.getByText("1 of 17 classes completed")).toBeVisible();
+    await expect(page.getByText("1 of 29 classes completed")).toBeVisible();
 
     await page.reload();
     await expect(page.getByRole("button", { name: "Completed" })).toBeVisible();

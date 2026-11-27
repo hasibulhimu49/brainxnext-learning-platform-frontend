@@ -46,6 +46,21 @@ describe("admin pages render with data", () => {
   });
 });
 
+describe("admin overview and unknown sections", () => {
+  it("shows a not-found state for an unknown section", async () => {
+    renderWithProviders(<AdminDashboard />, { route: "/admin/nope", path: "/admin/:section" });
+    expect(await screen.findByText("This admin page doesn't exist")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to overview" })).toHaveAttribute("href", "/admin");
+  });
+
+  it("derives the overview numbers from the student list", async () => {
+    const { adminService } = await import("@/services/adminService");
+    const [overview, students] = await Promise.all([adminService.overview(), adminService.students()]);
+    expect(overview.kpis[0]).toMatchObject({ label: "Total students", value: String(students.rows.length) });
+    expect(overview.kpis[2]?.value).toBe(String(students.rows.filter((r) => r.plan === "pro").length));
+  });
+});
+
 describe("admin page details", () => {
   it("lists courses 10 per page with row actions", async () => {
     renderWithProviders(<AdminDashboard />, { route: "/admin/courses", path: "/admin/:section" });

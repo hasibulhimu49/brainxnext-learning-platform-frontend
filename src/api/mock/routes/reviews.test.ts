@@ -14,7 +14,7 @@ describe("course reviews (F-006)", () => {
   beforeEach(asStudent);
 
   it("lets a learner past 30% post a review that shows on the course page", async () => {
-    // seeded: python-data-analysis is 35% done, with no review yet
+    // seeded: python-data-analysis is 15 of 42 classes (36%) done, with no review yet
     const before = await reviewService.mine("python-data-analysis");
     expect(before).toMatchObject({ canReview: true, review: null, minPct: 30 });
     const after = await reviewService.save("python-data-analysis", { stars: 4, text: TEXT });
@@ -24,8 +24,8 @@ describe("course reviews (F-006)", () => {
   });
 
   it("asks for 30% first, and only enrolled learners can review", async () => {
-    // code-smells is 6% done
-    expect(await reviewService.mine("code-smells")).toMatchObject({ canReview: false, reason: "too_early", progressPct: 6 });
+    // code-smells is 1 of 12 classes (8%) done
+    expect(await reviewService.mine("code-smells")).toMatchObject({ canReview: false, reason: "too_early", progressPct: 8 });
     await expect(reviewService.save("code-smells", { stars: 5, text: TEXT })).rejects.toMatchObject({
       code: API_ERROR_CODES.reviewTooEarly,
     });

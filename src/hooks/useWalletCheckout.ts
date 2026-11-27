@@ -9,11 +9,12 @@ export type CheckoutPhase = "form" | "pending" | "failed";
  * The payment flow after an order is placed. Card orders come back `paid` → `onPaid`.
  * bKash / Nagad orders come back `pending` → the "Approve on your phone" screen, which resolves
  * through confirm (paid → `onPaid`, declined → failed state) or cancel / timeout (failed state).
+ * `resume`: start on the approve screen for an order that is already pending (Billing history).
  */
-export const useWalletCheckout = (onPaid: (order: OrderRecord) => void) => {
+export const useWalletCheckout = (onPaid: (order: OrderRecord) => void, resume: OrderRecord | null = null) => {
   const confirm = useConfirmOrder();
   const cancel = useCancelOrder();
-  const [pendingOrder, setPendingOrder] = useState<OrderRecord | null>(null);
+  const [pendingOrder, setPendingOrder] = useState<OrderRecord | null>(resume?.status === "pending" ? resume : null);
   const [failure, setFailure] = useState<string | null>(null);
 
   const placed = (order: OrderRecord) => {

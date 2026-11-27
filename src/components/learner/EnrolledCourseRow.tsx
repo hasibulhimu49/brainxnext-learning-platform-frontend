@@ -6,6 +6,11 @@ import type { EnrolledCourse } from "@/types/dashboard";
 /** One enrolled course (cover, title, progress bar, meta, status pill) → opens the player. */
 const EnrolledCourseRow = ({ course: c }: { course: EnrolledCourse }) => {
   const done = c.pct === 100;
+  const pill = done
+    ? { text: "COMPLETED", cls: "bg-success/14 text-success" }
+    : c.started
+      ? { text: "IN PROGRESS", cls: "bg-chip text-brand" }
+      : { text: "NOT STARTED", cls: "bg-surface2 text-muted" };
   return (
     <Link
       to={`/learn/${c.courseId}`}
@@ -27,9 +32,7 @@ const EnrolledCourseRow = ({ course: c }: { course: EnrolledCourse }) => {
         </span>
         <span className="text-[12.5px] font-semibold text-soft">{c.meta}</span>
       </span>
-      <span className={`pill w-max px-3.25 py-1.5 text-[11.5px] ${done ? "bg-success/14 text-success" : "bg-chip text-brand"}`}>
-        {done ? "COMPLETED" : "IN PROGRESS"}
-      </span>
+      <span className={`pill w-max px-3.25 py-1.5 text-[11.5px] ${pill.cls}`}>{pill.text}</span>
     </Link>
   );
 };

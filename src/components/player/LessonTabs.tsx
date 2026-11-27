@@ -2,13 +2,20 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import Icon from "@/components/common/Icon";
 import { PLACEHOLDER_PDF } from "@/constants/downloads";
+import type { FlatLesson } from "@/lib/lessons";
 
-/* Placeholder lesson content from the designs (the Class 11 overview, resources and discussion). */
+/*
+ * Placeholder lesson content. The designs show Class 11 of Generics in Java ("? super"), which is
+ * kept as is; every other class gets a short overview and resources built from its own title.
+ */
 const TABS = ["Overview", "Resources", "Discussion"] as const;
 type Tab = (typeof TABS)[number];
 
+/** The class from the designs */
+const isDesignLesson = (courseId: string, lesson: FlatLesson) => courseId === "java-generics" && lesson.id === "3-3";
+
 /** Placeholder files: every resource downloads the sample PDF under its own name (see src/constants/downloads.ts). */
-const RESOURCES = [
+const DESIGN_RESOURCES = [
   { icon: "folder_zip", color: "#1B6FD0", title: "Class 11 source code", meta: "4 KB", file: "class-11-source-code.pdf" },
   { icon: "picture_as_pdf", color: "#D0491B", title: "PECS cheat sheet", meta: "2 pages", file: "pecs-cheat-sheet.pdf" },
   { icon: "quiz", color: "#3FA457", title: "Practice problems — module 3", meta: "6 problems", file: "practice-problems-module-3.pdf" },
@@ -23,7 +30,42 @@ interface Comment {
   text: string;
 }
 
-const COMMENTS: Comment[] = [
+const slug = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const topicOf = (lesson: FlatLesson) => lesson.lesson.title.replace(/^Class \d+ — /, "");
+
+const resourcesFor = (courseId: string, lesson: FlatLesson) =>
+  isDesignLesson(courseId, lesson)
+    ? DESIGN_RESOURCES
+    : [
+        {
+          icon: "folder_zip",
+          color: "#1B6FD0",
+          title: `Class ${lesson.number} source & files`,
+          meta: "4 KB",
+          file: `class-${lesson.number}-files.pdf`,
+        },
+        {
+          icon: "picture_as_pdf",
+          color: "#D0491B",
+          title: `${lesson.module.title} notes`,
+          meta: "2 pages",
+          file: `${slug(lesson.module.title)}-notes.pdf`,
+        },
+        {
+          icon: "quiz",
+          color: "#3FA457",
+          title: `Practice problems — module ${lesson.moduleIndex + 1}`,
+          meta: "6 problems",
+          file: `practice-problems-module-${lesson.moduleIndex + 1}.pdf`,
+        },
+      ];
+
+const DESIGN_COMMENTS: Comment[] = [
   {
     id: "c1",
     initial: "R",
@@ -42,13 +84,22 @@ const COMMENTS: Comment[] = [
   },
 ];
 
+interface LessonTabsProps {
+  courseId: string;
+  lesson: FlatLesson;
+  /** signed-in name, "" for guests */
+  author: string;
+}
+
 /**
- * Overview / Resources / Discussion tabs under the video. Questions you post are kept in this
- * component only (there is no discussion endpoint yet) — they show at once and disappear on reload.
+ * Overview / Resources / Discussion tabs under the video. There is no discussion endpoint yet, so
+ * questions you post stay in this component for the current class only (the player keys it by
+ * lesson) — the tab says so, and they are gone after a reload.
  */
-const LessonTabs = ({ author }: { author: string }) => {
+const LessonTabs = ({ courseId, lesson, author }: LessonTabsProps) => {
+  const design = isDesignLesson(courseId, lesson);
   const [tab, setTab] = useState<Tab>("Overview");
-  const [comments, setComments] = useState(COMMENTS);
+  const [comments, setComments] = useState(design ? DESIGN_COMMENTS : []);
   const [draft, setDraft] = useState("");
 
   const post = (e: FormEvent) => {
@@ -67,7 +118,7 @@ const LessonTabs = ({ author }: { author: string }) => {
       },
     ]);
     setDraft("");
-    toast("Question posted");
+    toast("Question added", { description: "It's only shown on this page for now — it isn't saved yet." });
   };
   return (
     <>
@@ -90,7 +141,22 @@ const LessonTabs = ({ author }: { author: string }) => {
           ))}
         </div>
         <div className="p-6">
-          {tab === "Overview" && (
+          {tab === "Overview" && !design && (
+            <div className="flex flex-col gap-3.5 text-[14.5px] leading-[1.7] font-medium text-muted">
+              <p className="m-0">
+                Class {lesson.number} of the <span className="font-extrabold text-ink">{lesson.module.title}</span> module:{" "}
+                {topicOf(lesson)}. Follow along with the video, then try the practice problems in Resources before moving on.
+              </p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {[lesson.module.title, `Module ${lesson.moduleIndex + 1}`].map((t) => (
+                  <span key={t} className="pill bg-chip px-3.25 py-1.5 text-[11.5px] tracking-normal text-brand">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {tab === "Overview" && design && (
             <div className="flex flex-col gap-3.5 text-[14.5px] leading-[1.7] font-medium text-muted">
               <p className="m-0">
                 The consumer side of PECS. Where <code className="inline-code">? extends</code> lets a structure produce values safely,{" "}
@@ -112,7 +178,7 @@ const LessonTabs = ({ author }: { author: string }) => {
           )}
           {tab === "Resources" && (
             <div className="flex flex-col gap-2.5">
-              {RESOURCES.map((r) => (
+              {resourcesFor(courseId, lesson).map((r) => (
                 <a
                   key={r.title}
                   href={PLACEHOLDER_PDF}
@@ -128,6 +194,12 @@ const LessonTabs = ({ author }: { author: string }) => {
           )}
           {tab === "Discussion" && (
             <div className="flex flex-col gap-4">
+              <p className="m-0 flex items-start gap-2 rounded-[13px] border border-line bg-surface2 px-3.75 py-3 text-[12.5px] leading-normal font-semibold text-muted">
+                <Icon name="info" size={17} className="mt-px text-brand" />
+                The discussion board isn&apos;t connected yet: questions you post here are only visible to you, on this page, until you
+                reload.
+              </p>
+              {comments.length === 0 && <p className="m-0 text-[13.5px] font-medium text-soft">No questions about this class yet.</p>}
               {comments.map((c) => (
                 <div key={c.id} className="flex gap-3">
                   <span

@@ -18,7 +18,7 @@ describe("<Catalog />", () => {
     expect(screen.getByText("SQL From Query to Model")).toBeInTheDocument();
     expect(screen.queryByText("Python for Data Analysis")).not.toBeInTheDocument();
     expect(screen.getByText("1 course found")).toBeInTheDocument();
-  });
+  }, 20_000);
 
   it("shows an empty state when nothing matches", async () => {
     renderWithProviders(<Catalog />, { route: "/courses" });

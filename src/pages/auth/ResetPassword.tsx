@@ -52,7 +52,7 @@ const ResetPassword = () => {
         <>
           Remembered it?{" "}
           <Link to="/login" className="font-extrabold text-brand hover:text-teal">
-            Back to login
+            Back to log in
           </Link>
         </>
       }

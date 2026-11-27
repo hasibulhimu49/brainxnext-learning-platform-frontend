@@ -36,6 +36,8 @@ const Login = () => {
   const values = useWatch({ control });
   const ready = loginSchema.safeParse(values).success;
   const unverified = isApiError(login.error) && login.error.code === API_ERROR_CODES.emailNotVerified;
+  // our own copy: the reset link sits above the button, whatever the server message says
+  const wrongPassword = isApiError(login.error) && login.error.code === API_ERROR_CODES.wrongPassword;
   // editing a field clears the previous server error, like the design
   const clearServerState = () => login.reset();
 
@@ -49,7 +51,7 @@ const Login = () => {
         <>
           New to BrainXNext?{" "}
           <Link to="/register" className="font-extrabold text-brand hover:text-teal">
-            Create a free account
+            Sign up free
           </Link>
         </>
       }
@@ -106,7 +108,8 @@ const Login = () => {
               </Link>
             </Alert>
           )}
-          {login.isError && !unverified && <Alert>{errorMessage(login.error)}</Alert>}
+          {wrongPassword && <Alert>Wrong password. Try again, or use “Forgot password?” above.</Alert>}
+          {login.isError && !unverified && !wrongPassword && <Alert>{errorMessage(login.error)}</Alert>}
         </form>
       </AuthCard>
     </AuthLayout>

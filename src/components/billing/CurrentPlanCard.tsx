@@ -116,6 +116,7 @@ const ProPlan = ({ sub }: { sub: Subscription & { cycle: NonNullable<Subscriptio
         title="Cancel Pro?"
         description={`You keep Pro until ${end}, then your account moves to Free. Courses you bought, your progress and certificates stay.`}
         confirmLabel="Cancel plan"
+        cancelLabel="Keep Pro"
         danger
         pending={cancel.isPending}
         onConfirm={() =>

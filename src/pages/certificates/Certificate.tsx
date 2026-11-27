@@ -71,6 +71,8 @@ const CertificateDetail = ({ cert }: { cert: CertificateRecord }) => {
     // certificate and Share & download side by side on laptops, so both are visible without scrolling;
     // on smaller screens the cards follow the certificate
     <div className="grid w-full max-w-310 grid-cols-1 items-start gap-5 min-[1001px]:grid-cols-[minmax(0,1fr)_300px]">
+      {/* the certificate itself is the visual heading; screen readers get a real <h1> */}
+      <h1 className="sr-only">Certificate: {cert.course}</h1>
       {/* laptops: never taller than the screen (297:210 ≈ 1.4143), so the whole certificate shows without scrolling */}
       <div className="w-full justify-self-center min-[1001px]:max-w-[calc((100dvh-130px)*1.4143)]">
         <CertificateView cert={cert} />

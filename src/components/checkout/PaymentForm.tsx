@@ -51,7 +51,8 @@ const PaymentForm = ({ price, promo, pending, error, onPay, note, initialPromo =
     formState: { errors },
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
-    defaultValues: { ...defaultCheckoutValues, promo: initialPromo },
+    // after "Try again" the form remounts: keep showing the code that is still applied
+    defaultValues: { ...defaultCheckoutValues, promo: promo.data?.code ?? initialPromo },
   });
 
   const values = useWatch({ control });
@@ -68,7 +69,23 @@ const PaymentForm = ({ price, promo, pending, error, onPay, note, initialPromo =
   const ready = checkoutFormSchema.safeParse(values).success;
   const total = formatTaka(price - discountFor(price, promo.data?.percentOff ?? 0));
 
-  const onSubmit = handleSubmit((v) => onPay(toPayment(v), promo.data?.code));
+  /**
+   * A code typed but never applied is checked first: valid → applied and paid with; invalid → the
+   * error shows under the field and nothing is charged.
+   */
+  const onSubmit = handleSubmit(async (v) => {
+    const typed = v.promo.trim().toUpperCase();
+    let code = promo.data?.code;
+    if (typed && typed !== code) {
+      try {
+        code = (await promo.mutateAsync(typed)).code;
+      } catch {
+        return;
+      }
+    }
+    if (!typed) code = undefined;
+    onPay(toPayment(v), code);
+  });
 
   return (
     <form className="flex flex-col gap-5.5" onSubmit={onSubmit} noValidate>
@@ -186,8 +203,8 @@ const PaymentForm = ({ price, promo, pending, error, onPay, note, initialPromo =
         type="submit"
         size="none"
         shape="rounded"
-        disabled={pending}
-        aria-busy={pending || undefined}
+        disabled={pending || promo.isPending}
+        aria-busy={pending || promo.isPending || undefined}
         className={`px-5 py-4 text-[15px] ${ready && !pending ? "" : "opacity-55"}`}
       >
         <Icon name={pending ? "progress_activity" : "lock"} size={18} className={pending ? "animate-spin" : ""} />

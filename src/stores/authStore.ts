@@ -10,7 +10,8 @@ import type { AuthSession, SessionUser } from "@/types/auth";
  * data: profile details, courses, dashboards etc. are fetched through TanStack Query.
  *
  * Writers: the auth mutations in src/queries/auth.ts, useUpdateProfile (name sync) and the
- * 401 interceptor in src/api/client.ts (expireSession).
+ * 401 interceptor in src/api/client.ts (expireSession). When the session expires or someone signs
+ * in, watchSessionChanges (src/queries/auth.ts) drops the cached user-scoped queries.
  */
 interface AuthState {
   token: string | null;

@@ -16,7 +16,7 @@ const COLUMNS = [
     title: "LEARN",
     links: [
       { to: "/courses", label: "Courses" },
-      { to: "/paths", label: "Learning paths" },
+      { to: "/paths", label: "Career roadmaps" },
       { to: "/notes", label: "Free notes" },
       { to: "/pricing", label: "Pricing" },
       { to: "/verify", label: "Verify a certificate" },
@@ -48,13 +48,16 @@ const SIMPLE_LINKS = [
 ];
 
 const footerLink = "text-[13.5px] font-semibold text-[#A9BFD8] transition-colors hover:text-brand-light aria-[current=page]:text-white";
-const legalLink = "font-semibold text-[#5B7590] transition-colors hover:text-brand-light aria-[current=page]:text-[#A9BFD8]";
+const legalLink = "font-semibold text-[#6F88A2] transition-colors hover:text-brand-light aria-[current=page]:text-[#A9BFD8]";
 
-/** variant="full" (home) — four-column footer; variant="simple" — link row + legal row */
+/**
+ * variant="full" (home) — four-column footer; variant="simple" — link row + legal row.
+ * Both end with pb-24 so the fixed Next AI circle (bottom-right, ~80px tall) never covers the last row.
+ */
 const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
   if (variant === "full") {
     return (
-      <footer className="bg-navy-deep px-6 pt-14 pb-9 text-[#A9BFD8]">
+      <footer className="bg-navy-deep px-6 pt-14 pb-24 text-[#A9BFD8]">
         <div className="mx-auto max-w-310">
           <div className="grid grid-cols-1 gap-8 border-b border-white/10 pb-9 min-[640px]:grid-cols-2 min-[1001px]:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
             <div className="flex flex-col gap-3.5">
@@ -66,7 +69,7 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
             </div>
             {COLUMNS.map((col) => (
               <nav key={col.title} aria-label={col.title.toLowerCase()} className="flex flex-col gap-2.5">
-                <div className="text-[11px] font-extrabold tracking-[0.14em] text-[#5B7590]">{col.title}</div>
+                <div className="text-[11px] font-extrabold tracking-[0.14em] text-[#6F88A2]">{col.title}</div>
                 {col.links.map((l) => (
                   <Link key={l.label} to={l.to} className={footerLink}>
                     {l.label}
@@ -75,7 +78,7 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
               </nav>
             ))}
           </div>
-          <div className="flex flex-wrap justify-between gap-4 pt-5.5 text-[12.5px] font-semibold text-[#5B7590]">
+          <div className="flex flex-wrap justify-between gap-4 pt-5.5 text-[12.5px] font-semibold text-[#6F88A2]">
             <span>© 2026 BrainXNext</span>
             <span>Made for learners everywhere</span>
           </div>
@@ -85,7 +88,7 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
   }
 
   return (
-    <footer className="bg-navy-deep px-6 pt-11 pb-8 text-[#A9BFD8]">
+    <footer className="bg-navy-deep px-6 pt-11 pb-24 text-[#A9BFD8]">
       <div className="mx-auto flex max-w-310 flex-wrap items-center justify-between gap-5 border-b border-white/10 pb-6">
         <span className="flex items-center gap-5">
           <Logo size="sm" onDark />
@@ -99,7 +102,7 @@ const Footer = ({ variant = "simple" }: { variant?: "full" | "simple" }) => {
           ))}
         </nav>
       </div>
-      <div className="mx-auto flex max-w-310 flex-wrap items-center justify-between gap-4 pt-5 text-[12.5px] font-semibold text-[#5B7590]">
+      <div className="mx-auto flex max-w-310 flex-wrap items-center justify-between gap-4 pt-5 text-[12.5px] font-semibold text-[#6F88A2]">
         <span>© 2026 BrainXNext</span>
         <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
           {LEGAL_LINKS.map((l) => (

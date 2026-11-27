@@ -15,8 +15,6 @@ import { reviewSchema, type ReviewValues } from "@/schemas/review";
 import { useIsSignedIn } from "@/stores/authStore";
 import type { CourseDetail, CourseReview, MyReviewState } from "@/types/course";
 
-const FILLED = { fontVariationSettings: "'FILL' 1" };
-
 /** 1–5 star picker as a radio group. */
 const StarPicker = ({ value, onChange }: { value: number; onChange: (n: number) => void }) => (
   <div role="radiogroup" aria-label="Your rating" className="flex gap-1">
@@ -30,7 +28,7 @@ const StarPicker = ({ value, onChange }: { value: number; onChange: (n: number) 
         onClick={() => onChange(n)}
         className="flex h-9 w-9 items-center justify-center rounded-lg border-0 bg-transparent p-0 text-amber transition-transform hover:scale-110"
       >
-        <Icon name="star" size={28} style={n <= value ? FILLED : undefined} />
+        <Icon name="star" size={28} filled={n <= value} />
       </button>
     ))}
   </div>

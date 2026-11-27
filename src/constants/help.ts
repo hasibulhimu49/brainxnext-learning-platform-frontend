@@ -21,12 +21,12 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "account",
     q: "How do I create an account?",
-    a: "Click “Sign up”, enter your name, email and a password, then type the 6-digit code we email you. It's free and needs no card.",
+    a: "Choose “Sign up”, enter your name, email and a password, then type the 6-digit code we email you. It's free and needs no card.",
   },
   {
     category: "account",
     q: "I forgot my password. What now?",
-    a: "On the login page choose “Forgot password?”, enter your email and follow the reset link we send. The link expires after a short time, so use it soon.",
+    a: "On the Log in page choose “Forgot password?” (just above the Log in button), enter your email and follow the reset link we send. The link expires after a short time, so use it soon.",
   },
   {
     category: "account",
@@ -42,7 +42,7 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "learning",
     q: "Which courses are free?",
-    a: "Every course marked Free is complete — all lessons, exercise files and handbooks — with no trial timer. A free account gets every free course; Pro unlocks the rest.",
+    a: "Every course marked Free is complete — all lessons, exercise files and handbooks — with no trial timer. A free account gets every free course; Pro, or buying a course, unlocks the rest.",
   },
   {
     category: "learning",
@@ -59,6 +59,11 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
     q: "Are the handbooks really free?",
     a: "Yes — every handbook on the Notes page is free and needs no account. You can choose to support the platform before downloading, but it is optional.",
   },
+  {
+    category: "learning",
+    q: "Are career roadmaps part of Pro?",
+    a: "No — anyone can follow a career roadmap. Its free courses are open to every account; its paid courses need Pro or a one-time purchase.",
+  },
   // Payments & refunds
   {
     category: "payments",
@@ -68,7 +73,7 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "payments",
     q: "What do I get with Pro?",
-    a: "Pro unlocks every course on BrainXNext, mentor review of your project submissions and certificates. Free accounts get free courses only.",
+    a: "Pro unlocks every course on BrainXNext, mentor review of your project submissions and certificates. Free accounts get every free course, the handbooks and career roadmaps — but no mentor review or certificates.",
   },
   {
     category: "payments",
@@ -84,12 +89,12 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "certificates",
     q: "How do I earn a certificate?",
-    a: "Finish every lesson in a course and get your final project approved by a mentor. Certificates come with Pro or with a paid course.",
+    a: "Finish every lesson in a course and get your final project approved by a mentor. Certificates come with Pro, or with a course you bought.",
   },
   {
     category: "certificates",
     q: "Can employers check my certificate?",
-    a: "Every certificate has a unique ID printed on it. Employers can email us the ID and we'll confirm it's genuine.",
+    a: "Every certificate has a unique ID printed on it. Anyone can enter that ID on our Verify page (/verify) to confirm it's genuine.",
   },
   {
     category: "certificates",
@@ -100,7 +105,7 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "mentor-review",
     q: "What is mentor review?",
-    a: "When you submit a course project, a working practitioner reviews your code or design and leaves written feedback — what's good, what to fix and what to learn next.",
+    a: "When you submit a course project, a working practitioner reviews your code or design and leaves written feedback — what's good, what to fix and what to learn next. It comes with Pro, and with any course you bought.",
   },
   {
     category: "mentor-review",
@@ -110,7 +115,7 @@ export const HELP_QUESTIONS: HelpQuestion[] = [
   {
     category: "mentor-review",
     q: "Can I resubmit after feedback?",
-    a: "Yes. Fix the points your mentor raised and submit again — there's no limit on resubmissions while your plan is active.",
+    a: "Yes. Fix the points your mentor raised and submit again — there's no limit on resubmissions while you have access to the course.",
   },
 ];
 

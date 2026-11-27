@@ -22,3 +22,7 @@ export const formatTaka = (amount: number) => `৳${takaFormat.format(Math.round
 
 /** Promo discount in whole Taka (shared by checkout and the mock API so they never disagree). */
 export const discountFor = (price: number, percentOff: number) => Math.round((price * percentOff) / 100);
+
+/** Where a course's "Notes" / handbook buttons go: its own handbook download, or the handbook list. */
+export const handbookPath = (course: { handbook: string | null }) =>
+  course.handbook ? `/support?handbook=${encodeURIComponent(course.handbook)}` : "/notes";

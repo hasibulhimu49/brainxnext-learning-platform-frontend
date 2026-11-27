@@ -64,6 +64,15 @@ describe("mock API — orders (F-002 Phase 2)", () => {
     });
   });
 
+  it("doesn't let a Pro member pay for a course Pro already includes", async () => {
+    await checkoutService.placePlanOrder("monthly", CARD);
+    await expect(checkoutService.placeOrder("applied-ml", CARD)).rejects.toMatchObject({
+      status: 409,
+      code: API_ERROR_CODES.alreadySubscribed,
+      message: expect.stringContaining("included in your Pro plan") as unknown,
+    });
+  });
+
   it("records anonymous donations as paid orders", async () => {
     useAuthStore.getState().clearSession();
     await expect(checkoutService.donate(99, "bKash")).resolves.toMatchObject({

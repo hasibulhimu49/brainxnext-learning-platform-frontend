@@ -79,7 +79,7 @@ const StudentView = ({ student }: { student: Detail }) => {
 
       <div className="grid grid-cols-1 gap-5 min-[1050px]:grid-cols-[1.45fr_.75fr]">
         <div className="flex min-w-0 flex-col gap-5">
-          <AdminCard title="Enrolments">
+          <AdminCard title="Enrollments">
             {student.enrollments.length === 0 && <Empty>Not enrolled in any course yet.</Empty>}
             {student.enrollments.map((e) => (
               <ListItem key={e.courseId}>

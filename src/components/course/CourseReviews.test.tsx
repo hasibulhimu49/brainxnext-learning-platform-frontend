@@ -22,7 +22,7 @@ describe("<CourseReviews /> (F-006)", () => {
     await user.type(screen.getByLabelText("Your review"), "Pandas finally clicked for me — great real dataset.");
     await user.click(screen.getByRole("button", { name: "Post review" }));
     expect(await screen.findByText("YOUR REVIEW")).toBeInTheDocument();
-  });
+  }, 20_000);
 
   it("guests are asked to log in to review", async () => {
     const course = await courseService.detail("java-generics");

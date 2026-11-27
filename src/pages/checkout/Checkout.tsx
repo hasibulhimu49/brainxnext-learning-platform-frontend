@@ -4,17 +4,19 @@ import { API_ERROR_CODES, isApiError } from "@/api/envelope";
 import { AuthCard, AuthHeader } from "@/components/auth/AuthCard";
 import CheckoutShell, { CheckoutGrid } from "@/components/checkout/CheckoutShell";
 import OrderSummary, { SummaryItem } from "@/components/checkout/OrderSummary";
-import PaymentFailed from "@/components/checkout/PaymentFailed";
+import CheckoutFlow from "@/components/checkout/CheckoutFlow";
+import IncludedInPro from "@/components/checkout/IncludedInPro";
 import PaymentForm from "@/components/checkout/PaymentForm";
 import { useWalletCheckout } from "@/hooks/useWalletCheckout";
-import WalletPending from "@/components/checkout/WalletPending";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import usePageTitle from "@/hooks/usePageTitle";
+import { useSubscription } from "@/queries/account";
 import { useApplyPromo, usePlaceOrder } from "@/queries/checkout";
 import { useCourse } from "@/queries/courses";
 import { useEnrollments } from "@/queries/learning";
 import type { CourseDetail } from "@/types/course";
+import { plural } from "@/lib/utils";
 
 const PERKS = ["Lifetime access", "Certificate on completion", "Mentor review included", "30-day money-back guarantee"];
 
@@ -33,7 +35,7 @@ const CheckoutView = ({ course }: { course: CourseDetail }) => {
               icon={course.icon}
               grad={course.grad}
               title={course.title}
-              meta={`${course.lessons} lessons · ${course.hours} · ${course.mentor}`}
+              meta={`${plural(course.lessons, "lesson")} · ${course.hours} · ${course.mentor}`}
             />
           }
           priceLabel="Course price"
@@ -43,17 +45,7 @@ const CheckoutView = ({ course }: { course: CourseDetail }) => {
         />
       }
     >
-      {flow.phase === "pending" && flow.pendingOrder ? (
-        <WalletPending
-          order={flow.pendingOrder}
-          approving={flow.approving}
-          onApprove={flow.approve}
-          onCancel={() => flow.abandon()}
-          onExpire={() => flow.abandon("The payment request expired before it was approved. No money was taken.")}
-        />
-      ) : flow.phase === "failed" ? (
-        <PaymentFailed message={flow.failure ?? ""} onRetry={flow.retry} backTo={`/courses/${course.id}`} />
-      ) : (
+      <CheckoutFlow flow={flow} backTo={`/courses/${course.id}`}>
         <PaymentForm
           price={course.price}
           promo={promo}
@@ -62,7 +54,7 @@ const CheckoutView = ({ course }: { course: CourseDetail }) => {
           onPay={(payment, promoCode) => order.mutate({ courseId: course.id, payment, promoCode }, { onSuccess: flow.placed })}
           note="30-day money-back guarantee. Courses you buy are yours forever."
         />
-      )}
+      </CheckoutFlow>
     </CheckoutGrid>
   );
 };
@@ -83,11 +75,19 @@ const AlreadyOwned = ({ course }: { course: CourseDetail }) => (
   </AuthCard>
 );
 
-/** Remembers ownership at first load, so paying (which enrols) doesn't flip to "already owned" before the receipt opens. */
-const CheckoutContent = ({ course, owned }: { course: CourseDetail; owned: boolean }) => {
-  const [ownedOnArrival] = useState(owned);
+/** Remembers ownership (and Pro) at first load, so paying (which enrols) doesn't flip to "already owned" before the receipt opens. */
+const CheckoutContent = ({ course, owned, isPro }: { course: CourseDetail; owned: boolean; isPro: boolean }) => {
+  const [onArrival] = useState({ owned, isPro });
   if (course.free) return <Navigate to={`/courses/${course.id}`} replace />;
-  return ownedOnArrival ? <AlreadyOwned course={course} /> : <CheckoutView course={course} />;
+  if (onArrival.owned) return <AlreadyOwned course={course} />;
+  if (onArrival.isPro) {
+    return (
+      <IncludedInPro title="Included in your Pro plan" to={`/learn/${course.id}`} label="Start learning" icon="play_arrow">
+        <span className="font-extrabold text-ink">{course.title}</span> is part of Pro, so there&apos;s nothing to pay.
+      </IncludedInPro>
+    );
+  }
+  return <CheckoutView course={course} />;
 };
 
 /** /checkout/:courseId — decides between the payment flow and the "already owned" state. */
@@ -96,13 +96,21 @@ const Checkout = () => {
   usePageTitle("Checkout");
   const courseQuery = useCourse(courseId);
   const enrollments = useEnrollments();
+  // Pro includes every course: wait for the plan before offering to take payment
+  const subscription = useSubscription();
   if (isApiError(courseQuery.error) && courseQuery.error.code === API_ERROR_CODES.notFound) return <Navigate to="/404" replace />;
   return (
-    <CheckoutShell>
+    <CheckoutShell closeTo={`/courses/${courseId}`}>
       <QueryStatus query={enrollments}>
         {(owned) => (
-          <QueryStatus query={courseQuery}>
-            {(course) => <CheckoutContent course={course} owned={owned.some((e) => e.courseId === course.id)} />}
+          <QueryStatus query={subscription}>
+            {(sub) => (
+              <QueryStatus query={courseQuery}>
+                {(course) => (
+                  <CheckoutContent course={course} owned={owned.some((e) => e.courseId === course.id)} isPro={sub.plan === "pro"} />
+                )}
+              </QueryStatus>
+            )}
           </QueryStatus>
         )}
       </QueryStatus>

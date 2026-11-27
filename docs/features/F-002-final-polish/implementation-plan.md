@@ -1,6 +1,8 @@
 # F-002 — Implementation plan
 
-**Status:** Approved (by Mohammad Hasibul Hasan, 2026-11-24) — Phase 1 implemented 2026-11-25
+> **Note (F-009):** files were reorganised by area in F-009 (e.g. `pages/marketing/Checkout` → `pages/checkout/`, `dashboard/*` → `learner/`). Paths below are as they were when this plan was written; see `CLAUDE.md` §9 for the current layout.
+
+**Status:** Done — approved by Mohammad Hasibul Hasan 2026-11-24; phases 1–4 implemented 2026-11-25
 
 > Do not start coding until this plan is approved. Each phase ends green (`typecheck`, `lint`, `test`, `test:e2e`) and can be approved separately.
 

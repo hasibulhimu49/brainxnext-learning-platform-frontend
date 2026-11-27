@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import WishlistButton from "@/components/shop/WishlistButton";
-import { courseCover, formatTaka } from "@/lib/utils";
+import { courseCover, formatTaka, plural } from "@/lib/utils";
 import type { Course } from "@/types/course";
 import Icon from "../common/Icon";
 
@@ -16,10 +16,19 @@ const Meta = ({ icon, color, children }: { icon: string; color?: string; childre
  * Course tile.
  * variant="featured" (home page): discount + featured badges, full meta, "View Course" button
  * variant="catalog": compact, track label + level badge, mentor and price footer
+ * owned: the learner already has the course — "Owned" replaces the price
  */
-const CourseCard = ({ course: c, variant = "catalog" }: { course: Course; variant?: "featured" | "catalog" }) => {
-  const priceLabel = c.free ? "Free" : formatTaka(c.price);
-  const priceColor = c.free ? "text-success" : "text-ink";
+const CourseCard = ({
+  course: c,
+  variant = "catalog",
+  owned = false,
+}: {
+  course: Course;
+  variant?: "featured" | "catalog";
+  owned?: boolean;
+}) => {
+  const priceLabel = owned ? "Owned" : c.free ? "Free" : formatTaka(c.price);
+  const priceColor = owned || c.free ? "text-success" : "text-ink";
 
   if (variant === "featured") {
     const off = !c.free && c.oldPrice ? Math.round((1 - c.price / c.oldPrice) * 100) : 0;
@@ -57,7 +66,7 @@ const CourseCard = ({ course: c, variant = "catalog" }: { course: Course; varian
                 {c.hours}
               </Meta>
               <Meta icon="menu_book" color="#3FA457">
-                {c.lessons} lessons
+                {plural(c.lessons, "lesson")}
               </Meta>
               <Meta icon="translate" color="#7A4FD0">
                 {c.lang || "English"}
@@ -65,7 +74,9 @@ const CourseCard = ({ course: c, variant = "catalog" }: { course: Course; varian
             </div>
             <div className="mt-auto flex items-baseline gap-2.5 pt-2.5">
               <span className={`font-display text-[21px] font-extrabold ${priceColor}`}>{priceLabel}</span>
-              {!c.free && c.oldPrice && <span className="text-sm font-semibold text-soft line-through">{formatTaka(c.oldPrice)}</span>}
+              {!owned && !c.free && c.oldPrice && (
+                <span className="text-sm font-semibold text-soft line-through">{formatTaka(c.oldPrice)}</span>
+              )}
             </div>
             <span className="flex w-full items-center justify-center rounded-xl border-[1.5px] border-line bg-surface2 px-4.5 py-3.25 text-sm font-extrabold text-ink">
               View Course
@@ -86,7 +97,7 @@ const CourseCard = ({ course: c, variant = "catalog" }: { course: Course; varian
         <div className="relative flex aspect-video flex-col justify-between px-5 py-4.5" style={{ background: courseCover(c) }}>
           <div className="flex items-start justify-between">
             <span className="text-[11px] font-extrabold tracking-[0.12em] text-white/90">{c.img ? "" : c.cat.toUpperCase()}</span>
-            <span className={`pill ${c.free ? "bg-white text-brand" : "bg-white/20 text-white"}`}>
+            <span className={`pill ${c.free ? "bg-white text-brand-solid" : "bg-white/20 text-white"}`}>
               {c.free ? "FREE" : c.level.toUpperCase()}
             </span>
           </div>
@@ -97,7 +108,7 @@ const CourseCard = ({ course: c, variant = "catalog" }: { course: Course; varian
           <div className="flex-1 text-[13.5px] leading-[1.55] text-muted">{c.blurb}</div>
           <div className="flex flex-wrap gap-3.5 text-xs font-bold text-soft">
             <Meta icon="signal_cellular_alt">{c.level}</Meta>
-            <Meta icon="menu_book">{c.lessons} lessons</Meta>
+            <Meta icon="menu_book">{plural(c.lessons, "lesson")}</Meta>
             <Meta icon="schedule">{c.hours}</Meta>
           </div>
           <div className="mt-1 flex items-center justify-between border-t border-line pt-3.5">

@@ -8,6 +8,8 @@ interface ConfirmDialogProps {
   title: string;
   description: ReactNode;
   confirmLabel: string;
+  /** the button that closes without acting (default "Cancel") */
+  cancelLabel?: string;
   /** red confirm button for destructive actions (delete, refund, cancel) */
   danger?: boolean;
   pending?: boolean;
@@ -15,7 +17,17 @@ interface ConfirmDialogProps {
 }
 
 /** "Are you sure?" dialog shared by destructive actions (F-002 D9). */
-const ConfirmDialog = ({ open, onOpenChange, title, description, confirmLabel, danger, pending, onConfirm }: ConfirmDialogProps) => (
+const ConfirmDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel,
+  cancelLabel = "Cancel",
+  danger,
+  pending,
+  onConfirm,
+}: ConfirmDialogProps) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent>
       <DialogHeader>
@@ -25,7 +37,7 @@ const ConfirmDialog = ({ open, onOpenChange, title, description, confirmLabel, d
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="outline" size="md">
-            Cancel
+            {cancelLabel}
           </Button>
         </DialogClose>
         <Button variant={danger ? "danger" : "primary"} size="md" disabled={pending} aria-busy={pending || undefined} onClick={onConfirm}>

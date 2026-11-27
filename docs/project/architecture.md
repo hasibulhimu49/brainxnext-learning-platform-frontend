@@ -20,8 +20,9 @@ Components never import Axios or call `fetch`; ESLint enforces this.
 | State | Owner | Notes |
 | --- | --- | --- |
 | Server data (courses, dashboard, admin tables, profile…) | TanStack Query | never copied into Zustand |
-| Session token, signed-in user summary, pending sign-up email | `stores/authStore.ts` | written only by auth mutations and the 401 interceptor |
+| Session token, signed-in user summary, pending sign-up email | `stores/authStore.ts` | written only by auth mutations, `useUpdateProfile` and the 401 interceptor; `watchSessionChanges` drops cached `me`/`admin` queries on expiry or a new sign-in |
 | Theme | `stores/uiStore.ts` | persisted as `bx-theme` |
+| Wishlist and cart course ids | `stores/shopStore.ts` | persisted as `bx-shop`; client-only until the backend has a cart API |
 | Tabs, accordions, filters, form drafts | component state / React Hook Form | not global |
 
 ## Folders
@@ -34,4 +35,4 @@ Layer-based: `pages → queries → services → api`. The full tree is in `CLAU
 
 ## Mock API
 
-`src/api/mock` replaces the Axios adapter, so requests still go through interceptors and the envelope check. Handlers (`mock/routes/*.ts`) return the same status codes and error codes the backend will. Seeded data and lookups (e.g. `findCourse`) live in `mock/db`. Turn it off with `VITE_USE_MOCK_API=false`.
+`src/api/mock` replaces the Axios adapter, so requests still go through interceptors and the envelope check. `client.ts` loads the adapter with a dynamic `import()`, so the mock and its demo database are a separate chunk that a `VITE_USE_MOCK_API=false` build does not emit. Handlers (`mock/routes/*.ts`) return the same status codes and error codes the backend will. Seeded data and lookups (e.g. `findCourse`, per-course curricula in `db/curricula.ts`) live in `mock/db`. Everything in the mock is provisional (CLAUDE.md §3).

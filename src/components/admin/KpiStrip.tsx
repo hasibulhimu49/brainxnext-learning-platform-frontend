@@ -17,7 +17,7 @@ export const KpiStrip = ({ items }: { items: OverviewKpi[] }) => (
         >
           <Icon name={k.up ? "trending_up" : "trending_down"} size={14} />
           {k.delta}
-          <span className="font-semibold text-soft">vs last month</span>
+          <span className="font-semibold text-soft">{k.note ?? "vs last month"}</span>
         </span>
       </div>
     ))}

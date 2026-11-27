@@ -14,8 +14,8 @@ import type { AdminCourseStatus, AdminNote, AdminReviewList, AdminNoteList, Admi
 import type { OrderRecord } from "@/types/commerce";
 import { API_ERROR_CODES as CODES } from "../../envelope";
 import {
-  OVERVIEW,
   addStudent,
+  buildOverview,
   adminCounts,
   adminCourses,
   adminNotes,
@@ -133,7 +133,7 @@ const studentRoutes: MockRoute[] = [
           trend: "Seen in the last 24 h",
         },
         { label: "Suspended", value: n(rows.filter((r) => r.status === "suspended").length), trend: "Access paused" },
-        { label: "Enrolments", value: n(rows.reduce((s, r) => s + r.courses, 0)), trend: "Across all courses" },
+        { label: "Enrollments", value: n(rows.reduce((s, r) => s + r.courses, 0)), trend: "Across all courses" },
       ],
       rows,
     });
@@ -313,7 +313,7 @@ const paymentRoutes: MockRoute[] = [
   route("POST", "/admin/payments/:id/refund", (req) => {
     const o = findOrder(req.params.id ?? "");
     if (!o) return notFound("Payment");
-    if (!counted(o)) return conflict("NOT_REFUNDABLE", "Only paid orders can be refunded.");
+    if (!counted(o)) return conflict(CODES.refundNotAllowed, "Only paid orders can be refunded.");
     const parsed = refundSchema.safeParse(bodyOf(req));
     if (!parsed.success) return invalid(parsed.error.issues);
     orders.update(
@@ -333,7 +333,7 @@ const paymentRoutes: MockRoute[] = [
   route("POST", "/admin/payments/:id/refund/reject", (req) => {
     const o = findOrder(req.params.id ?? "");
     if (!o) return notFound("Payment");
-    if (o.status !== "refund_requested") return conflict("NO_REFUND_REQUEST", "There is no refund request on this order.");
+    if (o.status !== "refund_requested") return conflict(CODES.noRefundRequest, "There is no refund request on this order.");
     const parsed = refundSchema.safeParse(bodyOf(req));
     if (!parsed.success) return invalid(parsed.error.issues);
     orders.update(
@@ -390,7 +390,7 @@ const promoRoutes: MockRoute[] = [
       usageLimit: b.usageLimit === null || b.usageLimit === undefined ? "" : String(b.usageLimit),
     });
     if (!parsed.success) return invalid(parsed.error.issues);
-    if (promos.all().some((p) => p.code === parsed.data.code)) return conflict("PROMO_EXISTS", "A promo with this code already exists.");
+    if (promos.all().some((p) => p.code === parsed.data.code)) return conflict(CODES.promoExists, "A promo with this code already exists.");
     const created = {
       code: parsed.data.code,
       percentOff: Number(parsed.data.percentOff),
@@ -478,7 +478,7 @@ const ticketRoutes: MockRoute[] = [
 ];
 
 export const adminRoutes: MockRoute[] = [
-  route("GET", "/admin/overview", () => ok(OVERVIEW)),
+  route("GET", "/admin/overview", () => ok(buildOverview())),
   route("GET", "/admin/counts", () => ok(adminCounts())),
   ...courseRoutes,
   ...studentRoutes,

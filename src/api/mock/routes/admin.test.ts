@@ -28,6 +28,31 @@ describe("admin mock API — access control", () => {
 describe("admin mock API — payments", () => {
   beforeEach(asAdmin);
 
+  it("counts cart orders in course revenue, splitting the promo by price", async () => {
+    const before = (await adminService.course("ux-research")).revenue;
+    orders.add({
+      id: "ORD-CART-TEST",
+      userEmail: "rifat.h@gmail.com",
+      userName: "Rifat Hossain",
+      kind: "cart",
+      itemId: "cart",
+      itemTitle: "2 courses",
+      method: "Card",
+      // ux-research ৳3,900 + motion-design ৳5,500 = ৳9,400, 20% off → ৳7,520
+      items: [
+        { courseId: "ux-research", title: "UX Research in Five Days", price: 3900 },
+        { courseId: "motion-design", title: "Motion Design for Interfaces", price: 5500 },
+      ],
+      subtotal: 9400,
+      discount: 1880,
+      total: 7520,
+      promoCode: "LEARN20",
+      status: "paid",
+      createdAt: new Date().toISOString(),
+    });
+    expect((await adminService.course("ux-research")).revenue).toBe(before + 3120);
+  });
+
   it("refunds a paid order in full and records it on the timeline", async () => {
     const detail = await adminService.refund("ORD-JS-8412", "Charged twice by mistake");
     expect(detail.order.status).toBe("refunded");
@@ -37,11 +62,16 @@ describe("admin mock API — payments", () => {
     });
     expect(orders.all().find((o) => o.id === "ORD-JS-8412")?.status).toBe("refunded");
     // already refunded → not refundable again
-    await expect(adminService.refund("ORD-JS-8412", "Again please")).rejects.toMatchObject({ status: 409, code: "NOT_REFUNDABLE" });
+    await expect(adminService.refund("ORD-JS-8412", "Again please")).rejects.toMatchObject({
+      status: 409,
+      code: API_ERROR_CODES.refundNotAllowed,
+    });
   });
 
   it("approves or rejects a learner's refund request", async () => {
-    await expect(adminService.rejectRefund("ORD-JS-8412", "Nothing to reject")).rejects.toMatchObject({ code: "NO_REFUND_REQUEST" });
+    await expect(adminService.rejectRefund("ORD-JS-8412", "Nothing to reject")).rejects.toMatchObject({
+      code: API_ERROR_CODES.noRefundRequest,
+    });
     const rejected = await adminService.rejectRefund("ORD-UX-8342", "Course was mostly completed");
     expect(rejected.order.status).toBe("paid");
     const refunded = await adminService.refund("ORD-UX-8342", "Approved on second look");
@@ -93,7 +123,7 @@ describe("admin mock API — promos, courses, inbox", () => {
     expect(findValidPromo("spring25")?.percentOff).toBe(25);
     await expect(adminService.createPromo({ code: "SPRING25", percentOff: 10, expiresAt: null, usageLimit: null })).rejects.toMatchObject({
       status: 409,
-      code: "PROMO_EXISTS",
+      code: API_ERROR_CODES.promoExists,
     });
     await expect(adminService.updatePromo("SPRING25", { active: false })).resolves.toMatchObject({ status: "inactive" });
     expect(findValidPromo("SPRING25")).toBeUndefined();

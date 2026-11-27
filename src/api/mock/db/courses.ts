@@ -1,6 +1,6 @@
 import codeSmellsImg from "@/assets/images/course-code-smells.jpg";
 import javaGenericsImg from "@/assets/images/course-java-generics.jpg";
-import type { Course, CourseModule, CourseReview, Handbook, NoteHighlight } from "@/types/course";
+import type { Course, CourseModule, Handbook } from "@/types/course";
 
 const g = (a: string, b: string) => `linear-gradient(135deg,${a},${b})`;
 
@@ -246,7 +246,7 @@ export const COURSES: Course[] = [
 
 export const findCourse = (id: string | undefined) => COURSES.find((c) => c.id === id);
 
-/* Java Generics is the only course with a full curriculum in the designs; other courses reuse it as placeholder content. */
+/* Java Generics is the only course with a full curriculum in the designs; the others are generated in ./curricula. */
 export const JAVA_GENERICS_DESCRIPTION =
   "The complete Java generics series in Bangla — type parameters, bounded types, wildcards, type erasure and generic methods, taught with real code in every class.";
 
@@ -301,20 +301,6 @@ export const CURRICULUM: CourseModule[] = [
       { title: "Class 17 — Final project: typed cache", dur: "28:40" },
     ],
   },
-];
-
-export const COURSE_REVIEWS: CourseReview[] = [
-  { stars: 5, name: "Rifat H.", text: "Wildcards finally make sense. The PECS module alone is worth the whole series." },
-  { stars: 5, name: "Sumaiya A.", text: "Best Bangla explanation of type erasure I've found anywhere." },
-  { stars: 4, name: "Mahin K.", text: "Great pacing. Would love more practice problems in module 2." },
-  { stars: 5, name: "Tania R.", text: "Watched Class 1 for free, finished all 17 in a week." },
-];
-
-export const NOTE_HIGHLIGHTS: NoteHighlight[] = [
-  { icon: "table_chart", grad: g("#1B6FD0", "#3E92E8"), title: "Pandas Cheat Sheet", meta: "8 pages · updated Jul" },
-  { icon: "javascript", grad: g("#0E97B0", "#2FB8CF"), title: "JS Interview Notes", meta: "14 pages · updated Aug" },
-  { icon: "schema", grad: g("#E9A21B", "#F2BC4B"), title: "SQL Patterns Handbook", meta: "11 pages · updated Jun" },
-  { icon: "smart_toy", grad: g("#7A4FD0", "#9B6FE8"), title: "LLM Prompting Notes", meta: "9 pages · updated Aug" },
 ];
 
 export const HANDBOOKS: Handbook[] = [

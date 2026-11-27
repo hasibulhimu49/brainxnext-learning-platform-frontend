@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { errorMessage } from "@/api/envelope";
 import Icon from "@/components/common/Icon";
 import LogoMark from "@/components/common/LogoMark";
+import useFocusTrap from "@/components/common/useFocusTrap";
 import { ASSISTANT_GREETING, ASSISTANT_LESSON_STARTER, ASSISTANT_NAME, ASSISTANT_STARTERS } from "@/constants/assistant";
 import { formatTaka } from "@/lib/utils";
 import { useAskAssistant } from "@/queries/assistant";
@@ -77,6 +78,7 @@ const AssistantWidget = () => {
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const context = contextFor(pathname);
 
   // newest message in view; focus the input when the panel opens
@@ -87,17 +89,12 @@ const AssistantWidget = () => {
   useEffect(() => {
     if (open) inputRef.current?.focus();
   }, [open]);
-  // Escape closes and returns focus to the circle
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpen(false);
-      toggleRef.current?.focus();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  // modal panel: Tab stays inside it; Escape closes and returns focus to the circle
+  useFocusTrap(panelRef, open, () => setOpen(false), toggleRef);
+  const close = () => {
+    setOpen(false);
+    toggleRef.current?.focus();
+  };
 
   if (pathname.startsWith("/admin")) return null;
 
@@ -125,8 +122,10 @@ const AssistantWidget = () => {
     <>
       {open && (
         <section
+          ref={panelRef}
           id={panelId}
           role="dialog"
+          aria-modal="true"
           aria-label={`${ASSISTANT_NAME} chat`}
           className="fixed inset-x-3 bottom-[calc(84px+var(--bx-bottom-bar,0px))] z-[75] flex h-[min(560px,calc(100dvh-110px-var(--bx-bottom-bar,0px)))] flex-col overflow-hidden rounded-[22px] border border-line bg-surface shadow-pop sm:inset-x-auto sm:right-5 sm:w-[380px]"
         >
@@ -138,7 +137,7 @@ const AssistantWidget = () => {
             </span>
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={close}
               aria-label="Close chat"
               className="flex h-9 w-9 items-center justify-center rounded-full border-0 bg-white/10 text-white hover:bg-white/20"
             >
@@ -212,7 +211,12 @@ const AssistantWidget = () => {
         title={`Ask ${ASSISTANT_NAME}`}
         className="group fixed right-4 bottom-[calc(16px+var(--bx-bottom-bar,0px))] z-[75] flex h-15 w-15 items-center justify-center rounded-full border-0 bg-[#050b1a] p-0 shadow-[0_10px_30px_rgba(27,111,208,.45)] ring-2 ring-[#6FB7FF]/60 transition-transform hover:scale-105 sm:right-5 sm:bottom-[calc(20px+var(--bx-bottom-bar,0px))]"
       >
-        {!open && <span className="absolute inset-0 animate-ping rounded-full bg-[#1B6FD0]/25" aria-hidden="true" />}
+        {/* the ping is clipped to the circle so its scale-up never widens the page (sideways scroll at 360px) */}
+        {!open && (
+          <span className="absolute inset-0 overflow-hidden rounded-full" aria-hidden="true">
+            <span className="absolute inset-0 animate-ping rounded-full bg-[#1B6FD0]/25" />
+          </span>
+        )}
         {open ? <Icon name="close" size={26} className="relative text-white" /> : <LogoMark size={54} className="relative shadow-none!" />}
         {!open && (
           <span className="absolute -top-1 -left-1 rounded-full bg-[linear-gradient(135deg,#F7C948,#E9A21B)] px-1.5 py-0.5 text-[9.5px] font-extrabold text-cocoa shadow">

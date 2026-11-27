@@ -26,7 +26,12 @@ const Item = ({ n, onOpen }: { n: NotificationItem; onOpen: () => void }) => (
         <span className="truncate text-[12.5px] font-semibold text-muted">{n.body}</span>
         <span className="text-[11.5px] font-semibold text-soft">{timeAgo(n.at)}</span>
       </span>
-      {!n.read && <span aria-label="Unread" className="mt-1.5 h-2 w-2 flex-none rounded-full bg-brand" />}
+      {!n.read && (
+        <span className="mt-1.5 h-2 w-2 flex-none rounded-full bg-brand">
+          {/* a bare span's aria-label is not announced, so the dot carries real (visually hidden) text */}
+          <span className="sr-only">Unread</span>
+        </span>
+      )}
     </Link>
   </li>
 );

@@ -1,5 +1,5 @@
 import { REFUND_WINDOW_DAYS } from "@/constants/plans";
-import { daysBetween } from "@/lib/dates";
+import { canRequestRefund } from "@/lib/billing";
 import { refundRequestSchema } from "@/schemas/learner";
 import { API_ERROR_CODES as CODES } from "../../envelope";
 import { findSubscription, isPro, patchSubscription, toSubscription } from "../db/billing";
@@ -76,11 +76,15 @@ export const billingRoutes: MockRoute[] = [
       if (!order) return fail(404, CODES.notFound, "We couldn't find that order.");
       const parsed = refundRequestSchema.safeParse(req.body);
       if (!parsed.success) return invalid(parsed.error.issues);
-      if (order.status !== "paid" || order.kind === "donation") {
-        return fail(409, CODES.refundNotAllowed, "Only paid course and plan orders can be refunded.");
-      }
-      if (daysBetween(order.createdAt) >= REFUND_WINDOW_DAYS) {
-        return fail(409, CODES.refundNotAllowed, `Refunds are available for ${REFUND_WINDOW_DAYS} days after purchase.`);
+      // same rule the Billing tab uses to show the button (src/lib/billing.ts)
+      if (!canRequestRefund(order)) {
+        return fail(
+          409,
+          CODES.refundNotAllowed,
+          order.status !== "paid" || order.kind === "donation"
+            ? "Only paid course and plan orders can be refunded."
+            : `Refunds are available for ${REFUND_WINDOW_DAYS} days after purchase.`
+        );
       }
       orders.update(
         (o) => o.id === order.id,

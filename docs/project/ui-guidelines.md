@@ -15,13 +15,16 @@ The Figma exports (Light/Dark pages + `BrainXNext_*_Proper` screens) are the sou
 | --- | --- |
 | `page`, `page-soft` | page background (`page-soft` on single-card/auth screens) |
 | `surface`, `surface2` | cards; inputs, nested rows, hover backgrounds |
-| `ink`, `muted`, `soft` | primary text, secondary text, captions/meta |
+| `ink`, `muted`, `soft` | primary text, secondary text, captions/meta (`soft` is darker than Figma in light mode for 4.5:1 contrast) |
 | `line` | borders and dividers |
 | `chip` | active nav item, eyebrow chips, selected options |
 | `brand` `#1B6FD0`, `teal` `#0E97B0` | primary actions, links, the brand gradient |
 | `gold` `#F7C948`, `amber` `#E9A21B` | highlight CTAs, streaks, "Featured"/"NOW" badges |
 | `success` `#3FA457`, `danger` `#D9302C` | free/completed/paid; errors, refunds, destructive actions |
 | `navy`, `navy-deep` | dark bands and the footer |
+| `brand-solid` | brand text on a fixed white chip (never switches theme) |
+
+**Text vs fills:** `text-brand`, `text-teal`, `text-success`, `text-amber`, `text-danger` use contrast-safe text colours per theme (`--brand-text`, `--success-text`, … in `src/index.css`: darker in light mode, lighter in dark mode). `bg-`/`border-` keep the Figma fills above, except `bg-success`, a deeper `#2D8444` so white text on it passes. Don't hard-code `#1B6FD0` for text. Details in `accessibility.md`.
 
 Gradients: `.bg-grad-brand` (primary), `.bg-grad-gold` (highlight), `.text-grad` / `.text-grad-hero` (highlighted heading words).
 
@@ -52,12 +55,13 @@ Gradients: `.bg-grad-brand` (primary), `.bg-grad-gold` (highlight), `.text-grad`
 | Page header band | `HeroBand`; section title `SectionHeading` |
 | Legal / long-form text page | `LegalPage` (`src/components/marketing/LegalPage.tsx`) with a `LegalDoc` from `src/constants/legal.ts` |
 | FAQ accordion | `FaqItem` (Pricing, Help) |
-| Icons | `<Icon name="…" size={…} />` (Material Symbols Rounded) |
+| Icons | `<Icon name="…" size={…} filled? />` (Material Symbols Rounded subset — add new names to `icon_names` in `index.html`) |
 | Loading/error | `QueryStatus` |
-| Info / error / success banner | `Alert` with `tone="info"`, `"error"` or `"success"` |
+| Info / error / success banner | `Alert` with `tone="info"`, `"error"` or `"success"` (`components/common/FormFeedback.tsx`, with `FieldError`, `SubmitButton`, `SuccessState`) |
 | Error pages | `ErrorCode` (big gradient 404 / 403 / 500) inside `AuthLayout` |
 | Confirmations | `ConfirmDialog` (shadcn `Dialog`, restyled to the tokens) |
 | Toasts | `toast()` from `sonner` (themed `Toaster` in `src/components/ui/sonner.tsx`) |
+| Pricing cards | `PricingCard` with `planCards()` (prices from `src/constants/plans.ts`) |
 
 ## Layout
 
@@ -70,7 +74,7 @@ Gradients: `.bg-grad-brand` (primary), `.bg-grad-gold` (highlight), `.text-grad`
 
 - **Language: English only.** No i18n library and no Bangla UI translation. A course's language label ("Bangla" or "English") describes the course content, not the interface.
 - **Currency: Bangladeshi Taka (৳) only** (implemented, F-001). Format every amount with `formatTaka()` from `src/lib/utils.ts`: whole taka, `৳` before the number with no space, South-Asian grouping (`৳4,900`, `৳1,24,000`). Free courses say `Free`, never `৳0`. Prices are VAT-inclusive (checkout says "VAT included"). Promo discounts use `discountFor()` so the UI and the API agree.
-- Copy comes from the design; keep the tone short and friendly.
+- Copy comes from the design; keep the tone short and friendly. Wording: "Log in", "Sign up", "Enroll" / "Enrollments", "Notes", "Career roadmaps" (navbar: "Roadmaps"). Catalog numbers (courses, free courses, tracks) come from `useCatalogStats()`, never hard-coded.
 - Prices show `Free` in `success` green, paid prices in `ink` with the old price struck through in `soft`.
 - Every data view handles loading, empty (dashed-border box with a "Clear filters"-style action) and error (`QueryStatus` with retry).
 - Success confirmations replace the form inside the same card (green circle icon + title + next action), as in the designs.

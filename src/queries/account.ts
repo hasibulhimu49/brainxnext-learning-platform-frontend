@@ -24,8 +24,6 @@ export const useUpdateProfile = () => {
 
 export const useChangePassword = () => useMutation({ mutationFn: accountService.changePassword });
 
-export const useVerifyCertificate = () => useMutation({ mutationFn: accountService.verifyCertificate });
-
 /** Public certificate lookup by id (the /verify/:certId deep link). */
 export const usePublicCertificate = (id: string) =>
   useQuery({ queryKey: queryKeys.certificate(id), queryFn: () => accountService.verifyCertificate(id), enabled: !!id, retry: false });

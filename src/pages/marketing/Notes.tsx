@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import notesHero from "@/assets/images/notes-hero.jpg";
+import notesHero from "@/assets/images/notes-hero.webp";
 import HeroBand from "@/components/common/HeroBand";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
@@ -8,7 +8,7 @@ import usePageTitle from "@/hooks/usePageTitle";
 import { useHandbooks } from "@/queries/courses";
 
 const Notes = () => {
-  usePageTitle("Free notes");
+  usePageTitle("Free handbooks");
   const handbooks = useHandbooks();
   return (
     <>
@@ -23,10 +23,10 @@ const Notes = () => {
           FREE FOR EVERYONE — NO ACCOUNT NEEDED
         </div>
         <h1 className="m-0 font-display text-[clamp(34px,4.6vw,56px)] leading-[1.06] font-extrabold tracking-[-0.02em]">
-          Download <span className="text-grad-hero">Handbooks</span>
+          Free <span className="text-grad-hero">handbooks</span>
         </h1>
         <p className="m-0 max-w-140 text-[16.5px] leading-relaxed font-semibold text-[#C3D8EF]">
-          Condensed revision notes and cheat sheets from every BrainXNext course — written by our mentors, updated with every cohort.
+          Condensed revision notes and cheat sheets for the tools our courses teach — written by our mentors, updated with every cohort.
         </p>
       </HeroBand>
 

@@ -12,7 +12,7 @@ Flow (all through `src/queries/auth.ts` → `authService` → API):
    - `/reset-password?token=…` → `POST /auth/reset-password` `{ token, password }`. A missing, used or expired token shows "This reset link isn't valid" with "Request a new link".
 5. **Log out** `useLogout()` navigates to `/`; once there, `useLogoutListener` (mounted in `App.tsx`) clears the session and `pendingEmail`, calls `queryClient.clear()` (user and admin data) and toasts "You've been logged out". Clearing happens after the navigation commits so the current page's guard doesn't bounce to `/login?next=`.
 
-The token is attached as `Authorization: Bearer …` by the request interceptor. A `401` response calls `expireSession()`: the session is dropped and, if one existed, `sessionExpired` is set so `RequireAuth` redirects to `/login?…&reason=expired`.
+The token is attached as `Authorization: Bearer …` by the request interceptor. A `401` response calls `expireSession()`: the session is dropped and, if one existed, `sessionExpired` is set so `RequireAuth` redirects to `/login?…&reason=expired`. On expiry, and whenever a different user signs in, `watchSessionChanges` removes the cached `me` / `admin` queries so the previous user's data can't show.
 
 **Remember me:** ticked (default) → the session is persisted in `localStorage`; unticked → `sessionStorage` (this tab only). See `state-management.md`.
 

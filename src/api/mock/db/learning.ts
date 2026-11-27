@@ -1,14 +1,13 @@
-import { flattenLessons } from "@/lib/lessons";
 import type { CertificateRecord } from "@/types/account";
 import type { WeekDay } from "@/types/dashboard";
 import type { CourseProgress, Enrollment, EnrollmentSource } from "@/types/learning";
-import { CURRICULUM } from "./courses";
+import { lessonIdsOf, totalLessonsOf } from "./curricula";
 import { createCollection } from "./store";
 
 /**
  * Server-side learner records for the mock API: enrolments and lesson progress per user,
- * persisted in localStorage (`bxn-mock-learning`) so a reload keeps them. Every course reuses the
- * Java Generics curriculum as placeholder content, so they all share the same lesson ids.
+ * persisted in localStorage (`bxn-mock-learning`) so a reload keeps them. Lesson ids are per
+ * course (see ./curricula); progress only counts ids that exist in that course's curriculum.
  */
 interface StoredEnrollment {
   courseId: string;
@@ -28,28 +27,24 @@ interface LearnerState {
 
 const STORAGE_KEY = "bxn-mock-learning";
 
-export const LESSONS = flattenLessons(CURRICULUM);
-export const LESSON_IDS = LESSONS.map((l) => l.id);
-export const TOTAL_LESSONS = LESSON_IDS.length;
-
 const WEEK_LABELS = ["S", "S", "M", "T", "W", "T", "F"];
 const emptyWeek = (): WeekDay[] => WEEK_LABELS.map((label, i) => ({ label, min: 0, ...(i === 6 ? { today: true } : {}) }));
 
-const seedEnrollment = (
-  courseId: string,
-  completed: string[],
-  lastLessonId: string,
-  lastActivityAt: string,
-  completedAt: string | null
-) => ({
-  courseId,
-  source: "free" as const,
-  enrolledAt: "2026-03-02T09:00:00.000Z",
-  lastActivityAt,
-  completed,
-  lastLessonId,
-  completedAt,
-});
+/** The first `done` lessons of the course completed; the last lesson opened is the next one (the last one when finished). */
+const seedEnrollment = (courseId: string, done: number | "all", lastActivityAt: string): StoredEnrollment => {
+  const ids = lessonIdsOf(courseId);
+  const completed = done === "all" ? [...ids] : ids.slice(0, done);
+  const finished = completed.length === ids.length;
+  return {
+    courseId,
+    source: "free",
+    enrolledAt: "2026-03-02T09:00:00.000Z",
+    lastActivityAt,
+    completed,
+    lastLessonId: (finished ? ids.at(-1) : ids[completed.length]) ?? null,
+    completedAt: finished ? lastActivityAt : null,
+  };
+};
 
 /** The demo student starts with the courses the dashboard designs show. */
 const seed = (): Record<string, LearnerState> => ({
@@ -66,11 +61,11 @@ const seed = (): Record<string, LearnerState> => ({
     ],
     enrollments: [
       // classes 1–10 done, resuming class 11
-      seedEnrollment("java-generics", LESSON_IDS.slice(0, 10), "3-3", "2026-11-23T18:30:00.000Z", null),
-      seedEnrollment("python-data-analysis", LESSON_IDS.slice(0, 6), "2-3", "2026-11-20T15:00:00.000Z", null),
-      seedEnrollment("code-smells", LESSON_IDS.slice(0, 1), "1-2", "2026-11-18T12:00:00.000Z", null),
-      seedEnrollment("sql-query-to-model", [...LESSON_IDS], "4-4", "2026-06-14T10:00:00.000Z", "2026-06-14T10:00:00.000Z"),
-      seedEnrollment("git-collaboration", [...LESSON_IDS], "4-4", "2026-04-20T10:00:00.000Z", "2026-04-20T10:00:00.000Z"),
+      seedEnrollment("java-generics", 10, "2026-11-23T18:30:00.000Z"),
+      seedEnrollment("python-data-analysis", 15, "2026-11-20T15:00:00.000Z"),
+      seedEnrollment("code-smells", 1, "2026-11-18T12:00:00.000Z"),
+      seedEnrollment("sql-query-to-model", "all", "2026-06-14T10:00:00.000Z"),
+      seedEnrollment("git-collaboration", "all", "2026-04-20T10:00:00.000Z"),
     ],
   },
 });
@@ -103,17 +98,27 @@ export const getLearner = (email: string): LearnerState => load()[keyOf(email)] 
 
 const putLearner = (email: string, learner: LearnerState) => save({ ...load(), [keyOf(email)]: learner });
 
-const toEnrollment = (e: StoredEnrollment): Enrollment => ({
-  courseId: e.courseId,
-  source: e.source,
-  enrolledAt: e.enrolledAt,
-  lastActivityAt: e.lastActivityAt,
-  completedLessons: e.completed.length,
-  totalLessons: TOTAL_LESSONS,
-  pct: Math.round((e.completed.length / TOTAL_LESSONS) * 100),
-  lastLessonId: e.lastLessonId,
-  completedAt: e.completedAt,
-});
+/** Completed lesson ids that exist in the course, in curriculum order. */
+const validCompleted = (courseId: string, completed: Iterable<string>) => {
+  const set = new Set(completed);
+  return lessonIdsOf(courseId).filter((id) => set.has(id));
+};
+
+const toEnrollment = (e: StoredEnrollment): Enrollment => {
+  const total = totalLessonsOf(e.courseId);
+  const done = validCompleted(e.courseId, e.completed).length;
+  return {
+    courseId: e.courseId,
+    source: e.source,
+    enrolledAt: e.enrolledAt,
+    lastActivityAt: e.lastActivityAt,
+    completedLessons: done,
+    totalLessons: total,
+    pct: total ? Math.round((done / total) * 100) : 0,
+    lastLessonId: e.lastLessonId,
+    completedAt: e.completedAt,
+  };
+};
 
 /** Newest activity first. */
 export const listEnrollments = (email: string): Enrollment[] =>
@@ -148,7 +153,7 @@ export const progressOf = (email: string, courseId: string): CourseProgress => {
   return {
     courseId,
     enrolled: !!e,
-    completed: e ? LESSON_IDS.filter((id) => e.completed.includes(id)) : [],
+    completed: e ? validCompleted(courseId, e.completed) : [],
     lastLessonId: e?.lastLessonId ?? null,
   };
 };
@@ -162,8 +167,8 @@ export const updateProgress = (email: string, courseId: string, lessonId: string
     const set = new Set(e.completed);
     if (completed === true) set.add(lessonId);
     if (completed === false) set.delete(lessonId);
-    const done = LESSON_IDS.filter((id) => set.has(id));
-    const finished = done.length === TOTAL_LESSONS;
+    const done = validCompleted(courseId, set);
+    const finished = done.length > 0 && done.length === totalLessonsOf(courseId);
     return { ...e, completed: done, lastLessonId: lessonId, lastActivityAt: now, completedAt: finished ? (e.completedAt ?? now) : null };
   });
   putLearner(email, { ...learner, enrollments });

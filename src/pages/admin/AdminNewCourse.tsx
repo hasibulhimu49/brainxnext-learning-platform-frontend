@@ -145,6 +145,10 @@ const CourseEditor = ({ initial }: { initial?: AdminCourseDetail }) => {
 
   return (
     <div className="min-h-screen bg-page text-ink">
+      {/* standalone page (no layout), so it renders its own skip link */}
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <nav className="sticky top-0 z-60 border-b border-line bg-surface">
         <div className="mx-auto flex max-w-310 items-center gap-2 px-3.5 py-3 sm:gap-3.5 sm:px-6">
           <Link
@@ -160,18 +164,19 @@ const CourseEditor = ({ initial }: { initial?: AdminCourseDetail }) => {
           >
             <Icon name="arrow_back" size={19} />
           </Link>
-          <span className="flex items-center gap-2.5 max-[379px]:hidden">
+          {/* under 380px the title is visually hidden but stays the page's <h1> */}
+          <div className="flex items-center gap-2.5 max-[379px]:sr-only">
             <LogoMark size={36} className="hidden sm:block" />
-            <span className="flex flex-col leading-tight">
-              <span className="font-display text-[15.5px] font-extrabold whitespace-nowrap text-ink">
+            <div className="flex flex-col leading-tight">
+              <h1 className="m-0 font-display text-[15.5px] font-extrabold whitespace-nowrap text-ink">
                 {editing ? "Edit course" : "New course"}
-              </span>
+              </h1>
               <span className="text-[10.5px] font-extrabold tracking-[0.12em] whitespace-nowrap text-soft max-[420px]:hidden">
                 ADMIN · {status === "published" ? "PUBLISHED" : "DRAFT"}
                 {unsaved ? " · UNSAVED" : ""}
               </span>
-            </span>
-          </span>
+            </div>
+          </div>
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2.25">
             <ThemeToggle className="h-9.5! w-9.5! max-sm:hidden" />
             {editing ? (
@@ -206,7 +211,10 @@ const CourseEditor = ({ initial }: { initial?: AdminCourseDetail }) => {
         </div>
       </nav>
 
-      <div className="mx-auto grid max-w-310 grid-cols-1 items-start gap-6 px-3.5 pt-7 pb-22 min-[1081px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] sm:px-6">
+      <main
+        id="main"
+        className="mx-auto grid max-w-310 grid-cols-1 items-start gap-6 px-3.5 pt-7 pb-22 min-[1081px]:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] sm:px-6"
+      >
         <div className="flex min-w-0 flex-col gap-5">
           {save.isError && <Alert>{errorMessage(save.error)}</Alert>}
 
@@ -335,7 +343,7 @@ const CourseEditor = ({ initial }: { initial?: AdminCourseDetail }) => {
             </span>
           </div>
         </div>
-      </div>
+      </main>
 
       <ConfirmDialog
         open={confirmLeave}

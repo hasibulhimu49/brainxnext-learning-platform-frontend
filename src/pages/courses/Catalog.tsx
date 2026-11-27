@@ -80,9 +80,9 @@ const Catalog = () => {
             <Icon name="route" size={22} className="text-brand" />
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="text-[14.5px] font-extrabold">Not sure where to start?</span>
-              <span className="text-[13px] font-semibold text-muted">Follow a learning path — the right courses in the right order.</span>
+              <span className="text-[13px] font-semibold text-muted">Follow a career roadmap — the right courses in the right order.</span>
             </span>
-            <span className="text-[13.5px] font-extrabold text-brand">Browse paths →</span>
+            <span className="text-[13.5px] font-extrabold text-brand">See all roadmaps →</span>
           </Link>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">

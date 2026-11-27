@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { USE_MOCK_API } from "@/api/config";
 import Icon from "@/components/common/Icon";
 import { Button } from "@/components/ui/button";
@@ -23,14 +23,22 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, 
 const WalletPending = ({ order, approving, onApprove, onCancel, onExpire }: WalletPendingProps) => {
   const [left, setLeft] = useState(APPROVAL_SECONDS);
 
+  // the clock pauses while "I've approved" is being checked, so a slow confirmation can't expire the request
   useEffect(() => {
+    if (approving) return;
     const t = setInterval(() => setLeft((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [approving]);
 
+  // fire once; the latest callback is read through a ref so a re-render doesn't fire it again
+  const onExpireRef = useRef(onExpire);
   useEffect(() => {
-    if (left === 0) onExpire();
-  }, [left, onExpire]);
+    onExpireRef.current = onExpire;
+  });
+  const expired = left === 0 && !approving;
+  useEffect(() => {
+    if (expired) onExpireRef.current();
+  }, [expired]);
 
   const style = METHOD_STYLE[order.method];
 

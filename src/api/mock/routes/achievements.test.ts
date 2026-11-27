@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { API_ERROR_CODES } from "@/api/envelope";
-import { LESSON_IDS } from "@/api/mock/db/learning";
+import { lessonIdsOf } from "@/api/mock/db/curricula";
 import { accountService } from "@/services/accountService";
 import { authService } from "@/services/authService";
 import { checkoutService } from "@/services/checkoutService";
@@ -15,7 +15,7 @@ const loginStudent = async () => {
 };
 
 const completeCourse = async (courseId: string) => {
-  for (const lessonId of LESSON_IDS) await learningService.updateProgress(courseId, { lessonId, completed: true });
+  for (const lessonId of lessonIdsOf(courseId)) await learningService.updateProgress(courseId, { lessonId, completed: true });
 };
 
 describe("mock API — certificates, submissions, notifications", () => {

@@ -9,10 +9,10 @@ best score kept. Linked from the player's curriculum sidebar ("Module quiz · Be
 
 - Optional practice: certificates still only need every lesson complete.
 - Questions are sent without answers; the server grades and returns explanations.
-- The mock shares one curriculum across courses, so one bank of 4 quizzes serves every course until real content exists.
+- Each course has its own quizzes, one per module of its own curriculum (F-009). Generics in Java has hand-written questions; the others are generated placeholders until real content exists.
 
 ## Pieces
 
-Mock `db/quizzes.ts` (bank + `bxn-mock-quiz-scores`), `routes/quizzes.ts` (`GET /courses/:id/quizzes/:module`,
+Mock `db/quizzes.ts` (question bank / generated quizzes per course + `bxn-mock-quiz-scores`), `routes/quizzes.ts` (`GET /courses/:id/quizzes/:module`,
 `POST /me/quizzes/:courseId/:module`, `GET /me/quizzes/:courseId`, provisional); `types/quiz.ts`, `services/quizService.ts`,
 `queries/quizzes.ts`, page `pages/courses/ModuleQuiz.tsx` at `/learn/:courseId/quiz/:module` (1-based).

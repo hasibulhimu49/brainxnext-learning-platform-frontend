@@ -42,7 +42,7 @@ export const PRIVACY: LegalDoc = {
       paragraphs: ["We only collect what we need to run your account and your courses:"],
       list: [
         "Account details — your name, email address and a securely hashed password.",
-        "Learning activity — courses you enrol in, lessons completed, project submissions and mentor feedback.",
+        "Learning activity — courses you enroll in, lessons completed, project submissions and mentor feedback.",
         "Payment records — what you bought, the amount and the payment method type. Card, bKash and Nagad details are handled by those payment processors; we never see or store your full card number or PIN.",
         "Messages you send us through the contact form or by email.",
       ],
@@ -113,7 +113,7 @@ export const TERMS: LegalDoc = {
       id: "free-and-pro",
       heading: "Free and Pro accounts",
       paragraphs: [
-        "A free account gives you every free course and all free notes and handbooks. A Pro plan unlocks every course, mentor review of your project submissions and certificates. You can also buy a single paid course on its own.",
+        "A free account gives you every free course, all free notes and handbooks, and every career roadmap. A Pro plan unlocks every course, mentor review of your project submissions and certificates. You can also buy a single paid course on its own; it includes that course's certificate and mentor review.",
       ],
     },
     {

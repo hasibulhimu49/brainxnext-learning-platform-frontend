@@ -11,20 +11,26 @@ import PlayerNav from "@/components/player/PlayerNav";
 import PlayerVideo from "@/components/player/PlayerVideo";
 import usePageTitle from "@/hooks/usePageTitle";
 import { flattenLessons, type FlatLesson } from "@/lib/lessons";
+import { handbookPath } from "@/lib/utils";
 import { useCertificates, useCourseExtras, useIsPro } from "@/queries/account";
 import { useLogout } from "@/queries/auth";
 import { useCourse } from "@/queries/courses";
 import { useEnroll, useProgress, useUpdateProgress } from "@/queries/learning";
 import { useQuizScores } from "@/queries/quizzes";
-import { useSessionUser } from "@/stores/authStore";
+import { loginPath } from "@/routes/redirects";
+import { useIsSignedIn, useSessionUser } from "@/stores/authStore";
 import type { CourseDetail } from "@/types/course";
 import type { CourseProgress } from "@/types/learning";
+
+/** A guest has no progress: nothing enrolled, nothing done. */
+const guestProgress = (courseId: string): CourseProgress => ({ courseId, enrolled: false, completed: [], lastLessonId: null });
 
 const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; progress: CourseProgress; lessonId?: string }) => {
   const navigate = useNavigate();
   const logout = useLogout();
+  const signedIn = useIsSignedIn();
   const userName = useSessionUser()?.name ?? "";
-  const initial = userName[0]?.toUpperCase() ?? "";
+  const initial = signedIn ? (userName[0]?.toUpperCase() ?? "") : null;
   const update = useUpdateProgress(course.id);
   const enroll = useEnroll();
   const isPro = useIsPro() ?? false;
@@ -36,12 +42,15 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
   const lessons = flattenLessons(course.curriculum);
   const index = lessons.findIndex((l) => l.id === lessonId);
   const current = lessons[index];
-  const fallback = lessons.find((l) => l.id === progress.lastLessonId) ?? lessons[0];
+  // guests land on the first free preview class
+  const fallback =
+    lessons.find((l) => l.id === progress.lastLessonId) ?? (signedIn ? undefined : lessons.find((l) => l.lesson.preview)) ?? lessons[0];
   if (!current) return fallback ? <Navigate to={`/learn/${course.id}/${fallback.id}`} replace /> : null;
 
   const owned = progress.enrolled;
-  // free courses (and every course for Pro) can be watched before enrolling; paid ones only show their preview classes
-  const canEnroll = course.free || isPro;
+  // signed in: free courses (and every course for Pro) can be watched before enrolling; paid ones only show their preview classes.
+  // guests: only the free preview classes.
+  const canEnroll = signedIn && (course.free || isPro);
   const isLocked = (l: FlatLesson) => !owned && !canEnroll && !l.lesson.preview;
   const done = new Set(progress.completed);
   const curDone = done.has(current.id);
@@ -49,6 +58,7 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
   const certificateId = certificates.data?.find((c) => c.courseId === course.id)?.id;
   const prev = lessons[index - 1];
   const next = lessons[index + 1];
+  const loginTo = loginPath(`/learn/${course.id}/${current.id}`);
 
   const goTo = (id: string) => {
     navigate(`/learn/${course.id}/${id}`);
@@ -57,17 +67,30 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
 
   return (
     <div className="min-h-screen bg-page text-ink">
-      <PlayerNav title={course.title} doneCount={done.size} total={lessons.length} initial={initial} onLogout={logout} />
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      <PlayerNav
+        title={course.title}
+        backTo={signedIn ? "/dashboard" : `/courses/${course.id}`}
+        doneCount={done.size}
+        total={lessons.length}
+        initial={initial}
+        onLogout={logout}
+        loginTo={loginTo}
+      />
 
-      <div className="mx-auto grid max-w-350 grid-cols-1 items-start gap-5.5 px-3.5 pt-6 pb-18 min-[1081px]:grid-cols-[minmax(0,1fr)_380px] sm:px-5">
-        <div className="flex min-w-0 flex-col gap-4.5">
+      <div className="mx-auto grid max-w-350 grid-cols-1 items-start gap-5.5 px-3.5 pt-6 pb-24 min-[1081px]:grid-cols-[minmax(0,1fr)_380px] sm:px-5">
+        <div id="main" tabIndex={-1} className="flex min-w-0 flex-col gap-4.5 outline-none">
           {finished && <CourseCompleteCard course={course} entitled={extras} certificateId={certificateId} />}
           <PlayerVideo
-            key={current.id}
+            key={`video-${current.id}`}
             duration={current.lesson.dur}
             onPrev={prev && (() => goTo(prev.id))}
             onNext={next && (() => goTo(next.id))}
-            overlay={isLocked(current) ? <PaywallCard courseId={course.id} price={course.price} /> : undefined}
+            overlay={
+              isLocked(current) ? <PaywallCard courseId={course.id} price={course.price} free={course.free} loginTo={loginTo} /> : undefined
+            }
           />
 
           {/* Title row */}
@@ -79,7 +102,9 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
               <h1 className="m-0 font-display text-[clamp(19px,2.4vw,25px)] font-extrabold tracking-[-0.01em] text-ink">
                 {current.lesson.title}
               </h1>
-              <span className="text-[13px] font-semibold text-soft">{current.lesson.dur} · Bangla · updated Aug 2026</span>
+              <span className="text-[13px] font-semibold text-soft">
+                {current.lesson.dur} · {course.lang || "English"} · updated Aug 2026
+              </span>
             </div>
             <div className="flex flex-wrap gap-2.25">
               {owned ? (
@@ -102,6 +127,11 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
                   <Icon name="bookmark_add" size={17} />
                   Enroll to track progress
                 </button>
+              ) : !signedIn ? (
+                <Link to={loginTo} className="btn btn-primary px-5 py-3 text-[13.5px]">
+                  <Icon name="login" size={17} />
+                  Log in to enroll
+                </Link>
               ) : null}
               {next && (
                 <button type="button" onClick={() => goTo(next.id)} className="btn btn-outline px-5 py-3 text-[13.5px]">
@@ -109,7 +139,7 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
                   <Icon name="arrow_forward" size={17} />
                 </button>
               )}
-              <Link to="/notes" className="btn btn-outline px-5 py-3 text-[13.5px]">
+              <Link to={handbookPath(course)} className="btn btn-outline px-5 py-3 text-[13.5px]">
                 <Icon name="download" size={17} />
                 Notes
               </Link>
@@ -124,12 +154,13 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
           {update.isError && <Alert>{errorMessage(update.error)}</Alert>}
           {enroll.isError && <Alert>{errorMessage(enroll.error)}</Alert>}
 
-          <LessonTabs author={userName} />
+          <LessonTabs key={`tabs-${current.id}`} courseId={course.id} lesson={current} author={userName} />
         </div>
 
         <CurriculumSidebar
           curriculum={course.curriculum}
           lessons={lessons}
+          hours={course.hours}
           currentId={current.id}
           done={done}
           isLocked={isLocked}
@@ -142,9 +173,10 @@ const PlayerView = ({ course, progress, lessonId }: { course: CourseDetail; prog
   );
 };
 
-/** /learn/:courseId/:lessonId? — loads the course and the learner's progress. */
+/** /learn/:courseId/:lessonId? — loads the course and the learner's progress; guests can watch the free preview classes. */
 const Player = () => {
   const { courseId = "", lessonId } = useParams();
+  const signedIn = useIsSignedIn();
   const courseQuery = useCourse(courseId);
   const progressQuery = useProgress(courseId);
 
@@ -152,11 +184,15 @@ const Player = () => {
 
   return (
     <QueryStatus query={courseQuery} className="min-h-screen bg-page">
-      {(course) => (
-        <QueryStatus query={progressQuery} className="min-h-screen bg-page">
-          {(progress) => <PlayerView course={course} progress={progress} lessonId={lessonId} />}
-        </QueryStatus>
-      )}
+      {(course) =>
+        signedIn ? (
+          <QueryStatus query={progressQuery} className="min-h-screen bg-page">
+            {(progress) => <PlayerView course={course} progress={progress} lessonId={lessonId} />}
+          </QueryStatus>
+        ) : (
+          <PlayerView course={course} progress={guestProgress(course.id)} lessonId={lessonId} />
+        )
+      }
     </QueryStatus>
   );
 };

@@ -137,6 +137,13 @@ const placeOrder = (req: MockRequest) => {
   if (!course) return fail(404, CODES.notFound, "That course doesn't exist.");
   if (course.free) return fail(400, CODES.validation, "This course is free — enrol from the course page.");
   if (findEnrollment(user.email, course.id)) return fail(409, CODES.alreadyEnrolled, "You already own this course.");
+  if (isPro(user.email)) {
+    return fail(
+      409,
+      CODES.alreadySubscribed,
+      `${course.title} is included in your Pro plan — enrol from the course page, no payment needed.`
+    );
+  }
   return createPaidOrPending({
     ...base,
     ...who,

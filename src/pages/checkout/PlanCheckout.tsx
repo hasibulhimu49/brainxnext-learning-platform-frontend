@@ -4,10 +4,9 @@ import { AuthCard, AuthHeader } from "@/components/auth/AuthCard";
 import CheckoutShell, { CheckoutGrid } from "@/components/checkout/CheckoutShell";
 import CycleToggle from "@/components/checkout/CycleToggle";
 import OrderSummary, { SummaryItem } from "@/components/checkout/OrderSummary";
-import PaymentFailed from "@/components/checkout/PaymentFailed";
+import CheckoutFlow from "@/components/checkout/CheckoutFlow";
 import PaymentForm from "@/components/checkout/PaymentForm";
 import { useWalletCheckout } from "@/hooks/useWalletCheckout";
-import WalletPending from "@/components/checkout/WalletPending";
 import Icon from "@/components/common/Icon";
 import { QueryStatus } from "@/components/common/QueryStatus";
 import { PRO_FEATURES, PRO_PRICE, PRO_YEARLY_PER_MONTH, parseCycle } from "@/constants/plans";
@@ -83,29 +82,17 @@ const ProCheckout = ({ cycle, onCycle }: { cycle: BillingCycle; onCycle: (c: Bil
         />
       }
     >
-      {flow.phase === "pending" && flow.pendingOrder ? (
-        <WalletPending
-          order={flow.pendingOrder}
-          approving={flow.approving}
-          onApprove={flow.approve}
-          onCancel={() => flow.abandon()}
-          onExpire={() => flow.abandon("The payment request expired before it was approved. No money was taken.")}
+      <CheckoutFlow flow={flow} backTo="/pricing">
+        <CycleToggle cycle={cycle} onChange={onCycle} disabled={order.isPending} />
+        <PaymentForm
+          price={price}
+          promo={promo}
+          pending={order.isPending}
+          error={order.error}
+          onPay={(payment, promoCode) => order.mutate({ cycle, payment, promoCode }, { onSuccess: flow.placed })}
+          note="Cancel anytime from Settings → Billing. 30-day money-back guarantee."
         />
-      ) : flow.phase === "failed" ? (
-        <PaymentFailed message={flow.failure ?? ""} onRetry={flow.retry} backTo="/pricing" />
-      ) : (
-        <>
-          <CycleToggle cycle={cycle} onChange={onCycle} disabled={order.isPending} />
-          <PaymentForm
-            price={price}
-            promo={promo}
-            pending={order.isPending}
-            error={order.error}
-            onPay={(payment, promoCode) => order.mutate({ cycle, payment, promoCode }, { onSuccess: flow.placed })}
-            note="Cancel anytime from Settings → Billing. 30-day money-back guarantee."
-          />
-        </>
-      )}
+      </CheckoutFlow>
     </CheckoutGrid>
   );
 };

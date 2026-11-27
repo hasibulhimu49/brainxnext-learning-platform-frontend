@@ -36,7 +36,7 @@ const ForgotPassword = () => {
         <>
           Remembered it?{" "}
           <Link to="/login" className="font-extrabold text-brand hover:text-teal">
-            Back to login
+            Back to log in
           </Link>
         </>
       }
@@ -52,7 +52,7 @@ const ForgotPassword = () => {
                 className="btn w-full rounded-[13px] border border-line bg-surface2 px-5 py-3.5 text-ink hover:border-brand hover:text-brand"
               >
                 <Icon name="arrow_back" size={17} />
-                Back to login
+                Back to log in
               </Link>
             }
           >

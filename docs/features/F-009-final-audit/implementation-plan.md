@@ -1,6 +1,6 @@
 # F-009 — Final audit: implementation plan
 
-**Status:** Planned — awaiting approval (2026-11-26)
+**Status:** Done — approved 2026-11-26, implemented 2026-11-27
 
 Five read-only audits (architecture, code quality, UX flows, accessibility/responsive/performance, docs/hygiene) were merged
 into the workstreams below. Order matters: the folder moves land first (alone), then the other workstreams run in parallel

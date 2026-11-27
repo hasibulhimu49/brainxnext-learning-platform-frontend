@@ -25,6 +25,24 @@ describe("<AssistantWidget /> (F-005)", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("is a modal dialog that keeps Tab inside and returns focus on Escape", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AssistantWidget />, { route: "/" });
+    const circle = screen.getByRole("button", { name: "Ask Next AI" });
+    await user.click(circle);
+    const dialog = screen.getByRole("dialog", { name: "Next AI chat" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByLabelText("Message Next AI")).toHaveFocus();
+    // Send is disabled (empty draft), so the input is the last stop: Tab wraps to the first control
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Close chat" })).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(screen.getByLabelText("Message Next AI")).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ask Next AI" })).toHaveFocus();
+  });
+
   it("stays out of the admin panel", () => {
     renderWithProviders(<AssistantWidget />, { route: "/admin/payments" });
     expect(screen.queryByRole("button", { name: "Ask Next AI" })).not.toBeInTheDocument();

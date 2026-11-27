@@ -21,6 +21,8 @@ export interface OverviewKpi {
   color: string;
   delta: string;
   up: boolean;
+  /** what the delta compares against (default "vs last month") */
+  note?: string;
 }
 
 export interface TopCourse {
@@ -123,7 +125,7 @@ export interface AdminStudentRow {
   email: string;
   plan: StudentPlan;
   courses: number;
-  /** average progress over enrolments, 0–100 */
+  /** average progress over enrollments, 0–100 */
   progress: number;
   status: AdminStudentStatus;
   lastActiveAt: string;

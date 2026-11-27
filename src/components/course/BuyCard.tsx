@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Alert } from "@/components/common/FormFeedback";
 import Icon from "@/components/common/Icon";
-import { courseCover, formatTaka } from "@/lib/utils";
+import { courseCover, formatTaka, handbookPath } from "@/lib/utils";
 import { useInCart, useShopStore } from "@/stores/shopStore";
 import type { CourseDetail } from "@/types/course";
 import WishlistButton from "@/components/shop/WishlistButton";
@@ -125,7 +125,7 @@ const BuyCard = ({ course, enrolled, includedInPro = false, pending, error, onPr
               <WishlistButton courseId={course.id} title={course.title} variant="full" className="min-w-0 flex-1" />
             </div>
           )}
-          <Link to="/notes" className="btn btn-outline rounded-[13px] bg-transparent! px-4.5 py-3.25">
+          <Link to={handbookPath(course)} className="btn btn-outline rounded-[13px] bg-transparent! px-4.5 py-3.25">
             <Icon name="download" size={17} />
             Download the handbook
           </Link>

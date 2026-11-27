@@ -68,6 +68,10 @@ export interface MyReviewState {
 export interface CourseDetail extends Course {
   description: string;
   outcomes: string[];
+  /** what learners should know / have before starting */
+  requirements: string[];
+  /** slug of the free handbook that goes with the course (/support?handbook=<slug>), or null */
+  handbook: string | null;
   curriculum: CourseModule[];
   totalLessons: number;
   reviews: CourseReview[];
@@ -79,12 +83,5 @@ export interface Handbook {
   logo: string;
   grad: string;
   glow: string;
-  meta: string;
-}
-
-export interface NoteHighlight {
-  icon: IconName;
-  grad: string;
-  title: string;
   meta: string;
 }

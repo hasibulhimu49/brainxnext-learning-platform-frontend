@@ -1,10 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { API_ERROR_CODES, isApiError } from "@/api/envelope";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "@/stores/authStore";
+import { queryKeys } from "./keys";
 
 /** The auth mutations are the only writers of the session in the auth store. */
 
@@ -75,9 +76,30 @@ export const useLogout = (message?: string) => {
   return () => navigate("/", { state: { loggedOut: true, message } satisfies LogoutState });
 };
 
-/** Mounted once in App: finishes a logout after the navigation to "/" has committed. */
+/** Forget every cached response that belongs to a signed-in user (learner and admin data). */
+export const removeUserScopedQueries = (qc: QueryClient) => {
+  qc.removeQueries({ queryKey: queryKeys.me.all });
+  qc.removeQueries({ queryKey: queryKeys.admin.all });
+};
+
+/**
+ * Drop user-scoped cache whenever the session changes hands: a 401 expired it, or someone signed
+ * in (login / OTP) — possibly a different user than the one whose data is cached. Otherwise the
+ * previous account's dashboard, orders or admin lists could show for up to a minute (staleTime).
+ * A token swap within a session (email change) keeps the cache; that flow refetches it itself.
+ * Returns the unsubscribe function.
+ */
+export const watchSessionChanges = (qc: QueryClient) =>
+  useAuthStore.subscribe((state, prev) => {
+    const expired = state.sessionExpired && !prev.sessionExpired;
+    const signedIn = !!state.token && !prev.token;
+    if (expired || signedIn) removeUserScopedQueries(qc);
+  });
+
+/** Mounted once in App: finishes a logout after the navigation to "/" has committed, and clears another user's cache. */
 export const useLogoutListener = () => {
   const qc = useQueryClient();
+  useEffect(() => watchSessionChanges(qc), [qc]);
   const navigate = useNavigate();
   const location = useLocation();
   const clearSession = useAuthStore((s) => s.clearSession);

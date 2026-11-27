@@ -10,6 +10,7 @@ import usePageTitle from "@/hooks/usePageTitle";
 import AuthLayout from "@/layouts/AuthLayout";
 import { useQuiz, useSubmitQuiz } from "@/queries/quizzes";
 import type { Quiz, QuizResult } from "@/types/quiz";
+import { plural } from "@/lib/utils";
 
 const LETTERS = ["A", "B", "C", "D", "E"];
 
@@ -94,6 +95,7 @@ const QuizView = ({ quiz, courseId }: { quiz: Quiz; courseId: string }) => {
   const result = submit.data;
   const answered = answers.filter((a) => a !== undefined).length;
   const nextModule = quiz.module + 2; // 1-based number of the next module
+  const hasNext = nextModule <= quiz.moduleCount;
   const retry = () => {
     submit.reset();
     setAnswers(quiz.questions.map(() => undefined));
@@ -103,8 +105,8 @@ const QuizView = ({ quiz, courseId }: { quiz: Quiz; courseId: string }) => {
   return (
     <AuthCard width={640}>
       <AuthHeader icon="quiz" title={`Module ${quiz.module + 1} quiz`}>
-        <span className="font-extrabold text-ink">{quiz.moduleTitle}</span> · {quiz.questions.length} questions · {quiz.passPct}% to pass.
-        Practice only — it doesn&apos;t affect your certificate.
+        <span className="font-extrabold text-ink">{quiz.moduleTitle}</span> · {plural(quiz.questions.length, "question")} · {quiz.passPct}%
+        to pass. Practice only — it doesn&apos;t affect your certificate.
       </AuthHeader>
 
       {result && (
@@ -149,10 +151,10 @@ const QuizView = ({ quiz, courseId }: { quiz: Quiz; courseId: string }) => {
             Try again
           </Button>
           <Link
-            to={nextModule <= 4 ? `/learn/${courseId}/${nextModule}-1` : `/learn/${courseId}`}
+            to={hasNext ? `/learn/${courseId}/${nextModule}-1` : `/learn/${courseId}`}
             className="btn btn-primary flex-1 rounded-[13px] px-5 py-3.5 text-[14px]"
           >
-            {nextModule <= 4 ? `Start module ${nextModule}` : "Back to the course"}
+            {hasNext ? `Start module ${nextModule}` : "Back to the course"}
             <Icon name="arrow_forward" size={18} />
           </Link>
         </div>
@@ -193,9 +195,10 @@ const NotEnrolled = ({ courseId }: { courseId: string }) => (
 const ModuleQuiz = () => {
   const { courseId = "", module = "" } = useParams();
   const index = Number(module) - 1;
+  const valid = /^\d+$/.test(module) && index >= 0;
   usePageTitle(`Module ${module} quiz`);
-  const quiz = useQuiz(courseId, index);
-  if (!Number.isInteger(index) || index < 0) return <Navigate to={`/learn/${courseId}`} replace />;
+  const quiz = useQuiz(courseId, index, valid);
+  if (!valid) return <Navigate to={`/learn/${courseId}`} replace />;
   if (isApiError(quiz.error) && quiz.error.code === API_ERROR_CODES.notFound) return <Navigate to="/404" replace />;
   const notEnrolled = isApiError(quiz.error) && quiz.error.code === API_ERROR_CODES.notEnrolled;
   return (
